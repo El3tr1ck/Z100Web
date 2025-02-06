@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site de download de documentos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .search-bar {
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .search-button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .search-button:hover {
+            background-color: #0056b3;
+        }
+        .download-button {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px; /* Diminuído para um tamanho menor */
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px; /* Bordas arredondadas */
+            transition: background-color 0.3s, transform 0.3s; /* Animação */
+            width: 80px; /* Largura fixa para ser quadrado */
+            height: 80px; /* Altura fixa para ser quadrado */
+            text-align: center; /* Centralizar texto */
+            font-size: 16px; /* Diminuído para ficar mais discreto */
+            position: relative; /* Para usar com o ícone */
+        }
+        .download-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05); /* Aumenta o tamanho ao passar o mouse */
+        }
+        .download-button i {
+            position: absolute;
+            top: 50%; /* Centraliza verticalmente */
+            left: 50%;
+            transform: translate(-50%, -50%); /* Centraliza horizontalmente */
+            font-size: 24px; /* Aumentar tamanho do ícone */
+        }
+        .secret-button {
+            display: none;
+            background-color: #2ecc71;
+        }
+        .secret-button:hover {
+            background-color: #27ae60;
+        }
+        .no-results {
+            display: none;
+            color: red;
+            margin-top: 20px;
+        }
+        .interface-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .interface-container.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .interface-panel {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        .interface-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .interface-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>leia e baixe aqui!!</h1>
+    <div class="search-container">
+        <button onclick="toggleInterface()" class="search-button"><i class="fas fa-cog"></i></button>
+        <button onclick="showAllChapters()" class="search-button"><i class="fas fa-list"></i></button>
+        <input type="text" id="searchInput" class="search-bar" placeholder="Digite o número do capítulo ou nome">
+        <button onclick="searchChapter()" class="search-button"><i class="fas fa-search"></i></button>
+    </div>
+    <p id="noResults" class="no-results">Capítulo inexistente</p>
+    
+    <!-- Botões de capítulos -->
+    <div id="chapterButtons">
+        <a href="https://drive.google.com/file/d/18nNcYB6TtHuMEIj9mEAuE52rXlitSjnh/view?usp=drive_link" class="download-button" data-chapter="Capítulo 1">
+            Capítulo 1
+            <i class="fas fa-download"></i>
+        </a>
+        <a href="https://drive.google.com/file/d/1Fp717e2X7jfji2-6OtfjRE0l1PdxJRfl/view?usp=drive_link" class="download-button" data-chapter="Capítulo 2">
+            Capítulo 2
+            <i class="fas fa-download"></i>
+        </a>
+        <a href="https://drive.google.com/file/d/17rMhrkr2nvc58rbnWUEha3U0I1i4r_9n/view?usp=drive_link" class="download-button" data-chapter="Capítulo 3">
+            Capítulo 3
+            <i class="fas fa-download"></i>
+        </a>
+        <a href="https://drive.google.com/file/d/1gj6fDly39qReA4eyoeZe23Jq1SxlZ0EE/view?usp=drive_link" class="download-button" data-chapter="Capítulo 4">
+            Capítulo 4
+            <i class="fas fa-download"></i>
+        </a>
+        <a href="https://drive.google.com/file/d/1ixfowttz-ZNmXga3r-2AVtva2gQaFMIr/view?usp=drive_link" class="download-button" data-chapter="Capítulo 5">
+            Capítulo 5
+            <i class="fas fa-download"></i>
+        </a>
+    </div>
+
+    <!-- Botões secretos -->
+    <div class="secret-buttons">
+        <a href="https://drive.google.com/file/d/16TzSdJ0zDQBJpRt7NI5rVsqTcG-NH5Bu/view?usp=drive_link" class="download-button secret-button" data-chapter="map-novel">
+            map-novel
+            <i class="fas fa-download"></i>
+        </a>
+        <a href="https://docs.google.com/document/d/1q-2EPscipSCEGAO9jheHjTZ_bJxTVPNmw9nWsjz5qQk/edit?usp=drive_link" class="download-button secret-button" data-chapter="experiment-z">
+            experiment-z
+            <i class="fas fa-download"></i>
+        </a>
+        <a href="https://drive.google.com/file/d/1OM3E7Ov3ocCf3NpagT0wZBluC2PzdQUC/view?usp=sharing" class="download-button secret-button" data-chapter="spirit life">
+            spirit life
+            <i class="fas fa-download"></i>
+        </a>
+        <a href="https://drive.google.com/file/d/1SVg9pMp9EhISpDwAfxCLBvA03l8uYStg/view?usp=sharing" class="download-button secret-button" data-chapter="dimension of spirits">
+            dimension of spirits
+            <i class="fas fa-download"></i>
+        </a>
+    </div>
+</div>
+
+<div class="interface-container" id="interfaceContainer">
+    <div class="interface-panel">
+        <button class="interface-button" onclick="toggleDarkMode()">
+            <i id="darkModeIcon" class="fas fa-moon"></i>
+        </button>
+        <button class="interface-button" onclick="hideInterface()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    function searchChapter() {
+        var input = document.getElementById('searchInput').value.toLowerCase();
+        var buttons = document.getElementsByClassName('download-button');
+        var noResults = document.getElementById('noResults');
+        var found = false;
+
+        // Primeiro, esconder todos os botões
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].style.display = 'none';
+        }
+
+        // Verificar cada botão
+        for (var j = 0; j < buttons.length; j++) {
+            var chapter = buttons[j].getAttribute('data-chapter').toLowerCase();
+            if (chapter.includes(input)) {
+                // Mostrar apenas se não for um botão secreto
+                if (buttons[j].classList.contains('secret-button')) {
+                    found = true; // Para mostrar a mensagem de resultados
+                    buttons[j].style.display = 'inline-block'; // Mostrar botão secreto que corresponde
+                } else {
+                    buttons[j].style.display = 'inline-block'; // Mostrar botão normal
+                    found = true;
+                }
+            }
+        }
+
+        // Mostrar mensagem se não encontrar resultados
+        noResults.style.display = found ? 'none' : 'block';
+    }
+
+    function toggleInterface() {
+        var container = document.getElementById('interfaceContainer');
+        container.classList.toggle('show');
+    }
+
+    function hideInterface() {
+        var container = document.getElementById('interfaceContainer');
+        container.classList.remove('show');
+    }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        var icon = document.getElementById('darkModeIcon');
+        icon.classList.toggle('fas fa-moon');
+        icon.classList.toggle('fas fa-sun');
+    }
+
+    function showAllChapters() {
+        var buttons = document.getElementsByClassName('download-button');
+        var noResults = document.getElementById('noResults');
+
+        // Mostrar todos os botões de download, exceto os botões secretos
+        for (var i = 0; i < buttons.length; i++) {
+            if (!buttons[i].classList.contains('secret-button')) {
+                buttons[i].style.display = 'inline-block';
+            } else {
+                buttons[i].style.display = 'none'; // Garante que os botões secretos permaneçam ocultos
+            }
+        }
+
+        // Ocultar a mensagem de "Capítulo inexistente"
+        noResults.style.display = 'none';
+
+        // Limpar o campo de busca
+        document.getElementById('searchInput').value = '';
+    }
+</script>
+</body>
+</html>
