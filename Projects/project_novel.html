@@ -121,7 +121,7 @@
     <div class="header-text">Desfrute do projeto Novel, leia e baixe os capítulos aqui</div>
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="Buscar..." onkeyup="searchCards()">
-        <button><i class="fas fa-search"></i></button>
+        <button onclick="searchAction()"><i class="fas fa-search"></i></button>
     </div>
     <div class="card-list" id="cardList"></div>
     <script>
@@ -182,6 +182,13 @@
                 }
             });
         }
+
+        function searchAction() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (query === 'secrets') {
+                window.location.href = 'secret_cards.html'; // Redireciona para o arquivo secret_cards.html
+            }
+        }
         
         addCard(1, 'O passado em ruinas,um verão de começos', 'https://drive.google.com/file/d/18nNcYB6TtHuMEIj9mEAuE52rXlitSjnh/view?usp=drive_link');
         addCard(2, 'Perguntas e incertezas,o destino falso', 'https://drive.google.com/file/d/1Fp717e2X7jfji2-6OtfjRE0l1PdxJRfl/view?usp=drive_link');
@@ -191,6 +198,3 @@
     </script>
 </body>
 </html>
-		
-
-		
