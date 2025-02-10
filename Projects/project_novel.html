@@ -124,77 +124,79 @@
         <button onclick="searchAction()"><i class="fas fa-search"></i></button>
     </div>
     <div class="card-list" id="cardList"></div>
-    <script>
-        function createCardElement(chapterNumber, title, date, link) {
-            const card = document.createElement('div');
-            card.classList.add('card');
-            card.onclick = () => window.open(link, '_blank');
-            card.setAttribute('data-title', title.toLowerCase());
-            card.setAttribute('data-chapter', chapterNumber);
-            
-            const icon = document.createElement('div');
-            icon.classList.add('card-icon');
-            icon.innerHTML = '<i class="fas fa-download"></i>';
-            
-            const content = document.createElement('div');
-            content.classList.add('card-content');
-            
-            const cardTitle = document.createElement('div');
-            cardTitle.classList.add('card-title');
-            cardTitle.textContent = title;
-            
-            const cardSubtitle = document.createElement('div');
-            cardSubtitle.classList.add('card-subtitle');
-            cardSubtitle.textContent = `Capítulo ${chapterNumber}`;
-            
-            const cardDate = document.createElement('div');
-            cardDate.classList.add('card-date');
-            cardDate.textContent = `Adicionado em ${date}`;
-            
-            content.appendChild(cardTitle);
-            content.appendChild(cardSubtitle);
-            content.appendChild(cardDate);
-            card.appendChild(icon);
-            card.appendChild(content);
-            
-            return card;
+<script>
+    function createCardElement(chapterNumber, title, date, link) {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.onclick = () => window.open(link, '_blank');
+        card.setAttribute('data-title', title.toLowerCase());
+        card.setAttribute('data-chapter', chapterNumber);
+        
+        const icon = document.createElement('div');
+        icon.classList.add('card-icon');
+        icon.innerHTML = '<i class="fas fa-download"></i>';
+        
+        const content = document.createElement('div');
+        content.classList.add('card-content');
+        
+        const cardTitle = document.createElement('div');
+        cardTitle.classList.add('card-title');
+        cardTitle.textContent = title;
+        
+        const cardSubtitle = document.createElement('div');
+        cardSubtitle.classList.add('card-subtitle');
+        cardSubtitle.textContent = `Capítulo ${chapterNumber}`;
+        
+        const cardDate = document.createElement('div');
+        cardDate.classList.add('card-date');
+        cardDate.textContent = `Adicionado em ${date}`;
+        
+        content.appendChild(cardTitle);
+        content.appendChild(cardSubtitle);
+        content.appendChild(cardDate);
+        card.appendChild(icon);
+        card.appendChild(content);
+        
+        return card;
+    }
+    
+    function addCard(chapterNumber, title, link) {
+        const cardList = document.getElementById('cardList');
+        const date = new Date().toLocaleDateString();
+        const cardElement = createCardElement(chapterNumber, title, date, link);
+        cardList.appendChild(cardElement);
+    }
+    
+    function searchCards() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        
+        // Se a pesquisa for "secrets", redireciona para secret_cards.html
+        if (query === "secrets") {
+            window.location.href = "secret_cards.html";
+            return; // Impede o restante da função de ser executado
         }
         
-        function addCard(chapterNumber, title, link) {
-            const cardList = document.getElementById('cardList');
-            const date = new Date().toLocaleDateString();
-            const cardElement = createCardElement(chapterNumber, title, date, link);
-            cardList.appendChild(cardElement);
-        }
+        // Se não for "secrets", continua com a pesquisa normal nos cards
+        const cards = document.querySelectorAll('.card');
         
-        function searchCards() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            const title = card.getAttribute('data-title');
+            const chapter = card.getAttribute('data-chapter');
             
-            cards.forEach(card => {
-                const title = card.getAttribute('data-title');
-                const chapter = card.getAttribute('data-chapter');
-                
-                if (title.includes(query) || chapter.includes(query)) {
-                    card.style.display = "flex";
-                } else {
-                    card.style.display = "none";
-                }
-            });
-        }
-
-        function searchAction() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            if (query === 'secrets') {
-                window.location.href = 'secret_cards.html'; // Redireciona para o arquivo secret_cards.html
+            if (title.includes(query) || chapter.includes(query)) {
+                card.style.display = "flex";
+            } else {
+                card.style.display = "none";
             }
-        }
-        
-        addCard(1, 'O passado em ruinas,um verão de começos', 'https://drive.google.com/file/d/18nNcYB6TtHuMEIj9mEAuE52rXlitSjnh/view?usp=drive_link');
-        addCard(2, 'Perguntas e incertezas,o destino falso', 'https://drive.google.com/file/d/1Fp717e2X7jfji2-6OtfjRE0l1PdxJRfl/view?usp=drive_link');
-        addCard(3, 'Um escuro na luz se manifesta,o passado de Eletrick e Lilie!!', 'https://drive.google.com/file/d/17rMhrkr2nvc58rbnWUEha3U0I1i4r_9n/view?usp=drive_link');
-        addCard(4, 'lembranças incompletas...', 'https://drive.google.com/file/d/1gj6fDly39qReA4eyoeZe23Jq1SxlZ0EE/view?usp=drive_link');
-        addCard(5, 'sorrisos desejaveis,traumas indesejaveis', 'https://drive.google.com/file/d/1ixfowttz-ZNmXga3r-2AVtva2gQaFMIr/view?usp=drive_link');
-    </script>
+        });
+    }
+    
+    addCard(1, 'O passado em ruinas,um verão de começos', 'https://drive.google.com/file/d/18nNcYB6TtHuMEIj9mEAuE52rXlitSjnh/view?usp=drive_link');
+    addCard(2, 'Perguntas e incertezas,o destino falso', 'https://drive.google.com/file/d/1Fp717e2X7jfji2-6OtfjRE0l1PdxJRfl/view?usp=drive_link');
+    addCard(3, 'Um escuro na luz se manifesta,o passado de Eletrick e Lilie!!', 'https://drive.google.com/file/d/17rMhrkr2nvc58rbnWUEha3U0I1i4r_9n/view?usp=drive_link');
+    addCard(4, 'lembranças incompletas...', 'https://drive.google.com/file/d/1gj6fDly39qReA4eyoeZe23Jq1SxlZ0EE/view?usp=drive_link');
+    addCard(5, 'sorrisos desejaveis,traumas indesejaveis', 'https://drive.google.com/file/d/1ixfowttz-ZNmXga3r-2AVtva2gQaFMIr/view?usp=drive_link');
+</script>
+
 </body>
 </html>
