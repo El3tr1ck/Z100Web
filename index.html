@@ -112,7 +112,7 @@ function handleCredentialResponse(response) {
 
     // Exibir o nome do usuário e a foto no canto superior direito
     document.getElementById("user-info").innerHTML =
-        `<p>Perfil:${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
+        `<p>Perfil: ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
 
     // Ocultar o botão de login
     document.getElementById("login-button").style.display = "none";
