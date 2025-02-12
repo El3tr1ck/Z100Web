@@ -94,6 +94,7 @@
 </head>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
+<script>
 document.addEventListener("DOMContentLoaded", () => {
     const savedToken = localStorage.getItem("userToken");
     if (savedToken) handleCredentialResponse({ credential: savedToken });
@@ -116,11 +117,9 @@ function handleCredentialResponse(response) {
     // Ocultar o botão de login
     document.getElementById("login-button").style.display = "none";
 }
-
 </script>
 
-
-    
+</script>    
     <body>
 <div id="user-info"></div>
 
