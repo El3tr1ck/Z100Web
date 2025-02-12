@@ -68,9 +68,55 @@
             transform: scale(1.05); /* Animação suave ao passar o mouse */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Efeito de sombra ao hover */
         }
+        #user-info {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+#user-info img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-left: 8px;
+}
     </style>
 </head>
-<body>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+function handleCredentialResponse(response) {
+    console.log("Token JWT recebido: " + response.credential);
+    
+    // Decodificar o token JWT para obter informações do usuário
+    const data = JSON.parse(atob(response.credential.split('.')[1]));
+    console.log("Usuário logado:", data);
+
+    // Exibir o nome do usuário e a foto no canto superior direito
+    document.getElementById("user-info").innerHTML =
+        `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
+}
+
+</script>
+
+    
+    <body>
+<div id="user-info"></div>
+
+
+<div id="g_id_onload"
+     data-client_id="59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com" 
+     data-context="signin"
+     data-ux_mode="popup"
+     data-callback="handleCredentialResponse"
+     data-auto_prompt="false">
+</div>
+<div class="g_id_signin" data-type="standard"></div>
 
     <!-- Texto Explicativo abaixo do Cabeçalho -->
     <section style="text-align: center; padding: 20px;">
