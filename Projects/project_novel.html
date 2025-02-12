@@ -114,10 +114,54 @@
             font-size: 12px;
             color: gray;
         }
+        .theme-toggle {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+}
+
+button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode {
+    background-color: #121212;
+    color: white;
+}
+
+body.dark-mode .header-text {
+    color: #d3d3d3;
+}
+
+body.dark-mode .card {
+    background: #333;
+    color: white;
+}
+
+body.dark-mode .card:hover {
+    transform: scale(1.03);
+    background-color: #444;
+}
+
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <div class="theme-toggle">
+    <button onclick="toggleTheme()">
+        <i id="theme-icon" class="fas fa-sun"></i>
+    </button>
+</div>
     <div class="header-text">Desfrute do projeto Novel, leia e baixe os capítulos aqui</div>
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="Buscar..." onkeyup="searchCards()">
@@ -197,6 +241,23 @@
     addCard(4, 'lembranças incompletas...', 'https://drive.google.com/file/d/1gj6fDly39qReA4eyoeZe23Jq1SxlZ0EE/view?usp=drive_link');
     addCard(5, 'sorrisos desejaveis,traumas indesejaveis', 'https://drive.google.com/file/d/1ixfowttz-ZNmXga3r-2AVtva2gQaFMIr/view?usp=drive_link');
 </script>
+<script>
+    function toggleTheme() {
+    const body = document.body;
+    const icon = document.getElementById('theme-icon');
+    
+    body.classList.toggle('dark-mode');
+    
+    // Alternar o ícone entre sol e lua
+    if (body.classList.contains('dark-mode')) {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+    } else {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+    }
+}
 
+</script>
 </body>
 </html>
