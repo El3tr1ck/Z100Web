@@ -91,6 +91,15 @@
     max-width: 50%; /* Garante que o botão não ultrapasse a largura da tela */
 }
     </style>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "a295c5ad-b7b5-4c7c-b904-c206a4324f5b",
+    });
+  });
+</script>
 </head>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
@@ -123,7 +132,7 @@ function handleCredentialResponse(response) {
     <body>
 <div id="user-info"></div>
 
-
+<div class='onesignal-customlink-container'></div>
 <div id="g_id_onload"
      data-client_id="59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com" 
      data-context="signin"
