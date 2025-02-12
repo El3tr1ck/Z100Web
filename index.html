@@ -94,37 +94,47 @@
 </head>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
-function handleCredentialResponse(response) {
-    console.log("Token JWT recebido: " + response.credential);
-    
-    // Decodificar o token JWT para obter informações do usuário
-    const data = JSON.parse(atob(response.credential.split('.')[1]));
-    console.log("Usuário logado:", data);
+    // Função que é chamada após o login
+    function handleCredentialResponse(response) {
+        console.log("Token JWT recebido: " + response.credential);
+        
+        // Decodificar o token JWT para obter informações do usuário
+        const data = JSON.parse(atob(response.credential.split('.')[1]));
+        console.log("Usuário logado:", data);
 
-    // Armazenar o token no localStorage para persistência
-    localStorage.setItem("user", JSON.stringify(data));
+        // Armazenar o token no localStorage para persistência
+        localStorage.setItem("user", JSON.stringify(data));
 
-    // Exibir o nome do usuário e a foto no canto superior direito
-    document.getElementById("user-info").innerHTML =
-        `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
-
-    // Ocultar o botão de login
-    document.getElementById("login-button").style.display = "none";
-}
-
-// Função para verificar o login na inicialização da página
-window.onload = function() {
-    const user = localStorage.getItem("user");
-    
-    if (user) {
-        const data = JSON.parse(user);
-        // Exibir o nome do usuário e a foto se estiver logado
+        // Exibir o nome do usuário e a foto no canto superior direito
         document.getElementById("user-info").innerHTML =
             `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
+
+        // Ocultar o botão de login
         document.getElementById("login-button").style.display = "none";
     }
-};
 
+    // Função para verificar o login na inicialização da página
+    window.onload = function() {
+        const user = localStorage.getItem("user");
+        
+        // Se já houver um usuário logado no localStorage, restauramos a sessão
+        if (user) {
+            const data = JSON.parse(user);
+            document.getElementById("user-info").innerHTML =
+                `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
+            document.getElementById("login-button").style.display = "none";
+        } else {
+            // Caso não tenha usuário no localStorage, configuramos o botão de login do Google
+            google.accounts.id.initialize({
+                client_id: "59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com",
+                callback: handleCredentialResponse
+            });
+            google.accounts.id.renderButton(
+                document.getElementById("login-button"),
+                { theme: "outline", size: "large" }
+            );
+        }
+    };
 </script>
 
 
