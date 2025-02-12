@@ -105,9 +105,12 @@ function handleCredentialResponse(response) {
     // Exibir o nome do usuário e a foto no canto superior direito
     document.getElementById("user-info").innerHTML =
         `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
-}
 
+    // Ocultar o botão de login
+    document.getElementById("login-button").style.display = "none";
+}
 </script>
+
 
     
     <body>
@@ -122,7 +125,7 @@ function handleCredentialResponse(response) {
      data-auto_prompt="false">
 </div>
 <div class="g_id_signin" data-type="standard"></div>
-
+<div id="login-button" class="g_id_signin" data-type="standard"></div>
     <!-- Texto Explicativo abaixo do Cabeçalho -->
     <section style="text-align: center; padding: 20px;">
         <h2 style="font-size: 28px; font-weight: bold; color: #fff;">Explore Meus Projetos e Trabalhos!</h2>
