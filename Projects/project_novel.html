@@ -210,10 +210,10 @@ body.dark-mode .card:hover {
         const cardElement = createCardElement(chapterNumber, title, date, link);
         cardList.appendChild(cardElement);
     }  
- function searchCards() {
+function searchCards() {
     const query = document.getElementById('searchInput').value.toLowerCase();
 
-    // Se a pesquisa for "secrets", redireciona para secret_cards.html
+    // Se o valor da pesquisa for "secrets", redireciona para secret_cards.html
     if (query === "secrets") {
         window.location.href = "secret_cards.html";
     } else {
@@ -232,6 +232,7 @@ body.dark-mode .card:hover {
         });
     }
 }
+
 
 
     
