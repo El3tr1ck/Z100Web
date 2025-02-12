@@ -165,7 +165,8 @@ body.dark-mode .card:hover {
     <div class="header-text">Desfrute do projeto Novel, leia e baixe os capítulos aqui</div>
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="Buscar..." onkeyup="searchCards()">
-        <button onclick="searchAction()"><i class="fas fa-search"></i></button>
+        <button onclick="searchCards()"><i class="fas fa-search"></i></button>
+
     </div>
     <div class="card-list" id="cardList"></div>
 <script>
@@ -211,16 +212,13 @@ body.dark-mode .card:hover {
         cardList.appendChild(cardElement);
     }
     
-    function searchCards() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        
-        // Se a pesquisa for "secrets", redireciona para secret_cards.html
-        if (query === "secrets") {
-            window.location.href = "secret_cards.html";
-            return; // Impede o restante da função de ser executado
-        }
-        
-        // Se não for "secrets", continua com a pesquisa normal nos cards
+  function searchCards() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    
+    // Se a pesquisa for "secrets", redireciona para secret_cards.html
+    if (query === "secrets") {
+        window.location.href = "secret_cards.html";
+    } else {
         const cards = document.querySelectorAll('.card');
         
         cards.forEach(card => {
@@ -234,6 +232,8 @@ body.dark-mode .card:hover {
             }
         });
     }
+}
+
     
     addCard(1, 'O passado em ruinas,um verão de começos', 'https://drive.google.com/file/d/18nNcYB6TtHuMEIj9mEAuE52rXlitSjnh/view?usp=drive_link');
     addCard(2, 'Perguntas e incertezas,o destino falso', 'https://drive.google.com/file/d/1Fp717e2X7jfji2-6OtfjRE0l1PdxJRfl/view?usp=drive_link');
