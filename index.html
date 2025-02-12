@@ -101,6 +101,9 @@ function handleCredentialResponse(response) {
     const data = JSON.parse(atob(response.credential.split('.')[1]));
     console.log("Usuário logado:", data);
 
+    // Armazenar o token no localStorage para persistência
+    localStorage.setItem("user", JSON.stringify(data));
+
     // Exibir o nome do usuário e a foto no canto superior direito
     document.getElementById("user-info").innerHTML =
         `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
@@ -108,6 +111,20 @@ function handleCredentialResponse(response) {
     // Ocultar o botão de login
     document.getElementById("login-button").style.display = "none";
 }
+
+// Função para verificar o login na inicialização da página
+window.onload = function() {
+    const user = localStorage.getItem("user");
+    
+    if (user) {
+        const data = JSON.parse(user);
+        // Exibir o nome do usuário e a foto se estiver logado
+        document.getElementById("user-info").innerHTML =
+            `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
+        document.getElementById("login-button").style.display = "none";
+    }
+};
+
 </script>
 
 
