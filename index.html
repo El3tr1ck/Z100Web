@@ -186,9 +186,11 @@
 </div>
 
 <button id="open-login-panel" class="transparent-button">Fazer Login</button>
+<!-- Painel de Login -->
 <div id="login-panel" class="login-panel">
     <div class="login-content">
-        <button id="google-login-button" class="g_id_signin" data-type="standard"></button>
+        <button id="login-button" class="g_id_signin" data-type="standard"></button>
+        <p>Clique fora para fechar</p>
     </div>
 </div>
 
@@ -260,23 +262,36 @@
         importScripts('https://web.webpushs.com/sp-push-worker-fb.js?ver=2.0');
     </script>
 <script>
-    document.getElementById("open-login-panel").addEventListener("click", function () {
-        document.getElementById("login-panel").style.display = "flex";
-    });
+    document.addEventListener("DOMContentLoaded", function () {
+    const loginPanel = document.getElementById("login-panel");
+    const openLoginPanel = document.getElementById("open-login-panel");
+    const loginButton = document.getElementById("login-button");
 
-    document.getElementById("login-panel").addEventListener("click", function (event) {
-        if (event.target === this) {
-            this.style.display = "none";
-        }
-    });
+    // Verifica se o usuário já está logado
+    const user = localStorage.getItem("user");
 
-    window.onload = function () {
-        const user = localStorage.getItem("user");
+    if (user) {
+        openLoginPanel.style.display = "none"; // Esconde o botão se já estiver logado
+    } else {
+        google.accounts.id.initialize({
+            client_id: "59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com",
+            callback: handleCredentialResponse
+        });
+        google.accounts.id.renderButton(loginButton, { theme: "outline", size: "large" });
 
-        if (user) {
-            document.getElementById("user-info").innerHTML =
-                `<p>Bem-vindo, ${JSON.parse(user).name}!</p><img src
+        openLoginPanel.addEventListener("click", () => {
+            loginPanel.style.display = "flex";
+        });
 
+        loginPanel.addEventListener("click", (event) => {
+            if (event.target === loginPanel) {
+                loginPanel.style.display = "none";
+            }
+        });
+    }
+});
+
+</script>
 
 </body>
 </html>
