@@ -7,24 +7,16 @@
     <link rel="icon" type="image/png" href="img/Z.png">
     <script charset="UTF-8" src="//web.webpushs.com/js/push/3337dfe9d8d38aba90cbf1df6e2373c6_1.js" async></script>
     <title>inicio</title>
+
+    <!-- Font Awesome para os ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <style>
         body {
             margin: 0;
             font-family: 'Arial', sans-serif;
             background-color: #2c2c2c; /* Fundo cinza escuro */
             color: #fff;
-        }
-
-        section {
-            margin-bottom: 40px;
-        }
-
-        h2, h3 {
-            font-family: 'Arial', sans-serif;
-        }
-
-        p {
-            font-family: 'Verdana', sans-serif;
         }
 
         /* Estilo dos Ícones de Redes Sociais */
@@ -41,7 +33,6 @@
             transform: scale(1.1);
         }
 
-        /* Estilo dos Botões de Projetos */
         .project-btn {
             display: block;
             text-align: center;
@@ -52,114 +43,49 @@
             transition: all 0.4s ease;
         }
 
-        .project-btn img {
-            filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2));
-        }
-
-        .project-btn p {
-            font-size: 18px;
-            color: #fff;
-            margin-top: 10px;
-        }
-
-        /* Animação suave nos botões de projetos */
         .project-btn:hover {
             background-color: rgba(255, 255, 255, 0.3); /* Mudança de cor ao passar o mouse */
             transform: scale(1.05); /* Animação suave ao passar o mouse */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Efeito de sombra ao hover */
         }
-        #user-info {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 5px 10px;
-    border-radius: 10px;
-    font-size: 14px;
-}
 
-#user-info img {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    margin-left: 8px;
-}
-.login-button{
-     width: 250px; /* Ajuste o valor conforme necessário */
-    max-width: 50%; /* Garante que o botão não ultrapasse a largura da tela */
-}
-	    /* Botão de Login Personalizado */
-.custom-login-btn {
-    background-color: #555; /* Cinza */
-    color: white;
-    border: 2px solid white;
-    border-radius: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.3s;
-}
+        /* Estilo do botão de login */
+        #login-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #999;
+            color: white;
+            border: 2px solid white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
 
-.custom-login-btn:hover {
-    background-color: #777;
-}
+        /* Estilo do painel de login (inicialmente oculto) */
+        #login-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 1000;
+            text-align: center;
+        }
 
-/* Botão de Logout */
-.logout-btn {
-    background-color: #151515; /* Vermelho */
-    color: white;
-    border: 2px solid white;
-    border-radius: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.logout-btn:hover {
-    background-color: #151515;
-}
-
-/* Estilos do Modal */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background: #333;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    color: white;
-    width: 300px;
-}
-
-.close-btn {
-    margin-top: 10px;
-    background: red;
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.close-btn:hover {
-    background: darkred;
-}
-
+        /* Estilo do ícone de logout */
+        #logout-btn {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
 </head>
+
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
     // Função que é chamada após o login
@@ -177,20 +103,25 @@
         document.getElementById("user-info").innerHTML =
             `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
 
-        // Ocultar o botão de login
-        document.getElementById("login-button").style.display = "none";
+        // Ocultar o painel de login e o botão de login
+        document.getElementById("login-panel").style.display = "none";
+        document.getElementById("login-btn").style.display = "none";
+
+        // Mostrar o ícone de logout
+        document.getElementById("logout-btn").style.display = "inline-block";
     }
 
     // Função para verificar o login na inicialização da página
     window.onload = function() {
         const user = localStorage.getItem("user");
-        
+
         // Se já houver um usuário logado no localStorage, restauramos a sessão
         if (user) {
             const data = JSON.parse(user);
             document.getElementById("user-info").innerHTML =
                 `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
-            document.getElementById("login-button").style.display = "none";
+            document.getElementById("login-btn").style.display = "none";
+            document.getElementById("logout-btn").style.display = "inline-block";
         } else {
             // Caso não tenha usuário no localStorage, configuramos o botão de login do Google
             google.accounts.id.initialize({
@@ -198,47 +129,43 @@
                 callback: handleCredentialResponse
             });
             google.accounts.id.renderButton(
-                document.getElementById("login-button"),
+                document.getElementById("google-login-button"),
                 { theme: "outline", size: "large" }
             );
         }
     };
+
+    // Função para mostrar o painel de login
+    function showLoginPanel() {
+        document.getElementById("login-panel").style.display = "block";
+    }
+
+    // Função para fazer logout
+    function logout() {
+        localStorage.removeItem("user");
+        document.getElementById("user-info").innerHTML = "";
+        document.getElementById("login-btn").style.display = "inline-block";
+        document.getElementById("logout-btn").style.display = "none";
+    }
 </script>
 
+<body>
+    <div id="user-info"></div>
 
-    
-    <body>
-<!-- Botão de Fazer Login -->
-<button id="custom-login-button" class="custom-login-btn">Fazer Login</button>
+    <!-- Botão de Fazer Login -->
+    <div id="login-btn" onclick="showLoginPanel()">Fazer Login</div>
 
-<!-- Painel Modal para Login -->
-<div id="login-modal" class="modal">
-    <div class="modal-content">
-        <p>Faça login</p>
-        <div id="login-button" class="g_id_signin" data-type="standard"></div>
-        <button id="close-modal" class="close-btn">Fechar</button>
+    <!-- Painel de Login -->
+    <div id="login-panel">
+        <div id="google-login-button"></div>
     </div>
-</div>
 
-<!-- Botão de Logout (escondido por padrão) -->
-<div id="logout-btn" onclick="logout()">
-    <i class="fa-solid fa-right-from-bracket"></i> <!-- Ícone de logout -->
-</div>
+    <!-- Ícone de Logout -->
+    <div id="logout-btn" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i> <!-- Ícone de logout -->
+    </div>
 
-	    
-	    <div id="user-info"></div>
-
-
-<div id="g_id_onload"
-     data-client_id="59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com" 
-     data-context="signin"
-     data-ux_mode="popup"
-     data-callback="handleCredentialResponse"
-     data-auto_prompt="false">
-</div>
-
-
-    <!-- Texto Explicativo abaixo do Cabeçalho -->
+    <!-- Conteúdo do Site -->
     <section style="text-align: center; padding: 20px;">
         <h2 style="font-size: 28px; font-weight: bold; color: #fff;">Explore Meus Projetos e Trabalhos!</h2>
         <p style="font-size: 18px; color: #e0e0e0; max-width: 800px; margin: 0 auto;">
@@ -261,111 +188,5 @@
             </a>
         </div>
     </section>
-
-    <!-- Título para Projetos Ambiciosos -->
-    <section style="text-align: center; padding: 40px 20px;">
-        <h3 style="font-size: 24px; font-weight: bold; color: #fff;">Projetos principais</h3>
-
-        <!-- Grade de Projetos -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto; padding-top: 20px;">
-            
-            <!-- Primeiro Botão: Projeto Novel -->
-            <a href="Projects/project_novel.html" class="project-btn">
-                <img src="https://img.icons8.com/ios-filled/50/ffffff/book.png" alt="Livro" />
-                <p>Projeto Novel</p>
-            </a>
-
-            <!-- Segundo Botão: Jogados do meu Canal -->
-            <a href="Projects/DS_store.html" class="project-btn">
-                <img src="https://img.icons8.com/ios-filled/50/ffffff/controller.png" alt="Controle" />
-                <p>loja de jogados e etc do canal</p>
-            </a>
-
-        </div>
-    </section>
-    <!-- Título para Projetos Ambiciosos -->
-    <section style="text-align: center; padding: 40px 20px;">
-        <h3 style="font-size: 24px; font-weight: bold; color: #fff;">Veja mais:</h3>
-
-        <!-- Grade de Projetos -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto; padding-top: 20px;">
-            
-            <!-- Primeiro Botão: Projeto Novel -->
-            <a href="Biography.html" class="project-btn">
-                <img src="https://img.icons8.com/ios-filled/50/ffffff/user.png" alt="Livro" />
-                <p>Biografia</p>
-            </a>
-
-            <!-- Segundo Botão: Jogados do meu Canal -->
-            <a href="Donate.html" class="project-btn">
-                <img src="https://img.icons8.com/ios-filled/50/ffffff/money.png" alt="Controle" />
-                <p>Doação</p>
-            </a>
-    <!-- Web Push Notification Script -->
-    <script>
-        importScripts('https://web.webpushs.com/sp-push-worker-fb.js?ver=2.0');
-    </script>
-<script>
-    function handleCredentialResponse(response) {
-        console.log("Token JWT recebido: " + response.credential);
-
-        const data = JSON.parse(atob(response.credential.split('.')[1]));
-        console.log("Usuário logado:", data);
-
-        localStorage.setItem("user", JSON.stringify(data));
-
-        // Atualiza a interface
-        document.getElementById("custom-login-button").style.display = "none"; // Esconde botão de login
-        document.getElementById("logout-button").style.display = "block"; // Exibe botão de logout
-        document.getElementById("login-modal").style.display = "none"; // Fecha o modal
-
-        document.getElementById("user-info").innerHTML =
-            `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
-    }
-
-    window.onload = function () {
-        const user = localStorage.getItem("user");
-
-        if (user) {
-            const data = JSON.parse(user);
-            document.getElementById("user-info").innerHTML =
-                `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
-            document.getElementById("custom-login-button").style.display = "none";
-            document.getElementById("logout-button").style.display = "block";
-        } else {
-            google.accounts.id.initialize({
-                client_id: "59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com",
-                callback: handleCredentialResponse
-            });
-
-            google.accounts.id.renderButton(
-                document.getElementById("login-button"),
-                { theme: "outline", size: "large" }
-            );
-        }
-    };
-
-    // Abre o painel de login ao clicar no botão "Fazer Login"
-    document.getElementById("custom-login-button").addEventListener("click", function () {
-        document.getElementById("login-modal").style.display = "flex";
-    });
-
-    // Fecha o painel ao clicar no botão "Fechar"
-    document.getElementById("close-modal").addEventListener("click", function () {
-        document.getElementById("login-modal").style.display = "none";
-    });
-
-    // Logout
-    document.getElementById("logout-button").addEventListener("click", function () {
-        localStorage.removeItem("user"); // Remove o usuário salvo
-
-        document.getElementById("user-info").innerHTML = ""; // Limpa a área de usuário
-        document.getElementById("logout-button").style.display = "none"; // Esconde botão de logout
-        document.getElementById("custom-login-button").style.display = "block"; // Mostra botão de login
-    });
-</script>
-
 </body>
 </html>
-	
-	
