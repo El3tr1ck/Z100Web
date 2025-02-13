@@ -260,16 +260,23 @@
         importScripts('https://web.webpushs.com/sp-push-worker-fb.js?ver=2.0');
     </script>
 <script>
-document.getElementById("open-login-panel").addEventListener("click", function() {
-    document.getElementById("login-panel").style.display = "flex";
-});
+    document.getElementById("open-login-panel").addEventListener("click", function () {
+        document.getElementById("login-panel").style.display = "flex";
+    });
 
-document.getElementById("login-panel").addEventListener("click", function(event) {
-    if (event.target === this) {
-        this.style.display = "none";
-    }
-});
-</script>
+    document.getElementById("login-panel").addEventListener("click", function (event) {
+        if (event.target === this) {
+            this.style.display = "none";
+        }
+    });
+
+    window.onload = function () {
+        const user = localStorage.getItem("user");
+
+        if (user) {
+            document.getElementById("user-info").innerHTML =
+                `<p>Bem-vindo, ${JSON.parse(user).name}!</p><img src
+
 
 </body>
 </html>
