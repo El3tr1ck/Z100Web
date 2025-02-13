@@ -90,6 +90,32 @@
      width: 250px; /* Ajuste o valor conforme necessário */
     max-width: 50%; /* Garante que o botão não ultrapasse a largura da tela */
 }
+	      .custom-google-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background-color: #ffffff;
+        color: #000;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .custom-google-button:hover {
+        background-color: #f0f0f0;
+        transform: scale(1.05);
+    }
+
+    .custom-google-button img {
+        width: 20px;
+        height: 20px;
+    }
     </style>
 </head>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -152,6 +178,18 @@
 </div>
 
 <div id="login-button" class="g_id_signin" data-type="standard"></div>
+	    <div id="login-container" style="display: flex; justify-content: center; margin-top: 20px;">
+    <button id="google-login" class="custom-google-button">
+        <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo" />
+        Entrar com Google
+    </button>
+</div>
+	    <script>
+    document.getElementById("google-login").addEventListener("click", function() {
+        google.accounts.id.prompt();
+    });
+</script>
+
     <!-- Texto Explicativo abaixo do Cabeçalho -->
     <section style="text-align: center; padding: 20px;">
         <h2 style="font-size: 28px; font-weight: bold; color: #fff;">Explore Meus Projetos e Trabalhos!</h2>
