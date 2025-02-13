@@ -90,6 +90,74 @@
      width: 250px; /* Ajuste o valor conforme necessário */
     max-width: 50%; /* Garante que o botão não ultrapasse a largura da tela */
 }
+	    /* Botão de Login Personalizado */
+.custom-login-btn {
+    background-color: #555; /* Cinza */
+    color: white;
+    border: 2px solid white;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.custom-login-btn:hover {
+    background-color: #777;
+}
+
+/* Botão de Logout */
+.logout-btn {
+    background-color: #d9534f; /* Vermelho */
+    color: white;
+    border: 2px solid white;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: #c9302c;
+}
+
+/* Estilos do Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #333;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    color: white;
+    width: 300px;
+}
+
+.close-btn {
+    margin-top: 10px;
+    background: red;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.close-btn:hover {
+    background: darkred;
+}
+
     </style>
 </head>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -140,7 +208,23 @@
 
     
     <body>
-<div id="user-info"></div>
+<!-- Botão de Fazer Login -->
+<button id="custom-login-button" class="custom-login-btn">Fazer Login</button>
+
+<!-- Painel Modal para Login -->
+<div id="login-modal" class="modal">
+    <div class="modal-content">
+        <p>Faça login para acessar o site:</p>
+        <div id="login-button" class="g_id_signin" data-type="standard"></div>
+        <button id="close-modal" class="close-btn">Fechar</button>
+    </div>
+</div>
+
+<!-- Botão de Logout (escondido por padrão) -->
+<button id="logout-button" class="logout-btn" style="display: none;">Logout</button>
+
+	    
+	    <div id="user-info"></div>
 
 
 <div id="g_id_onload"
@@ -151,7 +235,7 @@
      data-auto_prompt="false">
 </div>
 
-<div id="login-button" class="g_id_signin" data-type="standard"></div>
+
     <!-- Texto Explicativo abaixo do Cabeçalho -->
     <section style="text-align: center; padding: 20px;">
         <h2 style="font-size: 28px; font-weight: bold; color: #fff;">Explore Meus Projetos e Trabalhos!</h2>
@@ -219,6 +303,65 @@
     <script>
         importScripts('https://web.webpushs.com/sp-push-worker-fb.js?ver=2.0');
     </script>
+<script>
+    function handleCredentialResponse(response) {
+        console.log("Token JWT recebido: " + response.credential);
+
+        const data = JSON.parse(atob(response.credential.split('.')[1]));
+        console.log("Usuário logado:", data);
+
+        localStorage.setItem("user", JSON.stringify(data));
+
+        // Atualiza a interface
+        document.getElementById("custom-login-button").style.display = "none"; // Esconde botão de login
+        document.getElementById("logout-button").style.display = "block"; // Exibe botão de logout
+        document.getElementById("login-modal").style.display = "none"; // Fecha o modal
+
+        document.getElementById("user-info").innerHTML =
+            `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
+    }
+
+    window.onload = function () {
+        const user = localStorage.getItem("user");
+
+        if (user) {
+            const data = JSON.parse(user);
+            document.getElementById("user-info").innerHTML =
+                `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
+            document.getElementById("custom-login-button").style.display = "none";
+            document.getElementById("logout-button").style.display = "block";
+        } else {
+            google.accounts.id.initialize({
+                client_id: "59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com",
+                callback: handleCredentialResponse
+            });
+
+            google.accounts.id.renderButton(
+                document.getElementById("login-button"),
+                { theme: "outline", size: "large" }
+            );
+        }
+    };
+
+    // Abre o painel de login ao clicar no botão "Fazer Login"
+    document.getElementById("custom-login-button").addEventListener("click", function () {
+        document.getElementById("login-modal").style.display = "flex";
+    });
+
+    // Fecha o painel ao clicar no botão "Fechar"
+    document.getElementById("close-modal").addEventListener("click", function () {
+        document.getElementById("login-modal").style.display = "none";
+    });
+
+    // Logout
+    document.getElementById("logout-button").addEventListener("click", function () {
+        localStorage.removeItem("user"); // Remove o usuário salvo
+
+        document.getElementById("user-info").innerHTML = ""; // Limpa a área de usuário
+        document.getElementById("logout-button").style.display = "none"; // Esconde botão de logout
+        document.getElementById("custom-login-button").style.display = "block"; // Mostra botão de login
+    });
+</script>
 
 </body>
 </html>
