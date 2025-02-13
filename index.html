@@ -108,7 +108,7 @@
 
 /* Botão de Logout */
 .logout-btn {
-    background-color: #d9534f; /* Vermelho */
+    background-color: #151515; /* Vermelho */
     color: white;
     border: 2px solid white;
     border-radius: 20px;
@@ -119,7 +119,7 @@
 }
 
 .logout-btn:hover {
-    background-color: #c9302c;
+    background-color: #151515;
 }
 
 /* Estilos do Modal */
@@ -221,7 +221,9 @@
 </div>
 
 <!-- Botão de Logout (escondido por padrão) -->
-<button id="logout-button" class="logout-btn" style="display: none;"><i class="fa-solid fa-right-from-bracket"></i></button>
+<div id="logout-btn" onclick="logout()">
+    <i class="fa-solid fa-right-from-bracket"></i> <!-- Ícone de logout -->
+</div>
 
 	    
 	    <div id="user-info"></div>
