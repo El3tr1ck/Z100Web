@@ -90,6 +90,40 @@
      width: 250px; /* Ajuste o valor conforme necessário */
     max-width: 50%; /* Garante que o botão não ultrapasse a largura da tela */
 }
+        .transparent-button {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.transparent-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.login-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-content {
+    background: #2c2c2c;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
     </style>
 </head>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -151,7 +185,13 @@
      data-auto_prompt="false">
 </div>
 
-<div id="login-button" class="g_id_signin" data-type="standard"></div>
+<button id="open-login-panel" class="transparent-button">Fazer Login</button>
+<div id="login-panel" class="login-panel">
+    <div class="login-content">
+        <button id="google-login-button" class="g_id_signin" data-type="standard"></button>
+    </div>
+</div>
+
     <!-- Texto Explicativo abaixo do Cabeçalho -->
     <section style="text-align: center; padding: 20px;">
         <h2 style="font-size: 28px; font-weight: bold; color: #fff;">Explore Meus Projetos e Trabalhos!</h2>
@@ -219,6 +259,17 @@
     <script>
         importScripts('https://web.webpushs.com/sp-push-worker-fb.js?ver=2.0');
     </script>
+<script>
+document.getElementById("open-login-panel").addEventListener("click", function() {
+    document.getElementById("login-panel").style.display = "flex";
+});
+
+document.getElementById("login-panel").addEventListener("click", function(event) {
+    if (event.target === this) {
+        this.style.display = "none";
+    }
+});
+</script>
 
 </body>
 </html>
