@@ -90,56 +90,72 @@
      width: 250px; /* Ajuste o valor conforme necessário */
     max-width: 50%; /* Garante que o botão não ultrapasse a largura da tela */
 }
-	    /* Botão de Login */
-.login-transparent {
-    background: transparent;
-    border: 2px solid white;
+	    /* Estilizando o botão de login */
+.login-btn, .logout-btn {
+    background-color: #555; /* Cinza */
     color: white;
-    padding: 12px 24px;
-    font-size: 18px;
+    border: 2px solid white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 16px;
     cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.3s ease-in-out;
+    transition: 0.3s;
+}
+.login-btn:hover, .logout-btn:hover {
+    background-color: #777;
 }
 
-.login-transparent:hover {
-    background: rgba(255, 255, 255, 0.2);
+/* Painel de Login */
+.login-panel {
+    display: none; /* Oculto por padrão */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
 }
 
-/* Painel de Boas-Vindas */
-#welcome-panel {
-    background: #1e1e1e;
+.login-box {
+    background: #333;
     padding: 20px;
     border-radius: 10px;
     text-align: center;
-    margin-top: 20px;
-    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
 }
 
-/* Botão de Logout */
-#logout-button {
-    background: red;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
+.close-btn {
     margin-top: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
-#logout-button:hover {
-    background: darkred;
-}
-
-/* Esconder Elementos */
-.hidden {
-    display: none;
-}
     </style>
 </head>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script>
+
+<!-- Botão de Login -->
+<button id="open-login-panel" class="login-btn">Fazer Login</button>
+
+<!-- Painel de Login -->
+<div id="login-panel" class="login-panel">
+    <div class="login-box">
+        <h2>Faça login</h2>
+        <div id="login-button" class="g_id_signin" data-type="standard"></div>
+        <button id="close-login-panel" class="close-btn">Fechar</button>
+    </div>
+</div>
+
+<!-- Botão de Logout (inicialmente oculto) -->
+<button id="logout-button" class="logout-btn" style="display: none;">Logout</button>
+	
+	
+	<script>
     // Função que é chamada após o login
     function handleCredentialResponse(response) {
         console.log("Token JWT recebido: " + response.credential);
@@ -182,6 +198,61 @@
         }
     };
 </script>
+<script>
+    function handleCredentialResponse(response) {
+        console.log("Token JWT recebido: " + response.credential);
+
+        // Decodificar o token JWT para obter informações do usuário
+        const data = JSON.parse(atob(response.credential.split('.')[1]));
+        console.log("Usuário logado:", data);
+
+        // Armazena no localStorage
+        localStorage.setItem("user", JSON.stringify(data));
+
+        // Atualiza a interface
+        document.getElementById("open-login-panel").style.display = "none"; // Esconde botão de login
+        document.getElementById("login-panel").style.display = "none"; // Fecha painel
+        document.getElementById("logout-button").style.display = "block"; // Mostra botão de logout
+    }
+
+    // Função para Logout
+    function logout() {
+        localStorage.removeItem("user"); // Remove o usuário do localStorage
+        document.getElementById("open-login-panel").style.display = "block"; // Reexibe botão de login
+        document.getElementById("logout-button").style.display = "none"; // Esconde botão de logout
+    }
+
+    // Verifica se o usuário já está logado
+    window.onload = function() {
+        const user = localStorage.getItem("user");
+        if (user) {
+            document.getElementById("open-login-panel").style.display = "none";
+            document.getElementById("logout-button").style.display = "block";
+        } else {
+            google.accounts.id.initialize({
+                client_id: "59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com",
+                callback: handleCredentialResponse
+            });
+            google.accounts.id.renderButton(
+                document.getElementById("google-login-button"),
+                { theme: "outline", size: "large" }
+            );
+        }
+    };
+
+    // Mostra o painel de login
+    document.getElementById("open-login-panel").addEventListener("click", function() {
+        document.getElementById("login-panel").style.display = "flex";
+    });
+
+    // Fecha o painel de login
+    document.getElementById("close-login-panel").addEventListener("click", function() {
+        document.getElementById("login-panel").style.display = "none";
+    });
+
+    // Evento de logout
+    document.getElementById("logout-button").addEventListener("click", logout);
+</script>
 
 
     
@@ -197,64 +268,7 @@
      data-auto_prompt="false">
 </div>
 
- <!-- Botão de Login -->
-    <button id="login-button" class="login-transparent">Fazer Login</button>
-
-    <!-- Painel de Boas-Vindas -->
-    <div id="welcome-panel" class="hidden">
-        <p>Bem-vindo, <span id="user-name"></span>!</p>
-        <button id="logout-button">Sair</button>
-    </div>
-
-	    <script>
-		    document.addEventListener("DOMContentLoaded", function () {
-    const loginButton = document.getElementById("login-button");
-    const logoutButton = document.getElementById("logout-button");
-    const welcomePanel = document.getElementById("welcome-panel");
-    const userName = document.getElementById("user-name");
-
-    function updateUI(user) {
-        if (user) {
-            loginButton.classList.add("hidden");
-            welcomePanel.classList.remove("hidden");
-            userName.textContent = user.name;
-        } else {
-            loginButton.classList.remove("hidden");
-            welcomePanel.classList.add("hidden");
-        }
-    }
-
-    function handleCredentialResponse(response) {
-        const userData = jwtDecode(response.credential);
-        localStorage.setItem("user", JSON.stringify(userData));
-        updateUI(userData);
-    }
-
-    function logout() {
-        localStorage.removeItem("user");
-        updateUI(null);
-    }
-
-    // Inicializa o Google Login
-    google.accounts.id.initialize({
-        client_id: "59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com",
-        callback: handleCredentialResponse
-    });
-
-    google.accounts.id.renderButton(loginButton, {
-        theme: "outline",
-        size: "large"
-    });
-
-    // Verifica se já existe um usuário salvo
-    const savedUser = JSON.parse(localStorage.getItem("user"));
-    updateUI(savedUser);
-
-    // Evento de logout
-    logoutButton.addEventListener("click", logout);
-});
-
-	    </script>
+<div id="login-button" class="g_id_signin" data-type="standard"></div>
     <!-- Texto Explicativo abaixo do Cabeçalho -->
     <section style="text-align: center; padding: 20px;">
         <h2 style="font-size: 28px; font-weight: bold; color: #fff;">Explore Meus Projetos e Trabalhos!</h2>
