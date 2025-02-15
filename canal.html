@@ -3,206 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canal Eletrickz100</title>
-    <!-- Link para Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Mini YouTube - Últimos Vídeos</title>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <style>
-        /* Reset de Estilos */
-        * {
+        /* Estilos comuns */
+        body {
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            background-color: #f4f4f4;
         }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f7f7f7;
-            color: #333;
-            line-height: 1.6;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        /* Modo Claro */
-        .light-mode {
-            background-color: #f7f7f7;
-            color: #333;
-        }
-
-        /* Modo Escuro */
-        .dark-mode {
-            background-color: #121212;
-            color: #f7f7f7;
-        }
-
-        /* Estilos do Cabeçalho */
-        header {
-            background-color: #111;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            position: relative;
-        }
-
-        header h1 {
-            font-size: 36px;
-            font-weight: 600;
-        }
-
-        header p {
-            font-size: 18px;
-            margin-top: 10px;
-        }
-
-        /* Alternância de Modo Claro/Escuro */
-        .mode-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 22px;
-            color: #fff;
-            transition: color 0.3s ease;
-        }
-
-        .mode-toggle i {
-            font-size: 22px;
-        }
-
-        /* Estilos dos Cards de Vídeos */
-        .video-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            justify-items: center;
+        #video-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
         }
 
         .card {
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            margin: 10px;
+            border-radius: 8px;
             overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            width: 100%;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            background-color: #222;
-            border-radius: 12px;
-        }
-
-        .card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
         }
 
         .card img {
             width: 100%;
             height: 180px;
             object-fit: cover;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
         }
 
-        .card .info {
-            padding: 20px;
-            color: #333;
-            background-color: #fff;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-        }
-
-        .card .info .title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .card .info .description {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 15px;
-        }
-
-        .card .info a {
-            display: inline-block;
-            background-color: #ff5722;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 6px;
-            text-decoration: none;
-            text-align: center;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-        }
-
-        .card .info a:hover {
-            background-color: #e64a19;
-        }
-
-        footer {
-            background-color: #111;
-            color: #fff;
-            text-align: center;
+        .info {
             padding: 10px;
-            margin-top: 40px;
         }
 
-        footer p {
+        .title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .description {
             font-size: 14px;
+            color: #777;
+            margin: 5px 0;
         }
 
-        /* Responsividade para telas menores */
+        .card a {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .card a:hover {
+            background-color: #0056b3;
+        }
+
+        /* Estilos para celular */
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 28px;
+            #video-list {
+                flex-direction: column;
+                align-items: center;
             }
 
-            .mode-toggle {
-                font-size: 18px;
+            .card {
+                width: 90%;
+                margin: 10px 0;
+            }
+        }
+
+        /* Estilos para desktop */
+        @media (min-width: 769px) {
+            #video-list {
+                flex-direction: row;
+                justify-content: space-between;
             }
 
-            .card .info .title {
-                font-size: 16px;
+            .card {
+                width: 22%;
             }
+        }
 
-            .card .info .description {
-                font-size: 12px;
-            }
+        /* Modo escuro */
+        body.dark-mode {
+            background-color: #333;
+            color: white;
+        }
 
-            .card .info a {
-                font-size: 12px;
-            }
+        body.dark-mode .card {
+            background-color: #444;
+            color: white;
+        }
+
+        body.dark-mode .card a {
+            background-color: #333;
+        }
+
+        body.dark-mode .card a:hover {
+            background-color: #222;
         }
     </style>
 </head>
-<body class="light-mode">
-    <header>
-        <h1>Canal Eletrickz100</h1>
-        <p>Explore os vídeos mais recentes</p>
-        <button id="mode-toggle" class="mode-toggle">
-            <i id="mode-icon" class="fas fa-sun"></i> <!-- Ícone de sol -->
-        </button>
-    </header>
-
-    <div id="video-list" class="video-list">
-        <!-- Os vídeos serão carregados aqui -->
+<body>
+    <div id="mode-toggle">
+        <i id="mode-icon" class="fa fa-sun"></i> Modo
     </div>
-
-    <footer>
-        <p>&copy; 2025 Eletrickz100 - Todos os direitos reservados</p>
-    </footer>
+    <h1 style="text-align: center; margin-top: 20px;">Últimos Vídeos</h1>
+    <div id="video-list"></div>
 
     <script src="https://apis.google.com/js/api.js"></script>
     <script>
-        const API_KEY = 'AIzaSyAYUBNxqcp6s2f_Hq3_5K1B4eJX1ynwuaw';  // Sua chave de API
-        const CHANNEL_ID = 'UCaUpZWdX_v3j2w4UJX0f7TA';  // ID do canal
+        const API_KEY = 'AIzaSyAYUBNxqcp6s2f_Hq3_5K1B4eJX1ynwuaw'; // Sua chave de API
+        const CHANNEL_ID = 'UCaUpZWdX_v3j2w4UJX0f7TA'; // ID do canal
 
         let nextPageToken = '';
-        
+
         function loadYouTubeAPI() {
             gapi.client.init({
                 'apiKey': API_KEY,
@@ -212,14 +133,11 @@
         }
 
         function fetchVideos() {
-            // 1. Primeira chamada: Pegando a playlist 'uploads' do canal
             gapi.client.youtube.channels.list({
                 part: 'contentDetails',
                 id: CHANNEL_ID,
             }).then(response => {
                 const playlistId = response.result.items[0].contentDetails.relatedPlaylists.uploads;
-
-                // 2. Pegando os vídeos dessa playlist
                 fetchPlaylistVideos(playlistId);
             });
         }
@@ -228,7 +146,7 @@
             const request = gapi.client.youtube.playlistItems.list({
                 part: 'snippet',
                 playlistId: playlistId,
-                maxResults: 50,  // Maximo de 50 vídeos por requisição
+                maxResults: 50, // Maximo de 50 vídeos por requisição
                 pageToken: nextPageToken,
             });
 
@@ -260,7 +178,7 @@
                         <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">Assistir</a>
                     </div>
                 `;
-                
+
                 videoList.appendChild(card);
             });
         }
