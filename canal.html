@@ -175,7 +175,7 @@
             color: #fff;
         }
 
-        /* Spinner de Carregamento */
+        /* Substituindo o spinner pelo GIF de carregamento */
         #loading {
             display: none;
             position: absolute;
@@ -185,19 +185,9 @@
             text-align: center;
         }
 
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #007BFF;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 2s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        #loading img {
+            width: 100px;
+            height: 100px;
         }
 
         #loading p {
@@ -223,9 +213,9 @@
     <!-- Título -->
     <h1>Últimos Vídeos</h1>
 
-    <!-- Spinner de Carregamento -->
+    <!-- GIF de Carregamento -->
     <div id="loading">
-        <div class="spinner"></div>
+        <img src="img/Z.gif" alt="Carregando...">
         <p>Carregando vídeos...</p>
     </div>
 
@@ -253,7 +243,7 @@
         }
 
         function fetchVideos() {
-            // Exibir o spinner de carregamento
+            // Exibir o GIF de carregamento
             document.getElementById('loading').style.display = 'block';
 
             gapi.client.youtube.channels.list({
@@ -317,7 +307,7 @@
                 videoList.innerHTML = "<p>Não há vídeos disponíveis.</p>";
             }
 
-            // Esconder o spinner de carregamento
+            // Esconder o GIF de carregamento
             document.getElementById('loading').style.display = 'none';
         }
 
