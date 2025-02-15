@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="uAS7LHeZ838mFRHoBWRn9F5_zQea-t2cd-idSKcBdA4" />
     <link rel="icon" type="image/png" href="img/Z.png">
-    <script charset="UTF-8" src="//web.webpushs.com/js/push/3337dfe9d8d38aba90cbf1df6e2373c6_1.js" async></script>
     <title>inicio</title>
     <style>
         body {
@@ -117,6 +116,15 @@
         height: 20px;
     }
     </style>
+	<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "a2ce1314-1f68-4482-b13e-23018ecdeb67",
+    });
+  });
+</script>
 </head>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
@@ -252,9 +260,7 @@
                 <p>Doação</p>
             </a>
     <!-- Web Push Notification Script -->
-    <script>
-        importScripts('https://web.webpushs.com/sp-push-worker-fb.js?ver=2.0');
-    </script>
+   
 
 </body>
 </html>
