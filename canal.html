@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canal TLG - Vídeos</title>
+    <title>Canal Eletrickz100 - Explorar</title>
     <style>
         * {
             margin: 0;
@@ -16,10 +16,23 @@
             background-color: #f4f4f4;
             color: #333;
             line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Modo Claro */
+        .light-mode {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        /* Modo Escuro */
+        .dark-mode {
+            background-color: #111;
+            color: #f4f4f4;
         }
 
         header {
-            background-color: #111;
+            background-color: #1a1a1a;
             color: white;
             padding: 20px;
             text-align: center;
@@ -36,6 +49,24 @@
             margin-top: 10px;
         }
 
+        .mode-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            cursor: pointer;
+            background-color: #fff;
+            color: #111;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .mode-toggle.dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+
         .video-list {
             display: flex;
             flex-wrap: wrap;
@@ -47,11 +78,12 @@
 
         .card {
             width: 300px;
-            background-color: white;
+            background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             transition: transform 0.3s ease;
+            cursor: pointer;
         }
 
         .card:hover {
@@ -96,7 +128,7 @@
         }
 
         footer {
-            background-color: #111;
+            background-color: #1a1a1a;
             color: white;
             text-align: center;
             padding: 10px;
@@ -108,7 +140,7 @@
         }
     </style>
 </head>
-<body>
+<body class="light-mode">
     <header>
         <h1>Canal Eletrickz100</h1>
         <p>Explore nossos vídeos mais recentes</p>
@@ -121,6 +153,8 @@
     <footer>
         <p>&copy; 2025 Eletrickz100 - Todos os direitos reservados</p>
     </footer>
+
+    <div id="mode-toggle" class="mode-toggle light-mode">Modo Escuro</div>
 
     <script src="https://apis.google.com/js/api.js"></script>
     <script>
@@ -139,7 +173,7 @@
             const request = gapi.client.youtube.search.list({
                 part: 'snippet',
                 channelId: CHANNEL_ID,
-                maxResults: 12,  // Número de vídeos que você quer carregar
+                maxResults: 50,  // Agora carregamos até 50 vídeos
                 order: 'date',  // Ordenar por vídeos mais recentes
             });
 
@@ -174,6 +208,21 @@
                 videoList.appendChild(card);
             });
         }
+
+        // Alternar entre modo claro e escuro
+        const modeToggle = document.getElementById('mode-toggle');
+        modeToggle.addEventListener('click', function() {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            body.classList.toggle('light-mode');
+            modeToggle.classList.toggle('dark-mode');
+
+            if (body.classList.contains('dark-mode')) {
+                modeToggle.textContent = 'Modo Claro';
+            } else {
+                modeToggle.textContent = 'Modo Escuro';
+            }
+        });
 
         // Carregar a API do YouTube
         gapi.load('client', loadYouTubeAPI);
