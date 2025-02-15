@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canal Eletrickz100</title>
+    <!-- Link para Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Reset de Estilos */
         * {
@@ -60,16 +62,12 @@
             background-color: transparent;
             border: none;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 22px;
             color: #fff;
             transition: color 0.3s ease;
         }
 
-        .mode-toggle.sun {
-            font-size: 22px;
-        }
-
-        .mode-toggle.moon {
+        .mode-toggle i {
             font-size: 22px;
         }
 
@@ -185,7 +183,9 @@
     <header>
         <h1>Canal Eletrickz100</h1>
         <p>Explore os vídeos mais recentes</p>
-        <button id="mode-toggle" class="mode-toggle sun">☀️</button>
+        <button id="mode-toggle" class="mode-toggle">
+            <i id="mode-icon" class="fas fa-sun"></i> <!-- Ícone de sol -->
+        </button>
     </header>
 
     <div id="video-list" class="video-list">
@@ -267,15 +267,20 @@
 
         // Alternar entre modo claro e escuro com ícones
         const modeToggle = document.getElementById('mode-toggle');
+        const modeIcon = document.getElementById('mode-icon');
+
         modeToggle.addEventListener('click', function() {
             const body = document.body;
             body.classList.toggle('dark-mode');
             body.classList.toggle('light-mode');
 
+            // Alternar os ícones entre sol e lua
             if (body.classList.contains('dark-mode')) {
-                modeToggle.textContent = '🌙';  // Ícone Lua
+                modeIcon.classList.remove('fa-sun');
+                modeIcon.classList.add('fa-moon');  // Ícone de lua
             } else {
-                modeToggle.textContent = '☀️';  // Ícone Sol
+                modeIcon.classList.remove('fa-moon');
+                modeIcon.classList.add('fa-sun');  // Ícone de sol
             }
         });
 
