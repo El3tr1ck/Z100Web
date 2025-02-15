@@ -182,24 +182,31 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 24px;
-            color: #007BFF;
+            text-align: center;
         }
 
-        /* Spinner - animação */
         .spinner {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #007BFF;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 2s linear infinite;
+            margin-bottom: 20px;
         }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        #loading p {
+            font-size: 18px;
+            color: #007BFF;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
     </style>
 </head>
 <body>
