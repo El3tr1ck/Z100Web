@@ -161,6 +161,8 @@
         const API_KEY = 'AIzaSyAYUBNxqcp6s2f_Hq3_5K1B4eJX1ynwuaw';  // Sua chave de API
         const CHANNEL_ID = 'UCaUpZWdX_v3j2w4UJX0f7TA';  // ID do canal
 
+        let nextPageToken = '';
+        
         function loadYouTubeAPI() {
             gapi.client.init({
                 'apiKey': API_KEY,
@@ -170,15 +172,29 @@
         }
 
         function fetchVideos() {
-            const request = gapi.client.youtube.search.list({
+            // 1. Primeira chamada: Pegando a playlist 'uploads' do canal
+            gapi.client.youtube.channels.list({
+                part: 'contentDetails',
+                id: CHANNEL_ID,
+            }).then(response => {
+                const playlistId = response.result.items[0].contentDetails.relatedPlaylists.uploads;
+
+                // 2. Pegando os vídeos dessa playlist
+                fetchPlaylistVideos(playlistId);
+            });
+        }
+
+        function fetchPlaylistVideos(playlistId) {
+            const request = gapi.client.youtube.playlistItems.list({
                 part: 'snippet',
-                channelId: CHANNEL_ID,
-                maxResults: 50,  // Agora carregamos até 50 vídeos
-                order: 'date',  // Ordenar por vídeos mais recentes
+                playlistId: playlistId,
+                maxResults: 50,  // Maximo de 50 vídeos por requisição
+                pageToken: nextPageToken,
             });
 
             request.execute(function(response) {
                 const videos = response.items;
+                nextPageToken = response.nextPageToken;
                 displayVideos(videos);
             });
         }
@@ -188,7 +204,7 @@
             videoList.innerHTML = '';
 
             videos.forEach(video => {
-                const videoId = video.id.videoId;
+                const videoId = video.snippet.resourceId.videoId;
                 const title = video.snippet.title;
                 const description = video.snippet.description;
                 const thumbnail = video.snippet.thumbnails.high.url;
