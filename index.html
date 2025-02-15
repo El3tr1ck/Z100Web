@@ -116,15 +116,18 @@
         height: 20px;
     }
     </style>
-	<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+	<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 <script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "a2ce1314-1f68-4482-b13e-23018ecdeb67",
+    window.OneSignal = window.OneSignal || [];
+    OneSignal.push(function() {
+        OneSignal.init({
+            appId: "SUA_APP_ID",
+            notifyButton: { enable: true },
+            serviceWorkerPath: "/seu-repositorio/OneSignalSDKWorker.js" // Caminho correto
+        });
     });
-  });
 </script>
+
 </head>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
