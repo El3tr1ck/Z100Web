@@ -6,12 +6,21 @@
     <title>Mini YouTube - Últimos Vídeos</title>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <style>
-        /* Estilos comuns */
+        /* Reset e Estilos Gerais */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #444;
+            text-align: center;
+            margin-top: 40px;
+            font-weight: 600;
         }
 
         #video-list {
@@ -19,53 +28,62 @@
             flex-wrap: wrap;
             justify-content: center;
             margin-top: 20px;
+            padding: 0 10px;
         }
 
         .card {
             background: #fff;
             margin: 10px;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
             width: 300px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
         }
 
         .card img {
             width: 100%;
-            height: 180px;
+            height: 200px;
             object-fit: cover;
         }
 
         .info {
-            padding: 10px;
+            padding: 15px;
         }
 
         .title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
+            color: #333;
         }
 
         .description {
             font-size: 14px;
             color: #777;
-            margin: 5px 0;
+            margin: 10px 0;
         }
 
         .card a {
             display: inline-block;
-            padding: 8px 15px;
+            padding: 10px 20px;
             background-color: #007BFF;
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-top: 10px;
+            margin-top: 15px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
         }
 
         .card a:hover {
             background-color: #0056b3;
         }
 
-        /* Estilos para celular */
+        /* Layout Responsivo */
         @media (max-width: 768px) {
             #video-list {
                 flex-direction: column;
@@ -74,11 +92,9 @@
 
             .card {
                 width: 90%;
-                margin: 10px 0;
             }
         }
 
-        /* Estilos para desktop */
         @media (min-width: 769px) {
             #video-list {
                 flex-direction: row;
@@ -90,7 +106,30 @@
             }
         }
 
-        /* Modo escuro */
+        /* Estilos do botão de transmissão */
+        .broadcast-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #FF5733;
+            color: white;
+            font-size: 20px;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .broadcast-btn:hover {
+            background-color: #C0392B;
+        }
+
+        /* Modo Escuro */
         body.dark-mode {
             background-color: #333;
             color: white;
@@ -98,7 +137,6 @@
 
         body.dark-mode .card {
             background-color: #444;
-            color: white;
         }
 
         body.dark-mode .card a {
@@ -111,12 +149,18 @@
     </style>
 </head>
 <body>
-    <div id="mode-toggle">
-        <i id="mode-icon" class="fa fa-sun"></i> Modo
+    <!-- Botão de Transmissão -->
+    <div class="broadcast-btn" onclick="window.location.href='https://z100web.netlify.app/live.html';">
+        <i class="fa fa-video-camera"></i>
     </div>
-    <h1 style="text-align: center; margin-top: 20px;">Últimos Vídeos</h1>
+
+    <!-- Título -->
+    <h1>Últimos Vídeos</h1>
+
+    <!-- Lista de Vídeos -->
     <div id="video-list"></div>
 
+    <!-- Script da API do YouTube -->
     <script src="https://apis.google.com/js/api.js"></script>
     <script>
         const API_KEY = 'AIzaSyAYUBNxqcp6s2f_Hq3_5K1B4eJX1ynwuaw'; // Sua chave de API
@@ -183,7 +227,7 @@
             });
         }
 
-        // Alternar entre modo claro e escuro com ícones
+        // Alternar entre modo claro e escuro
         const modeToggle = document.getElementById('mode-toggle');
         const modeIcon = document.getElementById('mode-icon');
 
@@ -192,7 +236,6 @@
             body.classList.toggle('dark-mode');
             body.classList.toggle('light-mode');
 
-            // Alternar os ícones entre sol e lua
             if (body.classList.contains('dark-mode')) {
                 modeIcon.classList.remove('fa-sun');
                 modeIcon.classList.add('fa-moon');  // Ícone de lua
