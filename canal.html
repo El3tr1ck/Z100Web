@@ -172,7 +172,11 @@
             gapi.client.init({
                 'apiKey': API_KEY,
             }).then(() => {
-                gapi.client.load('youtube', 'v3', fetchVideos);
+                gapi.client.load('youtube', 'v3').then(() => {
+                    fetchVideos();
+                });
+            }).catch(err => {
+                console.error("Erro ao carregar a API do YouTube:", err);
             });
         }
 
@@ -183,6 +187,8 @@
             }).then(response => {
                 const playlistId = response.result.items[0].contentDetails.relatedPlaylists.uploads;
                 fetchPlaylistVideos(playlistId);
+            }).catch(err => {
+                console.error("Erro ao buscar playlist:", err);
             });
         }
 
@@ -190,60 +196,50 @@
             const request = gapi.client.youtube.playlistItems.list({
                 part: 'snippet',
                 playlistId: playlistId,
-                maxResults: 50, // Maximo de 50 vídeos por requisição
+                maxResults: 5, // Para testar, limite para 5 vídeos
                 pageToken: nextPageToken,
             });
 
             request.execute(function(response) {
-                const videos = response.items;
-                nextPageToken = response.nextPageToken;
-                displayVideos(videos);
+                if (response.error) {
+                    console.error("Erro na execução da requisição:", response.error);
+                } else {
+                    const videos = response.items;
+                    nextPageToken = response.nextPageToken;
+                    displayVideos(videos);
+                }
             });
         }
 
         function displayVideos(videos) {
             const videoList = document.getElementById('video-list');
-            videoList.innerHTML = '';
+            videoList.innerHTML = ''; // Limpar a lista antes de preencher
 
-            videos.forEach(video => {
-                const videoId = video.snippet.resourceId.videoId;
-                const title = video.snippet.title;
-                const description = video.snippet.description;
-                const thumbnail = video.snippet.thumbnails.high.url;
+            if (videos && videos.length > 0) {
+                videos.forEach(video => {
+                    const videoId = video.snippet.resourceId.videoId;
+                    const title = video.snippet.title;
+                    const description = video.snippet.description;
+                    const thumbnail = video.snippet.thumbnails.high.url;
 
-                const card = document.createElement('div');
-                card.classList.add('card');
+                    const card = document.createElement('div');
+                    card.classList.add('card');
 
-                card.innerHTML = `
-                    <img src="${thumbnail}" alt="${title}">
-                    <div class="info">
-                        <div class="title">${title}</div>
-                        <div class="description">${description.substring(0, 100)}...</div>
-                        <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">Assistir</a>
-                    </div>
-                `;
+                    card.innerHTML = `
+                        <img src="${thumbnail}" alt="${title}">
+                        <div class="info">
+                            <div class="title">${title}</div>
+                            <div class="description">${description.substring(0, 100)}...</div>
+                            <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">Assistir</a>
+                        </div>
+                    `;
 
-                videoList.appendChild(card);
-            });
-        }
-
-        // Alternar entre modo claro e escuro
-        const modeToggle = document.getElementById('mode-toggle');
-        const modeIcon = document.getElementById('mode-icon');
-
-        modeToggle.addEventListener('click', function() {
-            const body = document.body;
-            body.classList.toggle('dark-mode');
-            body.classList.toggle('light-mode');
-
-            if (body.classList.contains('dark-mode')) {
-                modeIcon.classList.remove('fa-sun');
-                modeIcon.classList.add('fa-moon');  // Ícone de lua
+                    videoList.appendChild(card);
+                });
             } else {
-                modeIcon.classList.remove('fa-moon');
-                modeIcon.classList.add('fa-sun');  // Ícone de sol
+                videoList.innerHTML = "<p>Não há vídeos disponíveis.</p>";
             }
-        });
+        }
 
         // Carregar a API do YouTube
         gapi.load('client', loadYouTubeAPI);
