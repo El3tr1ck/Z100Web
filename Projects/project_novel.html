@@ -214,9 +214,9 @@ body.dark-mode .card:hover {
 function searchCards() {
     const query = document.getElementById('searchInput').value.toLowerCase();
 
-    // Se o valor da pesquisa for "secrets", redireciona para secret_cards.html
+    // Se o valor da pesquisa for "secrets", redireciona para historical_concepts.html
     if (query === "secrets") {
-        window.location.href = "secret_cards.html";
+        window.location.href = "historical_concepts.html";
     } else {
         // Pesquisa normal nos cards
         const cards = document.querySelectorAll('.card');
