@@ -7,114 +7,202 @@
     <link rel="icon" type="image/png" href="img/Z.png">
     <title>inicio</title>
     <style>
+        /* Estilo Geral */
         body {
             margin: 0;
             font-family: 'Arial', sans-serif;
-            background-color: #2c2c2c; /* Fundo cinza escuro */
+            background: linear-gradient(135deg, #2c2c2c 0%, #1f1f1f 100%);
             color: #fff;
+            overflow-x: hidden;
         }
 
         section {
-            margin-bottom: 40px;
+            margin-bottom: 60px;
+            padding: 0 20px;
         }
 
         h2, h3 {
             font-family: 'Arial', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
         }
 
         p {
             font-family: 'Verdana', sans-serif;
+            line-height: 1.6;
         }
 
         /* Estilo dos Ícones de Redes Sociais */
         .social-icon {
-            display: block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
             padding: 10px;
             border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.1);
-            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .social-icon:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
         }
 
         /* Estilo dos Botões de Projetos */
         .project-btn {
-            display: block;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
             text-decoration: none;
-            padding: 20px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 15px; /* Bordas arredondadas */
-            transition: all 0.4s ease;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s ease;
+        }
+
+        .project-btn:hover::before {
+            left: 100%;
         }
 
         .project-btn img {
-            filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2));
+            filter: drop-shadow(2px 4px 8px rgba(0, 0, 0, 0.3));
+            transition: transform 0.4s ease;
         }
 
         .project-btn p {
             font-size: 18px;
             color: #fff;
-            margin-top: 10px;
+            margin-top: 15px;
+            transition: color 0.4s ease;
         }
 
-        /* Animação suave nos botões de projetos */
         .project-btn:hover {
-            background-color: rgba(255, 255, 255, 0.3); /* Mudança de cor ao passar o mouse */
-            transform: scale(1.05); /* Animação suave ao passar o mouse */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Efeito de sombra ao hover */
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
+
+        .project-btn:hover img {
+            transform: scale(1.1);
+        }
+
+        .project-btn:hover p {
+            color: #e0e0e0;
+        }
+
+        /* User Info */
         #user-info {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 5px 10px;
-    border-radius: 10px;
-    font-size: 14px;
-}
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
 
-#user-info img {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    margin-left: 8px;
-}
-.login-button{
-     width: 250px; /* Ajuste o valor conforme necessário */
-    max-width: 50%; /* Garante que o botão não ultrapasse a largura da tela */
-}
-	        .custom-google-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        background-color: #ffffff;
-        color: #000;
-        font-size: 16px;
-        font-weight: bold;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
+        #user-info:hover {
+            transform: scale(1.05);
+        }
 
-    .custom-google-button:hover {
-        background-color: #f0f0f0;
-        transform: scale(1.05);
-    }
+        #user-info img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin-left: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
 
-    .custom-google-button img {
-        width: 20px;
-        height: 20px;
-    }
+        /* Botão de Login (Mantido Original) */
+        .custom-google-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: #ffffff;
+            color: #000;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .custom-google-button:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        .custom-google-button img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .login-button {
+            width: 250px;
+            max-width: 50%;
+        }
+
+        /* Animações de Entrada */
+        section, .social-icon, .project-btn {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .social-icon {
+                width: 50px;
+                height: 50px;
+            }
+
+            .project-btn {
+                padding: 20px;
+            }
+
+            .project-btn p {
+                font-size: 16px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            h3 {
+                font-size: 20px;
+            }
+        }
     </style>
 	<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 <script>
@@ -194,23 +282,22 @@
         Entrar com Google
     </div>
 </div>
-	    <script>
-    document.getElementById("login-button").addEventListener("click", function() {
-        google.accounts.id.prompt();
-    });
-</script>
-    <!-- Texto Explicativo abaixo do Cabeçalho -->
-    <section style="text-align: center; padding: 20px;">
+    <script>
+        document.getElementById("login-button").addEventListener("click", function() {
+            google.accounts.id.prompt();
+        });
+    </script>
+
+    <section style="text-align: center; padding: 40px 20px;">
         <h2 style="font-size: 28px; font-weight: bold; color: #fff;">Explore Meus Projetos e Trabalhos!</h2>
-        <p style="font-size: 18px; color: #e0e0e0; max-width: 800px; margin: 0 auto;">
+        <p style="font-size: 18px; color: #e0e0e0; max-width: 800px; margin: 20px auto;">
             Aqui você poderá desfrutar dos meus projetos e trabalhos, tanto pessoais quanto públicos. Além disso, se quiser apoiar, pode fazer uma doação para ajudar a melhorar meus equipamentos e continuar criando coisas novas e empolgantes!
         </p>
     </section>
 
-    <!-- Seção de Redes Sociais -->
-    <section style="text-align: center; padding: 20px;">
+    <section style="text-align: center; padding: 40px 20px;">
         <h3 style="font-size: 22px; font-weight: bold; color: #fff;">Me siga nas Redes Sociais</h3>
-        <div style="display: flex; justify-content: center; gap: 20px;">
+        <div style="display: flex; justify-content: center; gap: 25px; margin-top: 20px;">
             <a href="https://www.youtube.com/@Z-100/videos" target="_blank" class="social-icon">
                 <img src="https://img.icons8.com/ios-filled/50/ffffff/youtube-play.png" alt="YouTube" />
             </a>
@@ -223,48 +310,32 @@
         </div>
     </section>
 
-    <!-- Título para Projetos Ambiciosos -->
     <section style="text-align: center; padding: 40px 20px;">
         <h3 style="font-size: 24px; font-weight: bold; color: #fff;">Projetos principais</h3>
-
-        <!-- Grade de Projetos -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto; padding-top: 20px;">
-            
-            <!-- Primeiro Botão: Projeto Novel -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 25px; max-width: 900px; margin: 0 auto; padding-top: 20px;">
             <a href="Projects/project_novel.html" class="project-btn">
                 <img src="https://img.icons8.com/ios-filled/50/ffffff/book.png" alt="Livro" />
                 <p>Projeto Novel</p>
             </a>
-
-            <!-- Segundo Botão: Jogados do meu Canal -->
             <a href="Projects/DS_store.html" class="project-btn">
                 <img src="https://img.icons8.com/ios-filled/50/ffffff/controller.png" alt="Controle" />
-                <p>loja de jogados e etc do canal</p>
+                <p>Loja de jogados e etc do canal</p>
             </a>
-
         </div>
     </section>
-    <!-- Título para Projetos Ambiciosos -->
+
     <section style="text-align: center; padding: 40px 20px;">
         <h3 style="font-size: 24px; font-weight: bold; color: #fff;">Veja mais:</h3>
-
-        <!-- Grade de Projetos -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto; padding-top: 20px;">
-            
-            <!-- Primeiro Botão: Projeto Novel -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 25px; max-width: 900px; margin: 0 auto; padding-top: 20px;">
             <a href="Biography.html" class="project-btn">
                 <img src="https://img.icons8.com/ios-filled/50/ffffff/user.png" alt="Livro" />
                 <p>Biografia</p>
             </a>
-
-            <!-- Segundo Botão: Jogados do meu Canal -->
             <a href="Donate.html" class="project-btn">
                 <img src="https://img.icons8.com/ios-filled/50/ffffff/money.png" alt="Controle" />
                 <p>Doação</p>
             </a>
-    <!-- Web Push Notification Script -->
-
-
+        </div>
+    </section>
 </body>
 </html>
-	
