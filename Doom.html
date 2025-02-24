@@ -1,64 +1,30 @@
-<div id="shortcut-panel" class="shortcut-panel">
-    <div class="panel-content">
-        <input type="text" id="shortcut-input" placeholder="Digite o código...">
-        <button id="submit-shortcut">Ir</button>
-        <button id="close-panel">X</button>
-    </div>
-</div>
-
-<script>
-    // Banco de dados de atalhos corrigido
-    const shortcutsDB = {
-        'novel': '/projetos/project_novel.html',
-        'secrets': '/concepts_historical.html',
-        'doom': '/Doom.html',
-        'canal': '/canal.html',
-        'home': '/index.html',
-        'cg': '/googlea6730812930fbc9a.html'
-    };
-
-    const panel = document.getElementById('shortcut-panel');
-    const input = document.getElementById('shortcut-input');
-    const submitBtn = document.getElementById('submit-shortcut');
-    const closeBtn = document.getElementById('close-panel');
-
-    // Detectar Ctrl+C
-    document.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.key === 'c') { // Voltando para Ctrl+C
-            e.preventDefault();
-            console.log('Ctrl+C detectado'); // Para depuração
-            panel.classList.add('active');
-            input.focus();
-        }
-    });
-
-    // Fechar painel
-    closeBtn.addEventListener('click', () => {
-        panel.classList.remove('active');
-        input.value = '';
-    });
-
-    // Submeter código
-    submitBtn.addEventListener('click', redirect);
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            redirect();
-        }
-    });
-
-    function redirect() {
-        const code = input.value.toLowerCase().trim();
-        console.log('Código digitado:', code); // Para depuração
-        if (shortcutsDB[code]) {
-            console.log('Redirecionando para:', shortcutsDB[code]);
-            window.location.href = shortcutsDB[code];
-        } else {
-            alert('Código não encontrado!');
-            input.value = '';
-        }
-    }
-
-    // Função para adicionar novos atalhos
-    function addShortcut(code, destination) {
-        shortcutsDB[code] = destination;
-    }
+<!doctype html>
+ 2 <html lang="en-us">
+ 3   <head>
+ 4     <meta charset="utf-8">
+ 5     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+ 6     <title>DOOM</title>
+ 7     <style type="text/css">
+ 8       .dosbox-container { width: 320px; height: 200px; }
+ 9       .dosbox-container > .dosbox-overlay { background: url(https://js-dos.com/cdn/DOOM.png); }
+10     </style>
+11   </head>
+12   <body>
+13     <div id="dosbox"></div>
+14     <br/>
+15     <button onclick="dosbox.requestFullScreen();">Make fullscreen</button>
+16     
+17     <script type="text/javascript" src="https://js-dos.com/cdn/js-dos-api.js"></script>
+18     <script type="text/javascript">
+19       var dosbox = new Dosbox({
+20         id: "dosbox",
+21         onload: function (dosbox) {
+22           dosbox.run("upload/DOOM-@evilution.zip", "./doom");
+23         },
+24         onrun: function (dosbox, app) {
+25           console.log("App '" + app + "' is runned");
+26         }
+27       });
+28     </script>
+29   </body>
+30 </html>
