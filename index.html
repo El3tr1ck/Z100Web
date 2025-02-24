@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta name="google-adsense-account" content="ca-pub-5715350873085221">
+    <meta name="google-adsense-account" content="ca-pub-5715350873085221">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="uAS7LHeZ838mFRHoBWRn9F5_zQea-t2cd-idSKcBdA4" />
     <link rel="icon" type="image/png" href="img/Z.png">
     <title>inicio</title>
     <style>
-        /* Estilo Geral */
-        body {
+ body {
             margin: 0;
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #2c2c2c 0%, #1f1f1f 100%);
@@ -203,7 +202,7 @@
                 font-size: 20px;
             }
         }
-	     .shortcut-panel {
+        .shortcut-panel {
             display: none;
             position: fixed;
             top: 50%;
@@ -250,17 +249,38 @@
             display: block;
         }
     </style>
-	<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-<script>
-    window.OneSignal = window.OneSignal || [];
-    OneSignal.push(function() {
-        OneSignal.init({
-            appId: "SUA_APP_ID",
-            notifyButton: { enable: true },
-            serviceWorkerPath: "/seu-repositorio/OneSignalSDKWorker.js" // Caminho correto
+    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+    <script>
+        window.OneSignal = window.OneSignal || [];
+        OneSignal.push(function() {
+            OneSignal.init({
+                appId: "SUA_APP_ID",
+                notifyButton: { enable: true },
+                serviceWorkerPath: "/seu-repositorio/OneSignalSDKWorker.js"
+            });
         });
-    });
-</script>
+    </script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <div id="user-info"></div>
+
+    <div id="g_id_onload"
+         data-client_id="59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com" 
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+
+    <div id="login-container" style="display: flex; justify-content: center; margin-top: 20px;">
+        <div id="login-button" class="custom-google-button g_id_signin" data-type="standard">
+            <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo" />
+            Entrar com Google
+        </div>
+    </div>
+
+    <!-- Painel de atalho adicionado aqui -->
     <div id="shortcut-panel" class="shortcut-panel">
         <div class="panel-content">
             <input type="text" id="shortcut-input" placeholder="Digite o código...">
@@ -268,135 +288,8 @@
             <button id="close-panel">X</button>
         </div>
     </div>
-    <script>
-        // Banco de dados de teste
-        const shortcutsDB = {
-            'novel': '/projetos/project_novel.html',
-            'secrets': '/concepts_historical.html',
-            'doom': '/Doom.html',
-            'canal': '/canal.html'
-            'home': '/index.html'
-            'cg': '/googlea6730812930fbc9a.html
-        };
 
-        const panel = document.getElementById('shortcut-panel');
-        const input = document.getElementById('shortcut-input');
-        const submitBtn = document.getElementById('submit-shortcut');
-        const closeBtn = document.getElementById('close-panel');
-
-        // Detectar Ctrl+C
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'y') {
-                e.preventDefault();
-                console.log('Ctrl+C detectado'); // Para depuração
-                panel.classList.add('active');
-                input.focus();
-            }
-        });
-
-        // Fechar painel
-        closeBtn.addEventListener('click', () => {
-            panel.classList.remove('active');
-            input.value = '';
-        });
-
-        // Submeter código
-        submitBtn.addEventListener('click', redirect);
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                redirect();
-            }
-        });
-
-        function redirect() {
-            const code = input.value.toLowerCase().trim();
-            console.log('Código digitado:', code); // Para depuração
-            if (shortcutsDB[code]) {
-                console.log('Redirecionando para:', shortcutsDB[code]);
-                window.location.href = shortcutsDB[code];
-            } else {
-                alert('Código não encontrado!');
-                input.value = '';
-            }
-        }
-
-        // Função para adicionar novos atalhos
-        function addShortcut(code, destination) {
-            shortcutsDB[code] = destination;
-        }
-    </script>
-</head>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script>
-    // Função que é chamada após o login
-    function handleCredentialResponse(response) {
-        console.log("Token JWT recebido: " + response.credential);
-        
-        // Decodificar o token JWT para obter informações do usuário
-        const data = JSON.parse(atob(response.credential.split('.')[1]));
-        console.log("Usuário logado:", data);
-
-        // Armazenar o token no localStorage para persistência
-        localStorage.setItem("user", JSON.stringify(data));
-
-        // Exibir o nome do usuário e a foto no canto superior direito
-        document.getElementById("user-info").innerHTML =
-            `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
-
-        // Ocultar o botão de login
-        document.getElementById("login-button").style.display = "none";
-    }
-
-    // Função para verificar o login na inicialização da página
-    window.onload = function() {
-        const user = localStorage.getItem("user");
-        
-        // Se já houver um usuário logado no localStorage, restauramos a sessão
-        if (user) {
-            const data = JSON.parse(user);
-            document.getElementById("user-info").innerHTML =
-                `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
-            document.getElementById("login-button").style.display = "none";
-        } else {
-            // Caso não tenha usuário no localStorage, configuramos o botão de login do Google
-            google.accounts.id.initialize({
-                client_id: "59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com",
-                callback: handleCredentialResponse
-            });
-            google.accounts.id.renderButton(
-                document.getElementById("login-button"),
-                { theme: "outline", size: "large" }
-            );
-        }
-    };
-</script>
-
-
-    
-    <body>
-<div id="user-info"></div>
-
-
-<div id="g_id_onload"
-     data-client_id="59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com" 
-     data-context="signin"
-     data-ux_mode="popup"
-     data-callback="handleCredentialResponse"
-     data-auto_prompt="false">
-</div>
-
-<div id="login-container" style="display: flex; justify-content: center; margin-top: 20px;">
-    <div id="login-button" class="custom-google-button g_id_signin" data-type="standard">
-        <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo" />
-        Entrar com Google
-    </div>
-</div>
-    <script>
-        document.getElementById("login-button").addEventListener("click", function() {
-            google.accounts.id.prompt();
-        });
-    </script>
-
+    <!-- [Seu HTML existente mantido intacto] -->
     <section style="text-align: center; padding: 40px 20px;">
         <h2 style="font-size: 28px; font-weight: bold; color: #fff;">Explore Meus Projetos e Trabalhos!</h2>
         <p style="font-size: 18px; color: #e0e0e0; max-width: 800px; margin: 20px auto;">
@@ -444,12 +337,100 @@
                 <img src="https://img.icons8.com/ios-filled/50/ffffff/money.png" alt="Controle" />
                 <p>Doação</p>
             </a>
-		 <a href="canal.html" class="project-btn">
-             <img src="https://img.icons8.com/ios-filled/50/ffffff/clapperboard.png" alt="Clapperboard Icon">
+            <a href="canal.html" class="project-btn">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/clapperboard.png" alt="Clapperboard Icon">
                 <p>Os melhores do canal</p>
             </a>
-
         </div>
     </section>
+
+    <!-- Scripts movidos para o final do body -->
+    <script>
+        // Função de login do Google (mantida intacta)
+        function handleCredentialResponse(response) {
+            console.log("Token JWT recebido: " + response.credential);
+            const data = JSON.parse(atob(response.credential.split('.')[1]));
+            console.log("Usuário logado:", data);
+            localStorage.setItem("user", JSON.stringify(data));
+            document.getElementById("user-info").innerHTML =
+                `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
+            document.getElementById("login-button").style.display = "none";
+        }
+
+        window.onload = function() {
+            const user = localStorage.getItem("user");
+            if (user) {
+                const data = JSON.parse(user);
+                document.getElementById("user-info").innerHTML =
+                    `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
+                document.getElementById("login-button").style.display = "none";
+            } else {
+                google.accounts.id.initialize({
+                    client_id: "59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com",
+                    callback: handleCredentialResponse
+                });
+                google.accounts.id.renderButton(
+                    document.getElementById("login-button"),
+                    { theme: "outline", size: "large" }
+                );
+            }
+        };
+
+        document.getElementById("login-button").addEventListener("click", function() {
+            google.accounts.id.prompt();
+        });
+
+        // Script do atalho
+        const shortcutsDB = {
+            'novel': '/projetos/project_novel.html',
+            'secrets': '/concepts_historical.html',
+            'doom': '/Doom.html',
+            'canal': '/canal.html',
+            'home': '/index.html',
+            'cg': '/googlea6730812930fbc9a.html' // Corrigido
+        };
+
+        const panel = document.getElementById('shortcut-panel');
+        const input = document.getElementById('shortcut-input');
+        const submitBtn = document.getElementById('submit-shortcut');
+        const closeBtn = document.getElementById('close-panel');
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'y') {
+                e.preventDefault();
+                console.log('Ctrl+Y detectado'); // Para depuração
+                panel.classList.add('active');
+                input.focus();
+            }
+        });
+
+        closeBtn.addEventListener('click', () => {
+            panel.classList.remove('active');
+            input.value = '';
+        });
+
+        submitBtn.addEventListener('click', redirect);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                redirect();
+            }
+        });
+
+        function redirect() {
+            const code = input.value.toLowerCase().trim();
+            console.log('Código digitado:', code);
+            if (shortcutsDB[code]) {
+                console.log('Redirecionando para:', shortcutsDB[code]);
+                window.location.href = shortcutsDB[code];
+            } else {
+                alert('Código não encontrado!');
+                input.value = '';
+            }
+        }
+
+        function addShortcut(code, destination) {
+            shortcutsDB[code] = destination;
+        }
+    </script>
 </body>
 </html>
