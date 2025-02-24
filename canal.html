@@ -6,7 +6,6 @@
     <title>Mini YouTube - Últimos Vídeos</title>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <style>
-        /* Reset e Estilos Gerais */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
@@ -25,12 +24,11 @@
         }
 
         #video-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 20px;
-            padding: 0 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
+            padding: 20px;
+            justify-content: center;
         }
 
         .card {
@@ -38,7 +36,6 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-            width: 300px;
             transition: transform 0.3s ease;
         }
 
@@ -84,7 +81,48 @@
             background-color: #0056b3;
         }
 
-        /* Spinner de Carregamento */
+        #mode-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #mode-toggle:hover {
+            background-color: #f0f0f0;
+        }
+
+        #mode-toggle i {
+            font-size: 24px;
+            transition: opacity 0.3s ease;
+        }
+
+        body.dark-mode {
+            background-color: #333;
+            color: white;
+        }
+
+        body.dark-mode .card {
+            background-color: #444;
+        }
+
+        body.dark-mode .card a {
+            background-color: #333;
+        }
+
+        body.dark-mode .card a:hover {
+            background-color: #222;
+        }
+
         #loading {
             display: flex;
             flex-direction: column;
@@ -95,17 +133,18 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            z-index: 9999;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 999;
         }
 
         .spinner {
-            border: 4px solid #f3f3f3;
+            border: 4px solid rgba(0, 0, 0, 0.1);
             border-top: 4px solid #007BFF;
             border-radius: 50%;
             width: 50px;
             height: 50px;
-            animation: spin 2s linear infinite;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
         }
 
         @keyframes spin {
@@ -115,19 +154,30 @@
     </style>
 </head>
 <body>
+
+    <button id="mode-toggle">
+        <i id="mode-icon" class="fa fa-sun"></i>
+    </button>
+
     <h1>Últimos Vídeos</h1>
     <div id="loading">
         <div class="spinner"></div>
         <p>Carregando vídeos...</p>
     </div>
     <div id="video-list"></div>
-    <script src="https://apis.google.com/js/api.js"></script>
+<script src="https://apis.google.com/js/api.js"></script>
+    
     <script>
-        const API_KEY = 'AIzaSyAYUBNxqcp6s2f_Hq3_5K1B4eJX1ynwuaw';
-        const CHANNEL_ID = 'UCaUpZWdX_v3j2w4UJX0f7TA';
+<script>
+        const API_KEY = 'AIzaSyAYUBNxqcp6s2f_Hq3_5K1B4eJX1ynwuaw'; // Sua chave de API
+        const CHANNEL_ID = 'UCaUpZWdX_v3j2w4UJX0f7TA'; // ID do canal
+
+        let nextPageToken = '';
 
         function loadYouTubeAPI() {
-            gapi.client.init({ apiKey: API_KEY }).then(() => {
+            gapi.client.init({
+                'apiKey': API_KEY,
+            }).then(() => {
                 gapi.client.load('youtube', 'v3').then(() => {
                     fetchVideos();
                 });
@@ -137,57 +187,21 @@
         }
 
         function fetchVideos() {
-            document.getElementById('loading').style.display = 'flex';
+        document.getElementById('mode-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            let icon = document.getElementById('mode-icon');
+            icon.classList.toggle('fa-sun');
+            icon.classList.toggle('fa-moon');
+        });
 
-            gapi.client.youtube.channels.list({
-                part: 'contentDetails',
-                id: CHANNEL_ID,
-            }).then(response => {
-                const playlistId = response.result.items[0].contentDetails.relatedPlaylists.uploads;
-                fetchPlaylistVideos(playlistId);
-            }).catch(err => {
-                console.error("Erro ao buscar playlist:", err);
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
-            });
-        }
+            }, 2000);
+        });
 
-        function fetchPlaylistVideos(playlistId) {
-            gapi.client.youtube.playlistItems.list({
-                part: 'snippet',
-                playlistId: playlistId,
-                maxResults: 10,
-            }).then(response => {
-                document.getElementById('loading').style.display = 'none';
-                displayVideos(response.items);
-            }).catch(err => {
-                console.error("Erro ao buscar vídeos:", err);
-                document.getElementById('loading').style.display = 'none';
-            });
-        }
-
-        function displayVideos(videos) {
-            const videoList = document.getElementById('video-list');
-            videoList.innerHTML = '';
-
-            videos.forEach(video => {
-                const { videoId } = video.snippet.resourceId;
-                const { title, description, thumbnails } = video.snippet;
-                const card = document.createElement('div');
-                card.classList.add('card');
-                card.innerHTML = `
-                    <img src="${thumbnails.high.url}" alt="${title}">
-                    <div class="info">
-                        <div class="title">${title}</div>
-                        <div class="description">${description.substring(0, 100)}...</div>
-                        <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">Assistir</a>
-                    </div>
-                `;
-                videoList.appendChild(card);
-            });
-        }
-
+        // Carregar a API do YouTube
         gapi.load('client', loadYouTubeAPI);
     </script>
 </body>
 </html>
-
