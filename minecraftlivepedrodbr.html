@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Live Stream</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('https://cdn.pixabay.com/photo/2015/12/23/22/36/minecraft-1106253_1280.png') no-repeat center center fixed;
+            background-size: cover;
+            backdrop-filter: blur(2px); /* Leve blur no fundo */
+            overflow: hidden; /* Evita scroll por causa das partículas */
+        }
+
+        .container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            top: 0px; /* Posição ajustada */
+            z-index: 1; /* Garante que o container fique acima das partículas */
+        }
+
+        .logo {
+            width: 400px; /* Tamanho da logo */
+            margin-bottom: 30px; /* Espaço abaixo da logo */
+        }
+
+        .live-window {
+            width: 960px; /* Largura do retângulo */
+            height: 540px; /* Altura proporcional */
+            background: rgba(0, 0, 0, 0.8);
+            border: 8px solid #555;
+            border-radius: 16px; /* Bordas arredondadas */
+            image-rendering: pixelated; /* Estilo pixelado */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .live-window iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Efeito pixelado nas bordas com detalhe de 2px nas pontas */
+        .live-window::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            border: 8px solid #777;
+            border-radius: 16px;
+            image-rendering: pixelated;
+            pointer-events: none;
+            box-shadow: 
+                2px 2px 0 #555, /* Canto superior esquerdo */
+                -2px 2px 0 #555, /* Canto superior direito */
+                2px -2px 0 #555, /* Canto inferior esquerdo */
+                -2px -2px 0 #555; /* Canto inferior direito */
+        }
+
+        /* Estilização das partículas como pixels quadradinhos */
+        .particle {
+            position: absolute;
+            width: 4px; /* Tamanho do pixel */
+            height: 4px; /* Quadrado */
+            background: #00ff55; /* Verde claro mais vivo */
+            box-shadow: 0 0 6px 2px rgba(0, 255, 85, 0.8); /* Efeito de luz brilhante */
+            animation: moveAcross 5s ease-in-out infinite, blink 1s infinite alternate;
+            z-index: 0; /* Fica atrás do container */
+        }
+
+        /* Animação de piscar entre verde claro brilhante e verde escuro */
+        @keyframes blink {
+            0% {
+                background: #00ff55; /* Verde claro mais vivo */
+                box-shadow: 0 0 6px 2px rgba(0, 255, 85, 0.8); /* Brilho máximo */
+            }
+            100% {
+                background: #006600; /* Verde escuro */
+                box-shadow: 0 0 2px 1px rgba(0, 102, 0, 0.5); /* Brilho mínimo */
+            }
+        }
+
+        /* Animação de movimento das bordas para fora do site */
+        @keyframes moveAcross {
+            0% {
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--end-x), var(--end-y)); /* Sai do site */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/3b9cfe86-8d02-489c-845f-16ad957749a2/dgod4yu-2577ded4-51af-4a20-b569-37ffa5a3bca7.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzNiOWNmZTg2LThkMDItNDg5Yy04NDVmLTE2YWQ5NTc3NDlhMlwvZGdvZDR5dS0yNTc3ZGVkNC01MWFmLTRhMjAtYjU2OS0zN2ZmYTVhM2JjYTcucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.XUg9peSdpKJyTJxWYGZ85OsExn8yg2aQy_iSdJyWKIQ" alt="Minecraft Live Logo" class="logo">
+        <div class="live-window">
+            <iframe src="https://www.youtube.com/embed/K6abCb5A1WU?si=edrM1RBBPrYnwKXi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <!-- Script para gerar partículas -->
+    <script>
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+
+            // Define a posição inicial fora das bordas
+            const edge = Math.floor(Math.random() * 4); // 0: topo, 1: direita, 2: baixo, 3: esquerda
+            let startX, startY, endX, endY;
+
+            switch (edge) {
+                case 0: // Topo
+                    startX = Math.random() * 100 + 'vw';
+                    startY = '-10vh';
+                    endX = (Math.random() - 0.5) * 200 + 'vw'; // Sai para fora horizontalmente
+                    endY = '110vh'; // Sai pelo fundo
+                    break;
+                case 1: // Direita
+                    startX = '110vw';
+                    startY = Math.random() * 100 + 'vh';
+                    endX = '-10vw'; // Sai pela esquerda
+                    endY = (Math.random() - 0.5) * 200 + 'vh'; // Sai verticalmente
+                    break;
+                case 2: // Baixo
+                    startX = Math.random() * 100 + 'vw';
+                    startY = '110vh';
+                    endX = (Math.random() - 0.5) * 200 + 'vw'; // Sai horizontalmente
+                    endY = '-10vh'; // Sai pelo topo
+                    break;
+                case 3: // Esquerda
+                    startX = '-10vw';
+                    startY = Math.random() * 100 + 'vh';
+                    endX = '110vw'; // Sai pela direita
+                    endY = (Math.random() - 0.5) * 200 + 'vh'; // Sai verticalmente
+                    break;
+            }
+
+            particle.style.left = startX;
+            particle.style.top = startY;
+            particle.style.setProperty('--end-x', endX);
+            particle.style.setProperty('--end-y', endY);
+            particle.style.animationDelay = Math.random() * 2 + 's'; // Delay aleatório
+
+            document.body.appendChild(particle);
+
+            // Remove a partícula após a animação
+            setTimeout(() => {
+                particle.remove();
+            }, 5000); /* Duração da animação */
+        }
+
+        // Gera partículas continuamente
+        setInterval(createParticle, 150); /* Cria uma nova partícula a cada 150ms */
+    </script>
+</body>
+</html>
+		
