@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testador de Código</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        textarea {
+            width: 90%;
+            height: 300px;
+            font-family: monospace;
+            font-size: 14px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Testador de Código HTML, CSS e JavaScript</h2>
+    <textarea id="codeInput" placeholder="Digite seu código HTML, CSS ou JavaScript aqui..."></textarea><br>
+    <button onclick="testarCodigo()">Testar</button>
+
+    <script>
+        function testarCodigo() {
+            let codigo = document.getElementById("codeInput").value;
+            let novaJanela = window.open();
+            novaJanela.document.write(codigo);
+            novaJanela.document.close();
+        }
+    </script>
+
+</body>
+</html>
