@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testador de Código</title>
+
+    <!-- CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+
+    <!-- CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: white;
+            text-align: center;
+            margin: 20px;
+        }
+        .editor-container {
+            width: 90%;
+            margin: auto;
+            text-align: left;
+        }
+        .CodeMirror {
+            height: 300px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            background: #282a36;
+            color: white;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Testador de Código HTML, CSS e JavaScript</h2>
+    <div class="editor-container">
+        <textarea id="codeInput"></textarea>
+    </div>
+    <button onclick="abrirJanela()">Abrir Visualização</button>
+
+    <script>
+        let janela = null;
+
+        // Inicializa o CodeMirror corretamente
+        let editor = CodeMirror.fromTextArea(document.getElementById("codeInput"), {
+            mode: "htmlmixed", // Suporta HTML, CSS e JavaScript no mesmo editor
+            theme: "dracula",  // Tema escuro com cores destacadas
+            lineNumbers: true,
+            autoCloseTags: true
+        });
+
+        function abrirJanela() {
+            if (!janela || janela.closed) {
+                janela = window.open();
+            }
+            atualizarCodigo();
+        }
+
+        function atualizarCodigo() {
+            if (janela && !janela.closed) {
+                let codigo = editor.getValue();
+                janela.document.open();
+                janela.document.write(codigo);
+                janela.document.close();
+            }
+        }
+
+        // Atualiza automaticamente a visualização ao modificar o código
+        editor.on("change", atualizarCodigo);
+    </script>
+
+</body>
+</html>
