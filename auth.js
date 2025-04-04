@@ -1,4 +1,11 @@
 // auth.js
+function protectPage() {
+    const user = localStorage.getItem("user");
+    if (!user && window.location.pathname !== "/index.html") {
+        window.location.href = "index.html"; // Redireciona para index se não logado
+    }
+}
+
 function updateUserInfo() {
     const user = localStorage.getItem("user");
     const userInfo = document.getElementById("user-info");
@@ -26,11 +33,12 @@ function handleCredentialResponse(response) {
 function logout() {
     localStorage.removeItem("user");
     updateUserInfo();
-    window.location.href = "index.html"; // Redireciona para o index após logout
+    window.location.href = "index.html";
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    updateUserInfo(); // Atualiza o user-info ao carregar a página
+    protectPage(); // Verifica se a página está protegida
+    updateUserInfo();
 
     const logoutButton = document.getElementById("logout-button");
     if (logoutButton) {
