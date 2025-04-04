@@ -13,6 +13,7 @@
             background: linear-gradient(135deg, #2c2c2c 0%, #1f1f1f 100%);
             color: #fff;
             overflow-x: hidden;
+            padding-top: 60px; /* Espaço padrão para o botão de login */
         }
 
         section {
@@ -119,6 +120,7 @@
             backdrop-filter: blur(5px);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease;
+            z-index: 1000; /* Garante que fique acima do conteúdo */
         }
 
         #user-info:hover {
@@ -145,6 +147,7 @@
             backdrop-filter: blur(5px);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease;
+            z-index: 1000; /* Garante que fique acima do conteúdo */
         }
 
         #login-container:hover {
@@ -178,7 +181,7 @@
         .carousel-inner {
             display: flex;
             width: 100%;
-            height: 300px; /* Altura padrão, ajustada em telas menores */
+            height: 300px;
             position: relative;
         }
 
@@ -218,8 +221,12 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Melhorias para Responsividade em Celulares */
+        /* Responsividade */
         @media (max-width: 768px) {
+            body {
+                padding-top: 50px; /* Espaço reduzido para tablets */
+            }
+
             section {
                 padding: 0 15px;
                 margin-bottom: 40px;
@@ -275,11 +282,15 @@
             }
 
             .carousel-inner {
-                height: 200px; /* Reduz a altura do carrossel em telas menores */
+                height: 200px;
             }
         }
 
         @media (max-width: 480px) {
+            body {
+                padding-top: 70px; /* Mais espaço em celulares para evitar sobreposição */
+            }
+
             h2 {
                 font-size: 20px;
             }
@@ -314,14 +325,27 @@
             #login-container {
                 right: 60px;
                 top: 10px;
+                padding: 3px 6px;
+            }
+
+            .custom-google-button {
+                padding: 5px 10px;
+                font-size: 11px;
             }
 
             #user-info {
                 top: 10px;
+                right: 5px;
+                padding: 5px 10px;
+            }
+
+            #user-info img {
+                width: 25px;
+                height: 25px;
             }
 
             .carousel-inner {
-                height: 150px; /* Ainda menor para telas muito pequenas */
+                height: 150px;
             }
         }
 
@@ -452,7 +476,7 @@
     </section>
 
     <section style="text-align: center; padding: 40px 20px;">
-        <h3 style="font-size: 22px; font-weight: bold; color: #fff;">Me siga nas Redes Sociais</h3>
+        <h3 style="font-series: 22px; font-weight: bold; color: #fff;">Me siga nas Redes Sociais</h3>
         <div style="display: flex; justify-content: center; gap: 25px; margin-top: 20px;">
             <a href="https://www.youtube.com/@Z-100/videos" target="_blank" class="social-icon">
                 <img src="https://img.icons8.com/ios-filled/50/ffffff/youtube-play.png" alt="YouTube" />
@@ -467,7 +491,7 @@
     </section>
 
     <section style="text-align: center; padding: 40px 20px;">
-        <h3 style="font-size: 24px; font-weight: bold; color: #fff;">Projetos principais</h3>
+        <h3 style="font-size: 24 much-weight: bold; color: #fff;">Projetos principais</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 25px; max-width: 900px; margin: 0 auto; padding-top: 20px;">
             <a href="Projects/project_novel.html" class="project-btn">
                 <img src="https://img.icons8.com/ios-filled/50/ffffff/book.png" alt="Livro" />
