@@ -168,6 +168,35 @@
             background-color: #f0f0f0;
         }
 
+        /* Estilo do Botão de Logout */
+        #logout-button {
+            position: fixed;
+            top: 15px;
+            right: 150px; /* Ajustado para ficar ao lado do #user-info */
+            display: none; /* Escondido por padrão */
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 50, 50, 0.8);
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, background 0.3s ease;
+            z-index: 1000;
+        }
+
+        #logout-button:hover {
+            background: rgba(255, 50, 50, 1);
+            transform: scale(1.1);
+        }
+
+        #logout-button img {
+            width: 20px;
+            height: 20px;
+        }
+
         .carousel {
             position: relative;
             width: 100%;
@@ -304,6 +333,17 @@
                 height: 30px;
             }
 
+            #logout-button {
+                right: 110px; /* Ajustado para tablets */
+                width: 35px;
+                height: 35px;
+            }
+
+            #logout-button img {
+                width: 18px;
+                height: 18px;
+            }
+
             .carousel {
                 max-width: 100%;
             }
@@ -375,6 +415,17 @@
             #user-info img {
                 width: 25px;
                 height: 25px;
+            }
+
+            #logout-button {
+                right: 80px; /* Ajustado para celulares */
+                width: 30px;
+                height: 30px;
+            }
+
+            #logout-button img {
+                width: 16px;
+                height: 16px;
             }
 
             .carousel-inner {
@@ -484,8 +535,12 @@
     <div id="login-container">
         <div id="login-button" class="custom-google-button g_id_signin" data-type="standard"></div>
     </div>
-<br>
-<br>
+
+    <!-- Botão de Logout -->
+    <button id="logout-button">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/logout-rounded.png" alt="Logout">
+    </button>
+
     <div id="shortcut-panel" class="shortcut-panel">
         <div class="panel-content">
             <input type="text" id="shortcut-input" placeholder="Digite o código...">
@@ -581,7 +636,7 @@
             img.src = src;
         });
 
-        // Controle do carrossel
+        // Controle do carrossel e bloqueio de botões
         document.addEventListener("DOMContentLoaded", () => {
             const items = document.querySelectorAll(".carousel-item");
             let currentIndex = 0;
@@ -604,13 +659,13 @@
                 notification.classList.add("active");
                 setTimeout(() => {
                     notification.classList.remove("active");
-                }, 3000); // Notificação desaparece após 3 segundos
+                }, 3000);
             }
 
             projectButtons.forEach(button => {
                 button.addEventListener("click", (e) => {
                     if (!localStorage.getItem("user")) {
-                        e.preventDefault(); // Impede o redirecionamento
+                        e.preventDefault();
                         showNotification();
                     }
                 });
@@ -619,10 +674,24 @@
             socialButtons.forEach(button => {
                 button.addEventListener("click", (e) => {
                     if (!localStorage.getItem("user")) {
-                        e.preventDefault(); // Impede o redirecionamento
+                        e.preventDefault();
                         showNotification();
                     }
                 });
+            });
+
+            // Controle do botão de logout
+            const logoutButton = document.getElementById("logout-button");
+            if (localStorage.getItem("user")) {
+                logoutButton.style.display = "flex"; // Mostra o botão se estiver logado
+            }
+
+            logoutButton.addEventListener("click", () => {
+                localStorage.removeItem("user"); // Remove os dados do usuário
+                document.getElementById("user-info").innerHTML = ""; // Limpa o user-info
+                document.getElementById("login-container").style.display = "flex"; // Mostra o botão de login
+                logoutButton.style.display = "none"; // Esconde o botão de logout
+                location.reload(); // Recarrega a página para atualizar o estado
             });
         });
 
@@ -634,6 +703,7 @@
             document.getElementById("user-info").innerHTML =
                 `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
             document.getElementById("login-container").style.display = "none";
+            document.getElementById("logout-button").style.display = "flex"; // Mostra o botão de logout
         }
 
         window.onload = function() {
@@ -643,6 +713,7 @@
                 document.getElementById("user-info").innerHTML =
                     `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
                 document.getElementById("login-container").style.display = "none";
+                document.getElementById("logout-button").style.display = "flex"; // Mostra o botão de logout
             } else {
                 google.accounts.id.initialize({
                     client_id: "59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com",
