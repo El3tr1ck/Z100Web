@@ -31,7 +31,6 @@
             line-height: 1.6;
         }
 
-        /* Estilo dos Ícones de Redes Sociais */
         .social-icon {
             display: inline-flex;
             align-items: center;
@@ -52,7 +51,6 @@
             box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
         }
 
-        /* Estilo dos Botões de Projetos */
         .project-btn {
             display: flex;
             flex-direction: column;
@@ -109,7 +107,6 @@
             color: #e0e0e0;
         }
 
-        /* User Info */
         #user-info {
             position: fixed;
             top: 15px;
@@ -136,7 +133,6 @@
             border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Botão de Login */
         #login-container {
             position: fixed;
             top: 15px;
@@ -169,7 +165,6 @@
             background-color: #f0f0f0;
         }
 
-        /* Carrossel de Imagens */
         .carousel {
             position: relative;
             width: 100%;
@@ -182,32 +177,38 @@
 
         .carousel-inner {
             display: flex;
-            width: 300%; /* 3 imagens */
-            animation: slide 9s infinite ease-in-out;
+            width: 100%;
+            height: 300px; /* Ajuste a altura conforme necessário */
+            position: relative;
         }
 
         .carousel-item {
-            width: 33.33%; /* Cada imagem ocupa 1/3 do total */
-            flex-shrink: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+        }
+
+        .carousel-item.active {
+            opacity: 1;
+            transform: translateX(0);
         }
 
         .carousel-item img {
             width: 100%;
-            height: auto;
+            height: 100%;
             display: block;
             object-fit: cover;
         }
 
-        @keyframes slide {
-            0% { transform: translateX(0); }
-            33.33% { transform: translateX(0); }
-            33.34% { transform: translateX(-33.33%); }
-            66.66% { transform: translateX(-33.33%); }
-            66.67% { transform: translateX(-66.66%); }
-            100% { transform: translateX(-66.66%); }
+        .carousel-item:nth-child(1).active ~ .carousel-item:nth-child(2),
+        .carousel-item:nth-child(2).active ~ .carousel-item:nth-child(3),
+        .carousel-item:nth-child(3).active ~ .carousel-item:nth-child(1) {
+            transform: translateX(10%);
+            opacity: 0;
         }
 
-        /* Animações de Entrada */
         section, .social-icon, .project-btn, #login-container, .carousel {
             animation: fadeIn 0.8s ease-out forwards;
         }
@@ -217,7 +218,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Responsividade */
         @media (max-width: 600px) {
             .social-icon {
                 width: 50px;
@@ -301,15 +301,8 @@
         }
     </style>
 
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5715350873085221"
-         crossorigin="anonymous"></script>
-    <!-- anuncios rapidos -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-5715350873085221"
-         data-ad-slot="1750177893"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5715350873085221" crossorigin="anonymous"></script>
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5715350873085221" data-ad-slot="1750177893" data-ad-format="auto" data-full-width-responsive="true"></ins>
     <script>
          (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
@@ -342,7 +335,6 @@
         <div id="login-button" class="custom-google-button g_id_signin" data-type="standard"></div>
     </div>
 
-    <!-- Painel de atalho -->
     <div id="shortcut-panel" class="shortcut-panel">
         <div class="panel-content">
             <input type="text" id="shortcut-input" placeholder="Digite o código...">
@@ -356,20 +348,20 @@
         <p style="font-size: 18px; color: #e0e0e0; max-width: 800px; margin: 20px auto;">
             Aqui você poderá desfrutar dos meus projetos e trabalhos, tanto pessoais quanto públicos. Além disso, se quiser apoiar, pode fazer uma doação para ajudar a melhorar meus equipamentos e continuar criando coisas novas e empolgantes!
         </p>
-       <!-- Carrossel de Imagens -->
-<div class="carousel">
-    <div class="carousel-inner">
-        <div class="carousel-item">
-            <img src="img/index_list1.png" alt="Imagem 1" onerror="console.log('Erro ao carregar img/index_list1.png')">
+        <div class="carousel">
+            <h3 style="font-size: 20px; font-weight: bold; color: #fff; margin-bottom: 15px;">Imagens do Site</h3>
+            <div class="carousel-inner">
+                <div class="carousel-item">
+                    <img src="img/index_list1.png" alt="Imagem 1">
+                </div>
+                <div class="carousel-item">
+                    <img src="img/index_list2.png" alt="Imagem 2">
+                </div>
+                <div class="carousel-item">
+                    <img src="img/index_list3.png" alt="Imagem 3">
+                </div>
+            </div>
         </div>
-        <div class="carousel-item">
-            <img src="img/index_list2.png" alt="Imagem 2" onerror="console.log('Erro ao carregar img/index_list2.png')">
-        </div>
-        <div class="carousel-item">
-            <img src="img/index_list3.png" alt="Imagem 3" onerror="console.log('Erro ao carregar img/index_list3.png')">
-        </div>
-    </div>
-</div>
     </section>
 
     <section style="text-align: center; padding: 40px 20px;">
@@ -419,8 +411,34 @@
         </div>
     </section>
 
-    <!-- Scripts -->
     <script>
+        // Pré-carregar imagens
+        const images = [
+            "img/index_list1.png",
+            "img/index_list2.png",
+            "img/index_list3.png"
+        ];
+
+        images.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+
+        // Controle do carrossel
+        document.addEventListener("DOMContentLoaded", () => {
+            const items = document.querySelectorAll(".carousel-item");
+            let currentIndex = 0;
+
+            function showNextImage() {
+                items[currentIndex].classList.remove("active");
+                currentIndex = (currentIndex + 1) % items.length;
+                items[currentIndex].classList.add("active");
+            }
+
+            items[0].classList.add("active");
+            setInterval(showNextImage, 3000);
+        });
+
         function handleCredentialResponse(response) {
             console.log("Token JWT recebido: " + response.credential);
             const data = JSON.parse(atob(response.credential.split('.')[1]));
@@ -454,7 +472,6 @@
             google.accounts.id.prompt();
         });
 
-        // Script do atalho
         const shortcutsDB = {
             'novel': '/projects/project_novel.html',
             'secrets': '/projects/concepts_historical.html',
