@@ -169,7 +169,7 @@
             position: relative;
             width: 100%;
             max-width: 800px;
-            margin: 0 auto 40px auto;
+            margin: 0 auto;
             overflow: hidden;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -178,7 +178,7 @@
         .carousel-inner {
             display: flex;
             width: 100%;
-            height: 300px; /* Ajuste a altura conforme necessário */
+            height: 300px; /* Altura padrão, ajustada em telas menores */
             position: relative;
         }
 
@@ -218,7 +218,25 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @media (max-width: 600px) {
+        /* Melhorias para Responsividade em Celulares */
+        @media (max-width: 768px) {
+            section {
+                padding: 0 15px;
+                margin-bottom: 40px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            h3 {
+                font-size: 18px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+
             .social-icon {
                 width: 50px;
                 height: 50px;
@@ -232,24 +250,78 @@
                 font-size: 16px;
             }
 
-            h2 {
-                font-size: 24px;
-            }
-
-            h3 {
-                font-size: 20px;
-            }
-
             #login-container {
                 right: 80px;
+                padding: 4px 8px;
+            }
+
+            .custom-google-button {
+                padding: 6px 12px;
+                font-size: 12px;
             }
 
             #user-info {
                 right: 10px;
+                padding: 6px 12px;
+            }
+
+            #user-info img {
+                width: 30px;
+                height: 30px;
             }
 
             .carousel {
                 max-width: 100%;
+            }
+
+            .carousel-inner {
+                height: 200px; /* Reduz a altura do carrossel em telas menores */
+            }
+        }
+
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 20px;
+            }
+
+            h3 {
+                font-size: 16px;
+            }
+
+            p {
+                font-size: 14px;
+            }
+
+            .social-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .project-btn {
+                padding: 15px;
+            }
+
+            .project-btn img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .project-btn p {
+                font-size: 14px;
+                margin-top: 10px;
+            }
+
+            #login-container {
+                right: 60px;
+                top: 10px;
+            }
+
+            #user-info {
+                top: 10px;
+            }
+
+            .carousel-inner {
+                height: 150px; /* Ainda menor para telas muito pequenas */
             }
         }
 
@@ -298,6 +370,21 @@
 
         .shortcut-panel.active {
             display: block;
+        }
+
+        @media (max-width: 768px) {
+            .shortcut-panel {
+                width: 90%;
+                padding: 15px;
+            }
+
+            #shortcut-input {
+                width: 100%;
+            }
+
+            #submit-shortcut, #close-panel {
+                padding: 6px 12px;
+            }
         }
     </style>
 
@@ -348,8 +435,8 @@
         <p style="font-size: 18px; color: #e0e0e0; max-width: 800px; margin: 20px auto;">
             Aqui você poderá desfrutar dos meus projetos e trabalhos, tanto pessoais quanto públicos. Além disso, se quiser apoiar, pode fazer uma doação para ajudar a melhorar meus equipamentos e continuar criando coisas novas e empolgantes!
         </p>
+        <h3 style="font-size: 20px; font-weight: bold; color: #fff; margin: 20px 0 15px 0;">Imagens do Site</h3>
         <div class="carousel">
-            <h3 style="font-size: 20px; font-weight: bold; color: #fff; margin-bottom: 15px;">Imagens do Site</h3>
             <div class="carousel-inner">
                 <div class="carousel-item">
                     <img src="img/index_list1.png" alt="Imagem 1">
