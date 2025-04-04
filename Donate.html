@@ -49,9 +49,182 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
         }
+<style>
+    #user-info {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 8px 15px;
+        border-radius: 15px;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+    }
+
+    #user-info:hover {
+        transform: scale(1.05);
+    }
+
+    #user-info img {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        margin-left: 10px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    #login-container {
+        position: fixed;
+        top: 15px;
+        right: 100px;
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 5px 10px;
+        border-radius: 15px;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+    }
+
+    #login-container:hover {
+        transform: scale(1.05);
+    }
+
+    .custom-google-button {
+        padding: 8px 15px;
+        font-size: 14px;
+        background-color: #ffffff;
+        color: #000;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .custom-google-button:hover {
+        background-color: #f0f0f0;
+    }
+
+    #logout-button {
+        position: fixed;
+        top: 15px;
+        right: 150px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 50, 50, 0.8);
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, background 0.3s ease;
+        z-index: 1000;
+    }
+
+    #logout-button:hover {
+        background: rgba(255, 50, 50, 1);
+        transform: scale(1.1);
+    }
+
+    #logout-button img {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        #login-container {
+            right: 80px;
+            padding: 4px 8px;
+        }
+
+        .custom-google-button {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        #user-info {
+            right: 10px;
+            padding: 6px 12px;
+        }
+
+        #user-info img {
+            width: 30px;
+            height: 30px;
+        }
+
+        #logout-button {
+            right: 110px;
+            width: 35px;
+            height: 35px;
+        }
+
+        #logout-button img {
+            width: 18px;
+            height: 18px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        #login-container {
+            right: 60px;
+            top: 10px;
+            padding: 3px 6px;
+        }
+
+        .custom-google-button {
+            padding: 5px 10px;
+            font-size: 11px;
+        }
+
+        #user-info {
+            top: 10px;
+            right: 5px;
+            padding: 5px 10px;
+        }
+
+        #user-info img {
+            width: 25px;
+            height: 25px;
+        }
+
+        #logout-button {
+            right: 80px;
+            width: 30px;
+            height: 30px;
+        }
+
+        #logout-button img {
+            width: 16px;
+            height: 16px;
+        }
+    }
+</style>
     </style>
 </head>
 <body>
+
+<!-- puxamento das informações de login-->
+<div id="user-info"></div>
+<div id="g_id_onload"
+     data-client_id="59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com" 
+     data-context="signin"
+     data-ux_mode="popup"
+     data-callback="handleCredentialResponse"
+     data-auto_prompt="false">
+</div>
+<div id="login-container">
+    <div id="login-button" class="custom-google-button g_id_signin" data-type="standard"></div>
+</div>
+<br>
+<br>
 
     <div class="container">
         <div class="image-container">
@@ -65,6 +238,7 @@
 
         </div>
     </div>
-
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="auth.js"></script>
 </body>
 </html>
