@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="img/Z.png">
     <title>inicio</title>
     <style>
- body {
+        body {
             margin: 0;
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #2c2c2c 0%, #1f1f1f 100%);
@@ -91,7 +91,9 @@
         .project-btn p {
             font-size: 18px;
             color: #fff;
-            margin-top: 15px;
+            margin-top:
+
+ 15px;
             transition: color 0.4s ease;
         }
 
@@ -136,41 +138,41 @@
             border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Botão de Login (Mantido Original) */
-        .custom-google-button {
+        /* Botão de Login */
+        #login-container {
+            position: fixed;
+            top: 15px;
+            right: 100px; /* Espaço antes do #user-info */
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px 10px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        #login-container:hover {
+            transform: scale(1.05);
+        }
+
+        .custom-google-button {
+            padding: 8px 15px;
+            font-size: 14px;
             background-color: #ffffff;
             color: #000;
-            font-size: 16px;
-            font-weight: bold;
-            padding: 12px 20px;
-            border: none;
             border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
         .custom-google-button:hover {
             background-color: #f0f0f0;
-            transform: scale(1.05);
-        }
-
-        .custom-google-button img {
-            width: 20px;
-            height: 20px;
-        }
-
-        .login-button {
-            width: 250px;
-            max-width: 50%;
         }
 
         /* Animações de Entrada */
-        section, .social-icon, .project-btn {
+        section, .social-icon, .project-btn, #login-container {
             animation: fadeIn 0.8s ease-out forwards;
         }
 
@@ -201,7 +203,16 @@
             h3 {
                 font-size: 20px;
             }
+
+            #login-container {
+                right: 80px; /* Ajuste para telas menores */
+            }
+
+            #user-info {
+                right: 10px;
+            }
         }
+
         .shortcut-panel {
             display: none;
             position: fixed;
@@ -250,18 +261,18 @@
         }
     </style>
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5715350873085221"
-     crossorigin="anonymous"></script>
-<!-- anuncios rapidos -->
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-5715350873085221"
-     data-ad-slot="1750177893"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5715350873085221"
+         crossorigin="anonymous"></script>
+    <!-- anuncios rapidos -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-5715350873085221"
+         data-ad-slot="1750177893"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
 
     <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
     <script>
@@ -287,12 +298,11 @@
          data-auto_prompt="false">
     </div>
 
-   <div id="login-container" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: flex; justify-content: center;">
-    <div id="login-button" class="custom-google-button g_id_signin" data-type="standard">
+    <div id="login-container">
+        <div id="login-button" class="custom-google-button g_id_signin" data-type="standard"></div>
     </div>
-</div>
 
-    <!-- Painel de atalho adicionado aqui -->
+    <!-- Painel de atalho -->
     <div id="shortcut-panel" class="shortcut-panel">
         <div class="panel-content">
             <input type="text" id="shortcut-input" placeholder="Digite o código...">
@@ -301,12 +311,12 @@
         </div>
     </div>
 
- <section style="text-align: center; margin-top: 0; padding: 0 20px 40px 20px;">
-    <h2 style="font-size: 28px; font-weight: bold; color: #fff; margin-top: 0;">Explore Meus Projetos e Trabalhos!</h2>
-    <p style="font-size: 18px; color: #e0e0e0; max-width: 800px; margin: 20px auto;">
-        Aqui você poderá desfrutar dos meus projetos e trabalhos, tanto pessoais quanto públicos. Além disso, se quiser apoiar, pode fazer uma doação para ajudar a melhorar meus equipamentos e continuar criando coisas novas e empolgantes!
-    </p>
-</section>
+    <section style="text-align: center; margin-top: 0; padding: 0 20px 40px 20px;">
+        <h2 style="font-size: 28px; font-weight: bold; color: #fff; margin-top: 0;">Explore Meus Projetos e Trabalhos!</h2>
+        <p style="font-size: 18px; color: #e0e0e0; max-width: 800px; margin: 20px auto;">
+            Aqui você poderá desfrutar dos meus projetos e trabalhos, tanto pessoais quanto públicos. Além disso, se quiser apoiar, pode fazer uma doação para ajudar a melhorar meus equipamentos e continuar criando coisas novas e empolgantes!
+        </p>
+    </section>
 
     <section style="text-align: center; padding: 40px 20px;">
         <h3 style="font-size: 22px; font-weight: bold; color: #fff;">Me siga nas Redes Sociais</h3>
@@ -355,9 +365,8 @@
         </div>
     </section>
 
-    <!-- Scripts movidos para o final do body -->
+    <!-- Scripts -->
     <script>
-        // Função de login do Google (mantida intacta)
         function handleCredentialResponse(response) {
             console.log("Token JWT recebido: " + response.credential);
             const data = JSON.parse(atob(response.credential.split('.')[1]));
@@ -365,7 +374,7 @@
             localStorage.setItem("user", JSON.stringify(data));
             document.getElementById("user-info").innerHTML =
                 `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
-            document.getElementById("login-button").style.display = "none";
+            document.getElementById("login-container").style.display = "none";
         }
 
         window.onload = function() {
@@ -374,7 +383,7 @@
                 const data = JSON.parse(user);
                 document.getElementById("user-info").innerHTML =
                     `<p>Bem-vindo, ${data.name}!</p><img src="${data.picture}" alt="Foto de perfil">`;
-                document.getElementById("login-button").style.display = "none";
+                document.getElementById("login-container").style.display = "none";
             } else {
                 google.accounts.id.initialize({
                     client_id: "59693124421-47qb2ds3tu2n2uo97foap2jl4pmuno6v.apps.googleusercontent.com",
@@ -382,7 +391,7 @@
                 });
                 google.accounts.id.renderButton(
                     document.getElementById("login-button"),
-                    { theme: "outline", size: "large" }
+                    { theme: "outline", size: "medium" }
                 );
             }
         };
@@ -398,7 +407,7 @@
             'doom': '/Doom.html',
             'canal': '/canal.html',
             'home': '/index.html',
-            'cg': '/googlea6730812930fbc9a.html' // Corrigido
+            'cg': '/googlea6730812930fbc9a.html',
             'testar': 'Testar.html',
         };
 
@@ -410,7 +419,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'y') {
                 e.preventDefault();
-                console.log('Ctrl+Y detectado'); // Para depuração
+                console.log('Ctrl+Y detectado');
                 panel.classList.add('active');
                 input.focus();
             }
