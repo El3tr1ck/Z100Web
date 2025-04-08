@@ -76,7 +76,7 @@
     .grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr); /* 4 colunas padrão */
-        gap: 20px;
+        gap: 20px; /* Padrão original para celulares */
         margin-top: 30px;
     }
 
@@ -93,7 +93,7 @@
         cursor: pointer;
         transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
         overflow: hidden;
-        pointer-events: auto; /* O card é clicável */
+        pointer-events: auto;
     }
 
     .game-button:hover {
@@ -118,17 +118,17 @@
         flex-wrap: wrap;
         overflow-wrap: break-word;
         word-break: break-word;
-        pointer-events: none; /* Desativa cliques no span por padrão */
+        pointer-events: none;
     }
 
     .game-button span a {
         color: #1a73e8;
         margin: 0 4px;
         white-space: nowrap;
-        pointer-events: auto; /* Ativa cliques apenas no link */
-        display: inline-block; /* Garante que o link ocupe espaço correto */
+        pointer-events: auto;
+        display: inline-block;
         position: relative;
-        z-index: 1; /* Garante que o link esteja acima */
+        z-index: 1;
     }
 
     .game-button span a:hover {
@@ -176,43 +176,76 @@
         color: var(--text-color-dark);
     }
 
-    @media (max-width: 1024px) {
+    /* Media Queries para PCs (acima de 1440px) */
+    @media (min-width: 1441px) {
+        .grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 35px; /* Espaçamento maior entre colunas */
+            max-width: 1400px; /* Centraliza em telas grandes */
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+    /* Media Queries para notebooks (1025px a 1440px) */
+    @media (min-width: 1025px) and (max-width: 1440px) {
+        .grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px; /* Espaçamento maior entre colunas */
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+    /* Media Queries para tablets (769px a 1024px) */
+    @media (max-width: 1024px) and (min-width: 769px) {
         .grid {
             grid-template-columns: repeat(2, 1fr);
+            gap: 25px; /* Espaçamento intermediário */
         }
+
         .search-bar {
             width: 80%;
         }
+
         h1 {
             font-size: 1.8em;
         }
+
         p {
             font-size: 1.1em;
         }
     }
 
+    /* Media Queries para celulares (até 768px) - Mantido como no original */
     @media (max-width: 768px) {
         .grid {
             grid-template-columns: 1fr;
+            gap: 20px; /* Exatamente como no original */
         }
+
         .search-bar {
             width: 100%;
         }
+
         .search-bar input[type="text"] {
             width: 100%;
         }
+
         .game-button {
             width: 100%;
         }
+
         h1 {
             font-size: 1.5em;
         }
+
         p {
             font-size: 1em;
         }
     }
 </style>
-
 </head>
 <body>
 
