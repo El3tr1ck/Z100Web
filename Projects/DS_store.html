@@ -7,7 +7,7 @@
 
 
     <title>Jogos trazidos ao canal Eletrickz100</title>
-   <style>
+<style>
     :root {
         --bg-color-light: #f0f0f0;
         --text-color-light: #333;
@@ -87,12 +87,13 @@
         background-color: var(--button-bg-light);
         border-radius: 10px;
         padding: 10px;
-        width: 100%; /* Ocupa toda a largura disponível */
+        width: 100%;
         height: auto;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         cursor: pointer;
         transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-        overflow: hidden; /* Evita que conteúdo transborde */
+        overflow: hidden;
+        pointer-events: auto; /* O card é clicável */
     }
 
     .game-button:hover {
@@ -105,7 +106,7 @@
         width: 50px;
         height: 50px;
         margin-right: 10px;
-        flex-shrink: 0; /* Impede que a imagem encolha */
+        flex-shrink: 0;
     }
 
     .game-button span {
@@ -114,15 +115,20 @@
         flex: 1;
         display: flex;
         align-items: center;
-        flex-wrap: wrap; /* Permite que o texto quebre em várias linhas se necessário */
-        overflow-wrap: break-word; /* Garante que palavras longas quebrem */
-        word-break: break-word; /* Compatibilidade adicional para quebra de palavras */
+        flex-wrap: wrap;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        pointer-events: none; /* Desativa cliques no span por padrão */
     }
 
     .game-button span a {
         color: #1a73e8;
-        margin: 0 4px; /* Adiciona um pequeno espaçamento ao redor dos links */
-        white-space: nowrap; /* Impede que links quebrem em várias linhas */
+        margin: 0 4px;
+        white-space: nowrap;
+        pointer-events: auto; /* Ativa cliques apenas no link */
+        display: inline-block; /* Garante que o link ocupe espaço correto */
+        position: relative;
+        z-index: 1; /* Garante que o link esteja acima */
     }
 
     .game-button span a:hover {
@@ -135,7 +141,6 @@
         margin-top: 20px;
     }
 
-    /* Estilo do botão de alternância de modo */
     .mode-toggle {
         position: fixed;
         top: 16px;
@@ -171,20 +176,16 @@
         color: var(--text-color-dark);
     }
 
-    /* Media Queries para responsividade */
     @media (max-width: 1024px) {
         .grid {
-            grid-template-columns: repeat(2, 1fr); /* 2 colunas para tablets */
+            grid-template-columns: repeat(2, 1fr);
         }
-
         .search-bar {
             width: 80%;
         }
-
         h1 {
             font-size: 1.8em;
         }
-
         p {
             font-size: 1.1em;
         }
@@ -192,25 +193,20 @@
 
     @media (max-width: 768px) {
         .grid {
-            grid-template-columns: 1fr; /* 1 coluna para smartphones */
+            grid-template-columns: 1fr;
         }
-
         .search-bar {
             width: 100%;
         }
-
         .search-bar input[type="text"] {
             width: 100%;
         }
-
         .game-button {
             width: 100%;
         }
-
         h1 {
             font-size: 1.5em;
         }
-
         p {
             font-size: 1em;
         }
@@ -387,14 +383,22 @@
         }
     }
 
-    // evento pra nova aba ao clicar para baixar
+    // Evento para nova aba ao clicar para baixar, com prevenção de propagação no <a>
     document.querySelectorAll('.game-button').forEach(button => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', (event) => {
             const downloadLink = button.getAttribute('data-download');
             if (downloadLink) {
                 window.open(downloadLink, '_blank');
             }
         });
+
+        // Impede que o clique no <a> dispare o evento do .game-button
+        const link = button.querySelector('span a');
+        if (link) {
+            link.addEventListener('click', (event) => {
+                event.stopPropagation(); // Para a propagação do evento
+            });
+        }
     });
 </script>
 
