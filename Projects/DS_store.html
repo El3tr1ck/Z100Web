@@ -92,6 +92,7 @@
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         cursor: pointer;
         transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        overflow: hidden; /* Evita que conteúdo transborde */
     }
 
     .game-button:hover {
@@ -104,6 +105,7 @@
         width: 50px;
         height: 50px;
         margin-right: 10px;
+        flex-shrink: 0; /* Impede que a imagem encolha */
     }
 
     .game-button span {
@@ -112,6 +114,19 @@
         flex: 1;
         display: flex;
         align-items: center;
+        flex-wrap: wrap; /* Permite que o texto quebre em várias linhas se necessário */
+        overflow-wrap: break-word; /* Garante que palavras longas quebrem */
+        word-break: break-word; /* Compatibilidade adicional para quebra de palavras */
+    }
+
+    .game-button span a {
+        color: #1a73e8;
+        margin: 0 4px; /* Adiciona um pequeno espaçamento ao redor dos links */
+        white-space: nowrap; /* Impede que links quebrem em várias linhas */
+    }
+
+    .game-button span a:hover {
+        text-decoration: underline;
     }
 
     #noResults {
@@ -123,15 +138,15 @@
     /* Estilo do botão de alternância de modo */
     .mode-toggle {
         position: fixed;
-        top: 16px;   /* Distância do topo */
-        left: 14px;  /* Distância da borda esquerda */
+        top: 16px;
+        left: 14px;
         padding: 10px 12px;
         background-color: #444;
         color: white;
         border: none;
         border-radius: 20px;
         cursor: pointer;
-        font-size: 1.3em; /* Tamanho maior do ícone */
+        font-size: 1.3em;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -139,11 +154,11 @@
     }
 
     .mode-toggle i {
-        margin: 0; /* Remove margens indesejadas ao redor do ícone */
+        margin: 0;
     }
 
     .mode-toggle:hover {
-        background-color: #555; /* Mudança de cor ao passar o mouse */
+        background-color: #555;
     }
 
     .dark-mode {
@@ -163,15 +178,15 @@
         }
 
         .search-bar {
-            width: 80%; /* Aumenta a largura da barra de pesquisa em telas médias */
+            width: 80%;
         }
 
         h1 {
-            font-size: 1.8em; /* Reduz o tamanho do título */
+            font-size: 1.8em;
         }
 
         p {
-            font-size: 1.1em; /* Reduz o tamanho do parágrafo */
+            font-size: 1.1em;
         }
     }
 
@@ -181,23 +196,23 @@
         }
 
         .search-bar {
-            width: 100%; /* Barra de pesquisa ocupa a tela inteira */
+            width: 100%;
         }
 
         .search-bar input[type="text"] {
-            width: 100%; /* O campo de pesquisa ocupa toda a barra de pesquisa */
+            width: 100%;
         }
 
         .game-button {
-            width: 100%; /* Os botões ocupam toda a largura disponível */
+            width: 100%;
         }
 
         h1 {
-            font-size: 1.5em; /* Ajusta o tamanho do título em dispositivos menores */
+            font-size: 1.5em;
         }
 
         p {
-            font-size: 1em; /* Ajusta o tamanho do texto em dispositivos menores */
+            font-size: 1em;
         }
     }
 </style>
