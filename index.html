@@ -8,13 +8,16 @@
     <title>inicio</title>
     <style>
         body {
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #2c2c2c 0%, #1f1f1f 100%);
-            color: #fff;
-            overflow-x: hidden;
-            padding-top: 60px;
-        }
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #2c2c2c 0%, #1f1f1f 100%);
+    color: #fff;
+    overflow-x: hidden;
+    padding-top: 60px;
+    min-height: 100vh; /* Garante que o body ocupe a altura total da tela */
+    display: flex;
+    flex-direction: column;
+}
 
         section {
             margin-bottom: 60px;
@@ -500,6 +503,27 @@
                 padding: 6px 12px;
             }
         }
+      footer {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+footer a:hover {
+    color: #fff;
+}
+      section:last-of-type {
+    flex: 1; /* Faz o conteúdo principal crescer e empurrar o footer para baixo */
+}
+      @media (max-width: 480px) {
+    footer {
+        padding: 20px 10px;
+    }
+    footer h4 {
+        font-size: 16px;
+    }
+    footer p, footer a {
+        font-size: 12px;
+    }
+}
     </style>
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5715350873085221" crossorigin="anonymous"></script>
@@ -591,37 +615,41 @@
         </div>
     </section>
 
-    <section style="text-align: center; padding: 40px 20px;">
-        <h3 style="font-size: 24 much-weight: bold; color: #fff;">Projetos principais</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 25px; max-width: 900px; margin: 0 auto; padding-top: 20px;">
-            <a href="Projects/project_novel.html" class="project-btn">
-                <img src="https://img.icons8.com/ios-filled/50/ffffff/book.png" alt="Livro" />
-                <p>Projeto Novel</p>
-            </a>
-            <a href="Projects/DS_store.html" class="project-btn">
-                <img src="https://img.icons8.com/ios-filled/50/ffffff/controller.png" alt="Controle" />
-                <p>Loja de jogados e etc do canal</p>
-            </a>
-        </div>
-    </section>
+<!--... -->
 
-    <section style="text-align: center; padding: 40px 20px;">
-        <h3 style="font-size: 24px; font-weight: bold; color: #fff;">Veja mais:</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 25px; max-width: 900px; margin: 0 auto; padding-top: 20px;">
-            <a href="Biography.html" class="project-btn">
-                <img src="https://img.icons8.com/ios-filled/50/ffffff/user.png" alt="Livro" />
-                <p>Biografia</p>
-            </a>
-            <a href="Donate.html" class="project-btn">
-                <img src="https://img.icons8.com/ios-filled/50/ffffff/money.png" alt="Controle" />
-                <p>Doação</p>
-            </a>
-            <a href="canal.html" class="project-btn">
-                <img src="https://img.icons8.com/ios-filled/50/ffffff/clapperboard.png" alt="Clapperboard Icon">
-                <p>Os melhores do canal</p>
-            </a>
-        </div>
-    </section>
+<section style="text-align: center; padding: 40px 20px;">
+    <h3 style="font-size: 24px; font-weight: bold; color: #fff;">Projetos principais</h3>
+  <p style="font-size: 18px; color: #e0e0e0; margin: 10px 0 20px 0;">Aqui você vai poder dar uma olhada em todos os projetos que a gente vai fazer pro site, tanto coisas do canal quanto outras ideias que não têm a ver com ele. A vibe é trazer coisas legais e divertidas, pra gerar conteúdo pro meu canal no YouTube e também pra você curtir um monte de coisa diferente que eu posto lá. E mais: quero mostrar antes pra vocês o que vai rolar no canal, sem precisar de nada especial, é só logar com sua conta Google no site e pronto!</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 25px; max-width: 900px; margin: 0 auto; padding-top: 20px;">
+        <a href="Projects/project_novel.html" class="project-btn">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/book.png" alt="Livro" />
+            <p>Projeto Novel</p>
+        </a>
+        <a href="Projects/DS_store.html" class="project-btn">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/controller.png" alt="Controle" />
+            <p>Loja de jogados e etc do canal</p>
+        </a>
+    </div>
+</section>
+
+<section style="text-align: center; padding: 40px 20px;">
+    <h3 style="font-size: 24px; font-weight: bold; color: #fff;">Veja mais:</h3>
+    <p style="font-size: 18px; color: #e0e0e0; margin: 10px 0 20px 0;">Aqui você vai poder dar uma sacada melhor em quem eu sou, no que rola no canal e nas formas de dar aquele apoio maroto pra coisa crescer. Também vou jogar pra vocês mais detalhes sobre o site, como ele funciona, e tudo que tem a ver com o Eletrickz100 – desde os projetos que já tão no ar até umas ideias maneiras que eu tô bolando pro futuro. Se você curtir a vibe e quiser ajudar a alavancar minhas ideias, meus planos e tudo que eu pretendo fazer lá na frente, é só me chamar! Meu e-mail vai tá lá no rodapé do site, esperando seu recado ou qualquer dica legal que você quiser mandar.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 25px; max-width: 900px; margin: 0 auto; padding-top: 20px;">
+        <a href="Biography.html" class="project-btn">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/user.png" alt="Livro" />
+            <p>Biografia</p>
+        </a>
+        <a href="Donate.html" class="project-btn">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/money.png" alt="Controle" />
+            <p>Doação</p>
+        </a>
+        <a href="canal.html" class="project-btn">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/clapperboard.png" alt="Clapperboard Icon">
+            <p>Os melhores do canal</p>
+        </a>
+    </div>
+</section>
 
     <script>
         // Pré-carregar imagens
@@ -782,5 +810,18 @@
             shortcutsDB[code] = destination;
         }
     </script>
+  <!-- Rodapé -->
+<footer style="background: rgba(255, 255, 255, 0.05); padding: 40px 20px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px);">
+    <div style="max-width: 900px; margin: 0 auto;">
+        <h4 style="font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 20px;">Z-100</h4>
+        <p style="font-size: 14px; color: #e0e0e0; margin-bottom: 20px;">
+            © 2025 Z-100. Todos os direitos reservados.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 20px;">
+            <a href="mailto:aparecidamartins8699044957@gmail.com" style="color: #e0e0e0; text-decoration: none; font-size: 14px; transition: color 0.3s ease;">Contato</a>
+            <span style="color: #e0e0e0; font-size: 14px;">Criado por:José Arthur De Oliveira Mourão</span>
+        </div>
+    </div>
+</footer>
 </body>
 </html>
