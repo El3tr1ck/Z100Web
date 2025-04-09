@@ -608,6 +608,81 @@
         padding: 5px 10px;
     }
 }
+        /* Estilo do painel de adblock */
+.adblock-panel {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    max-width: 500px;
+    text-align: center;
+}
+
+.adblock-panel.active {
+    display: block;
+    animation: popIn 0.3s ease-out;
+}
+
+.panel-content p {
+    font-family: 'Verdana', sans-serif;
+    font-size: 16px;
+    color: #e0e0e0;
+    margin-bottom: 15px;
+}
+
+.panel-content button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 8px;
+    background: #4CAF50;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.3s ease, background 0.3s ease;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+}
+
+.panel-content button:hover {
+    background: #45a049;
+    transform: scale(1.05);
+}
+
+@keyframes popIn {
+    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    .adblock-panel {
+        max-width: 90%;
+        padding: 15px;
+    }
+
+    .panel-content p {
+        font-size: 14px;
+    }
+
+    .panel-content button {
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .panel-content p {
+        font-size: 13px;
+    }
+
+    .panel-content button {
+        padding: 5px 10px;
+    }
+}
     </style>
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5715350873085221" crossorigin="anonymous"></script>
@@ -885,6 +960,35 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 </script>
+<script>
+// Detecção de Adblock e controle do painel
+document.addEventListener("DOMContentLoaded", () => {
+    const adblockPanel = document.getElementById("adblock-panel");
+    const closeAdblockPanel = document.getElementById("close-adblock-panel");
+
+    // Função para detectar adblock
+    function detectAdblock() {
+        const adScript = document.createElement("script");
+        adScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"; // Script do AdSense
+        adScript.async = true;
+        adScript.onerror = () => {
+            if (!localStorage.getItem("adblockDismissed")) {
+                adblockPanel.classList.add("active");
+            }
+        };
+        document.head.appendChild(adScript);
+    }
+
+    // Fecha o painel e salva a escolha do usuário
+    closeAdblockPanel.addEventListener("click", () => {
+        adblockPanel.classList.remove("active");
+        localStorage.setItem("adblockDismissed", "true");
+    });
+
+    // Executa a detecção
+    detectAdblock();
+});
+</script>
     <footer style="background: rgba(255, 255, 255, 0.05); padding: 40px 20px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px);">
         <div style="max-width: 900px; margin: 0 auto;">
             <h4 style="font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 20px;">Z-100</h4>
@@ -903,6 +1007,13 @@ document.addEventListener("DOMContentLoaded", () => {
     <p>Usamos cookies para melhorar sua experiência e exibir anúncios. Ao continuar, você aceita nossa <a href="privacy.html">Política de Privacidade</a>.</p>
     <button id="accept-cookies">Aceitar</button>
     <button id="decline-cookies">Recusar</button>
+</div>
+<!-- Painel de Adblock -->
+<div id="adblock-panel" class="adblock-panel">
+    <div class="panel-content">
+        <p>Olá! Parece que você está usando um bloqueador de anúncios. Os anúncios ajudam a manter o Z-100 funcionando e a criar mais conteúdo para você. Por favor, considere desativar o adblock para apoiar o site!</p>
+        <button id="close-adblock-panel">Entendido</button>
+    </div>
 </div>
 </body>
 </html>
