@@ -8,16 +8,16 @@
     <title>inicio</title>
     <style>
         body {
-    margin: 0;
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #2c2c2c 0%, #1f1f1f 100%);
-    color: #fff;
-    overflow-x: hidden;
-    padding-top: 60px;
-    min-height: 100vh; /* Garante que o body ocupe a altura total da tela */
-    display: flex;
-    flex-direction: column;
-}
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #2c2c2c 0%, #1f1f1f 100%);
+            color: #fff;
+            overflow-x: hidden;
+            padding-top: 60px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
         section {
             margin-bottom: 60px;
@@ -171,12 +171,11 @@
             background-color: #f0f0f0;
         }
 
-        /* Estilo do Botão de Logout */
         #logout-button {
             position: fixed;
             top: 15px;
-            left: 25px; /* Ajustado para ficar ao lado do #user-info */
-            display: none; /* Escondido por padrão */
+            left: 25px;
+            display: none;
             align-items: center;
             justify-content: center;
             width: 40px;
@@ -253,7 +252,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Estilo da Notificação */
         .login-notification {
             display: none;
             position: fixed;
@@ -280,7 +278,6 @@
             100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
 
-        /* Responsividade */
         @media (max-width: 768px) {
             body {
                 padding-top: 50px;
@@ -337,7 +334,7 @@
             }
 
             #logout-button {
-                right: 110px; /* Ajustado para tablets */
+                right: 110px;
                 width: 35px;
                 height: 35px;
             }
@@ -421,7 +418,7 @@
             }
 
             #logout-button {
-                right: 80px; /* Ajustado para celulares */
+                right: 80px;
                 width: 30px;
                 height: 30px;
             }
@@ -503,27 +500,30 @@
                 padding: 6px 12px;
             }
         }
-      footer {
-    animation: fadeIn 0.8s ease-out forwards;
-}
 
-footer a:hover {
-    color: #fff;
-}
-      section:last-of-type {
-    flex: 1; /* Faz o conteúdo principal crescer e empurrar o footer para baixo */
-}
-      @media (max-width: 480px) {
-    footer {
-        padding: 20px 10px;
-    }
-    footer h4 {
-        font-size: 16px;
-    }
-    footer p, footer a {
-        font-size: 12px;
-    }
-}
+        footer {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        footer a:hover {
+            color: #fff;
+        }
+
+        section:last-of-type {
+            flex: 1;
+        }
+
+        @media (max-width: 480px) {
+            footer {
+                padding: 20px 10px;
+            }
+            footer h4 {
+                font-size: 16px;
+            }
+            footer p, footer a {
+                font-size: 12px;
+            }
+        }
     </style>
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5715350873085221" crossorigin="anonymous"></script>
@@ -560,7 +560,6 @@ footer a:hover {
         <div id="login-button" class="custom-google-button g_id_signin" data-type="standard"></div>
     </div>
 
-    <!-- Botão de Logout -->
     <button id="logout-button">
         <img src="https://img.icons8.com/ios-filled/50/ffffff/logout-rounded.png" alt="Logout">
     </button>
@@ -573,7 +572,6 @@ footer a:hover {
         </div>
     </div>
 
-    <!-- Notificação de Login -->
     <div id="login-notification" class="login-notification">
         <p>Por favor, faça login para acessar este conteúdo!</p>
     </div>
@@ -615,41 +613,39 @@ footer a:hover {
         </div>
     </section>
 
-<!--... -->
+    <section style="text-align: center; padding: 40px 20px;">
+        <h3 style="font-size: 24px; font-weight: bold; color: #fff;">Projetos principais</h3>
+        <p style="font-size: 18px; color: #e0e0e0; margin: 10px 0 20px 0;">Aqui você vai poder dar uma olhada em todos os projetos que a gente vai fazer pro site, tanto coisas do canal quanto outras ideias que não têm a ver com ele. A vibe é trazer coisas legais e divertidas, pra gerar conteúdo pro meu canal no YouTube e também pra você curtir um monte de coisa diferente que eu posto lá. E mais: quero mostrar antes pra vocês o que vai rolar no canal, sem precisar de nada especial, é só logar com sua conta Google no site e pronto!</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 25px; max-width: 900px; margin: 0 auto; padding-top: 20px;">
+            <a href="Projects/project_novel.html" class="project-btn">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/book.png" alt="Livro" />
+                <p>Projeto Novel</p>
+            </a>
+            <a href="Projects/DS_store.html" class="project-btn">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/controller.png" alt="Controle" />
+                <p>Loja de jogados e etc do canal</p>
+            </a>
+        </div>
+    </section>
 
-<section style="text-align: center; padding: 40px 20px;">
-    <h3 style="font-size: 24px; font-weight: bold; color: #fff;">Projetos principais</h3>
-  <p style="font-size: 18px; color: #e0e0e0; margin: 10px 0 20px 0;">Aqui você vai poder dar uma olhada em todos os projetos que a gente vai fazer pro site, tanto coisas do canal quanto outras ideias que não têm a ver com ele. A vibe é trazer coisas legais e divertidas, pra gerar conteúdo pro meu canal no YouTube e também pra você curtir um monte de coisa diferente que eu posto lá. E mais: quero mostrar antes pra vocês o que vai rolar no canal, sem precisar de nada especial, é só logar com sua conta Google no site e pronto!</p>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 25px; max-width: 900px; margin: 0 auto; padding-top: 20px;">
-        <a href="Projects/project_novel.html" class="project-btn">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/book.png" alt="Livro" />
-            <p>Projeto Novel</p>
-        </a>
-        <a href="Projects/DS_store.html" class="project-btn">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/controller.png" alt="Controle" />
-            <p>Loja de jogados e etc do canal</p>
-        </a>
-    </div>
-</section>
-
-<section style="text-align: center; padding: 40px 20px;">
-    <h3 style="font-size: 24px; font-weight: bold; color: #fff;">Veja mais:</h3>
-    <p style="font-size: 18px; color: #e0e0e0; margin: 10px 0 20px 0;">Aqui você vai poder dar uma sacada melhor em quem eu sou, no que rola no canal e nas formas de dar aquele apoio maroto pra coisa crescer. Também vou jogar pra vocês mais detalhes sobre o site, como ele funciona, e tudo que tem a ver com o Eletrickz100 – desde os projetos que já tão no ar até umas ideias maneiras que eu tô bolando pro futuro. Se você curtir a vibe e quiser ajudar a alavancar minhas ideias, meus planos e tudo que eu pretendo fazer lá na frente, é só me chamar! Meu e-mail vai tá lá no rodapé do site, esperando seu recado ou qualquer dica legal que você quiser mandar.</p>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 25px; max-width: 900px; margin: 0 auto; padding-top: 20px;">
-        <a href="Biography.html" class="project-btn">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/user.png" alt="Livro" />
-            <p>Biografia</p>
-        </a>
-        <a href="Donate.html" class="project-btn">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/money.png" alt="Controle" />
-            <p>Doação</p>
-        </a>
-        <a href="canal.html" class="project-btn">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/clapperboard.png" alt="Clapperboard Icon">
-            <p>Os melhores do canal</p>
-        </a>
-    </div>
-</section>
+    <section style="text-align: center; padding: 40px 20px;">
+        <h3 style="font-size: 24px; font-weight: bold; color: #fff;">Veja mais:</h3>
+        <p style="font-size: 18px; color: #e0e0e0; margin: 10px 0 20px 0;">Aqui você vai poder dar uma sacada melhor em quem eu sou, no que rola no canal e nas formas de dar aquele apoio maroto pra coisa crescer. Também vou jogar pra vocês mais detalhes sobre o site, como ele funciona, e tudo que tem a ver com o Eletrickz100 – desde os projetos que já tão no ar até umas ideias maneiras que eu tô bolando pro futuro. Se você curtir a vibe e quiser ajudar a alavancar minhas ideias, meus planos e tudo que eu pretendo fazer lá na frente, é só me chamar! Meu e-mail vai tá lá no rodapé do site, esperando seu recado ou qualquer dica legal que você quiser mandar.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 25px; max-width: 900px; margin: 0 auto; padding-top: 20px;">
+            <a href="Biography.html" class="project-btn">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/user.png" alt="Livro" />
+                <p>Biografia</p>
+            </a>
+            <a href="Donate.html" class="project-btn">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/money.png" alt="Controle" />
+                <p>Doação</p>
+            </a>
+            <a href="canal.html" class="project-btn">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/clapperboard.png" alt="Clapperboard Icon">
+                <p>Os melhores do canal</p>
+            </a>
+        </div>
+    </section>
 
     <script>
         // Pré-carregar imagens
@@ -664,7 +660,7 @@ footer a:hover {
             img.src = src;
         });
 
-        // Controle do carrossel e bloqueio de botões
+        // Controle do carrossel
         document.addEventListener("DOMContentLoaded", () => {
             const items = document.querySelectorAll(".carousel-item");
             let currentIndex = 0;
@@ -677,36 +673,6 @@ footer a:hover {
 
             items[0].classList.add("active");
             setInterval(showNextImage, 3000);
-
-            // Bloqueio de botões e notificação
-            const projectButtons = document.querySelectorAll(".project-btn");
-            const socialButtons = document.querySelectorAll(".social-icon");
-            const notification = document.getElementById("login-notification");
-
-            function showNotification() {
-                notification.classList.add("active");
-                setTimeout(() => {
-                    notification.classList.remove("active");
-                }, 3000);
-            }
-
-            projectButtons.forEach(button => {
-                button.addEventListener("click", (e) => {
-                    if (!localStorage.getItem("user")) {
-                        e.preventDefault();
-                        showNotification();
-                    }
-                });
-            });
-
-            socialButtons.forEach(button => {
-                button.addEventListener("click", (e) => {
-                    if (!localStorage.getItem("user")) {
-                        e.preventDefault();
-                        showNotification();
-                    }
-                });
-            });
 
             // Controle do botão de logout
             const logoutButton = document.getElementById("logout-button");
@@ -810,18 +776,18 @@ footer a:hover {
             shortcutsDB[code] = destination;
         }
     </script>
-  <!-- Rodapé -->
-<footer style="background: rgba(255, 255, 255, 0.05); padding: 40px 20px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px);">
-    <div style="max-width: 900px; margin: 0 auto;">
-        <h4 style="font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 20px;">Z-100</h4>
-        <p style="font-size: 14px; color: #e0e0e0; margin-bottom: 20px;">
-            © 2025 Z-100. Todos os direitos reservados.
-        </p>
-        <div style="display: flex; justify-content: center; gap: 20px;">
-            <a href="mailto:aparecidamartins8699044957@gmail.com" style="color: #e0e0e0; text-decoration: none; font-size: 14px; transition: color 0.3s ease;">Email:aparecidamartins8699044957@gmail.com</a>
-            <span style="color: #e0e0e0; font-size: 14px;">Criado por:José Arthur De Oliveira Mourão</span>
+
+    <footer style="background: rgba(255, 255, 255, 0.05); padding: 40px 20px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px);">
+        <div style="max-width: 900px; margin: 0 auto;">
+            <h4 style="font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 20px;">Z-100</h4>
+            <p style="font-size: 14px; color: #e0e0e0; margin-bottom: 20px;">
+                © 2025 Z-100. Todos os direitos reservados.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 20px;">
+                <a href="mailto:aparecidamartins8699044957@gmail.com" style="color: #e0e0e0; text-decoration: none; font-size: 14px; transition: color 0.3s ease;">Email: aparecidamartins8699044957@gmail.com</a>
+                <span style="color: #e0e0e0; font-size: 14px;">Criado por: José Arthur De Oliveira Mourão</span>
+            </div>
         </div>
-    </div>
-</footer>
+    </footer>
 </body>
 </html>
