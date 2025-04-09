@@ -524,6 +524,90 @@
                 font-size: 12px;
             }
         }
+/* Estilo do banner de cookies */
+#cookie-banner {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    display: none;
+    max-width: 600px;
+    text-align: center;
+}
+
+#cookie-banner p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-family: 'Verdana', sans-serif;
+    color: #e0e0e0;
+}
+
+#cookie-banner a {
+    color: #fff;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+#cookie-banner a:hover {
+    color: #e0e0e0;
+}
+
+#cookie-banner button {
+    padding: 8px 15px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease, background 0.3s ease;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+}
+
+#accept-cookies {
+    background: #4CAF50;
+    color: #fff;
+}
+
+#decline-cookies {
+    background: #f44336;
+    color: #fff;
+}
+
+#cookie-banner button:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    #cookie-banner {
+        bottom: 10px;
+        padding: 10px 15px;
+        max-width: 90%;
+    }
+
+    #cookie-banner p {
+        font-size: 12px;
+    }
+
+    #cookie-banner button {
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    #cookie-banner p {
+        font-size: 11px;
+    }
+
+    #cookie-banner button {
+        padding: 5px 10px;
+    }
+}
     </style>
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5715350873085221" crossorigin="anonymous"></script>
@@ -776,7 +860,31 @@
             shortcutsDB[code] = destination;
         }
     </script>
+<script>
+// Controle do banner de cookies
+document.addEventListener("DOMContentLoaded", () => {
+    const cookieBanner = document.getElementById("cookie-banner");
+    const acceptCookies = document.getElementById("accept-cookies");
+    const declineCookies = document.getElementById("decline-cookies");
 
+    // Verifica se o usuário já fez uma escolha
+    if (!localStorage.getItem("cookieConsent")) {
+        cookieBanner.style.display = "block";
+    }
+
+    acceptCookies.addEventListener("click", () => {
+        localStorage.setItem("cookieConsent", "accepted");
+        cookieBanner.style.display = "none";
+        // Aqui você pode adicionar lógica para ativar cookies (ex.: Google Analytics/AdSense)
+    });
+
+    declineCookies.addEventListener("click", () => {
+        localStorage.setItem("cookieConsent", "declined");
+        cookieBanner.style.display = "none";
+        // Aqui você pode desativar cookies não essenciais, se possível
+    });
+});
+</script>
     <footer style="background: rgba(255, 255, 255, 0.05); padding: 40px 20px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px);">
         <div style="max-width: 900px; margin: 0 auto;">
             <h4 style="font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 20px;">Z-100</h4>
@@ -790,5 +898,11 @@
             </div>
         </div>
     </footer>
+<!-- Banner de Cookies -->
+<div id="cookie-banner">
+    <p>Usamos cookies para melhorar sua experiência e exibir anúncios. Ao continuar, você aceita nossa <a href="privacy.html">Política de Privacidade</a>.</p>
+    <button id="accept-cookies">Aceitar</button>
+    <button id="decline-cookies">Recusar</button>
+</div>
 </body>
 </html>
