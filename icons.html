@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca de Ícones Gratuitos</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" integrity="sha384-tViUnnbYAV00FLI7F1mmG/MeibZsgkXdBsdZTwA68XvKutSKbXu+URiE9R1p1cGQS" crossorigin="anonymous">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        .search-bar {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .filter-select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .icon-preview {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        .icon-name {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+        .copy-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .copy-btn:hover {
+            background: #0056b3;
+        }
+        .copy-btn.copied {
+            background: #28a745;
+        }
+        .error-message {
+            text-align: center;
+            color: red;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Biblioteca de Ícones Gratuitos</h1>
+        <div class="search-filter">
+            <input type="text" class="search-bar" placeholder="Pesquisar ícone...">
+            <select class="filter-select">
+                <option value="all">Todas as Fontes</option>
+                <option value="Font Awesome">Font Awesome</option>
+                <option value="Material Icons">Material Icons</option>
+                <option value="Bootstrap Icons">Bootstrap Icons</option>
+            </select>
+        </div>
+        <div class="grid" id="iconGrid"></div>
+    </div>
+
+    <script>
+        const icons = [
+            // Font Awesome - 50 ícones
+            { class: 'fa-brands fa-github', name: 'fa-github', source: 'Font Awesome' },
+            { class: 'fa-solid fa-heart', name: 'fa-heart', source: 'Font Awesome' },
+            { class: 'fa-solid fa-star', name: 'fa-star', source: 'Font Awesome' },
+            { class: 'fa-solid fa-user', name: 'fa-user', source: 'Font Awesome' },
+            { class: 'fa-solid fa-arrow-right', name: 'fa-arrow-right', source: 'Font Awesome' },
+            { class: 'fa-solid fa-house', name: 'fa-house', source: 'Font Awesome' },
+            { class: 'fa-solid fa-camera', name: 'fa-camera', source: 'Font Awesome' },
+            { class: 'fa-solid fa-bell', name: 'fa-bell', source: 'Font Awesome' },
+            { class: 'fa-solid fa-book', name: 'fa-book', source: 'Font Awesome' },
+            { class: 'fa-solid fa-car', name: 'fa-car', source: 'Font Awesome' },
+            { class: 'fa-solid fa-cloud', name: 'fa-cloud', source: 'Font Awesome' },
+            { class: 'fa-solid fa-envelope', name: 'fa-envelope', source: 'Font Awesome' },
+            { class: 'fa-solid fa-eye', name: 'fa-eye', source: 'Font Awesome' },
+            { class: 'fa-solid fa-flag', name: 'fa-flag', source: 'Font Awesome' },
+            { class: 'fa-solid fa-gear', name: 'fa-gear', source: 'Font Awesome' },
+            { class: 'fa-solid fa-globe', name: 'fa-globe', source: 'Font Awesome' },
+            { class: 'fa-solid fa-lock', name: 'fa-lock', source: 'Font Awesome' },
+            { class: 'fa-solid fa-map', name: 'fa-map', source: 'Font Awesome' },
+            { class: 'fa-solid fa-music', name: 'fa-music', source: 'Font Awesome' },
+            { class: 'fa-solid fa-phone', name: 'fa-phone', source: 'Font Awesome' },
+            { class: 'fa-solid fa-plane', name: 'fa-plane', source: 'Font Awesome' },
+            { class: 'fa-solid fa-search', name: 'fa-search', source: 'Font Awesome' },
+            { class: 'fa-solid fa-shopping-cart', name: 'fa-shopping-cart', source: 'Font Awesome' },
+            { class: 'fa-solid fa-trash', name: 'fa-trash', source: 'Font Awesome' },
+            { class: 'fa-solid fa-upload', name: 'fa-upload', source: 'Font Awesome' },
+            { class: 'fa-solid fa-video', name: 'fa-video', source: 'Font Awesome' },
+            { class: 'fa-solid fa-wallet', name: 'fa-wallet', source: 'Font Awesome' },
+            { class: 'fa-solid fa-wrench', name: 'fa-wrench', source: 'Font Awesome' },
+            { class: 'fa-brands fa-twitter', name: 'fa-twitter', source: 'Font Awesome' },
+            { class: 'fa-brands fa-linkedin', name: 'fa-linkedin', source: 'Font Awesome' },
+            { class: 'fa-solid fa-bolt', name: 'fa-bolt', source: 'Font Awesome' },
+            { class: 'fa-solid fa-calendar', name: 'fa-calendar', source: 'Font Awesome' },
+            { class: 'fa-solid fa-check', name: 'fa-check', source: 'Font Awesome' },
+            { class: 'fa-solid fa-circle', name: 'fa-circle', source: 'Font Awesome' },
+            { class: 'fa-solid fa-comment', name: 'fa-comment', source: 'Font Awesome' },
+            { class: 'fa-solid fa-download', name: 'fa-download', source: 'Font Awesome' },
+            { class: 'fa-solid fa-edit', name: 'fa-edit', source: 'Font Awesome' },
+            { class: 'fa-solid fa-exclamation', name: 'fa-exclamation', source: 'Font Awesome' },
+            { class: 'fa-solid fa-file', name: 'fa-file', source: 'Font Awesome' },
+            { class: 'fa-solid fa-folder', name: 'fa-folder', source: 'Font Awesome' },
+            { class: 'fa-solid fa-gift', name: 'fa-gift', source: 'Font Awesome' },
+            { class: 'fa-solid fa-headphones', name: 'fa-headphones', source: 'Font Awesome' },
+            { class: 'fa-solid fa-key', name: 'fa-key', source: 'Font Awesome' },
+            { class: 'fa-solid fa-laptop', name: 'fa-laptop', source: 'Font Awesome' },
+            { class: 'fa-solid fa-microphone', name: 'fa-microphone', source: 'Font Awesome' },
+            { class: 'fa-solid fa-paint-brush', name: 'fa-paint-brush', source: 'Font Awesome' },
+            { class: 'fa-solid fa-paperclip', name: 'fa-paperclip', source: 'Font Awesome' },
+            { class: 'fa-solid fa-puzzle-piece', name: 'fa-puzzle-piece', source: 'Font Awesome' },
+            { class: 'fa-solid fa-rocket', name: 'fa-rocket', source: 'Font Awesome' },
+            { class: 'fa-solid fa-shield', name: 'fa-shield', source: 'Font Awesome' },
+
+            // Material Icons - 50 ícones
+            { class: 'material-icons', name: 'face', text: 'face', source: 'Material Icons' },
+            { class: 'material-icons', name: 'home', text: 'home', source: 'Material Icons' },
+            { class: 'material-icons', name: 'favorite', text: 'favorite', source: 'Material Icons' },
+            { class: 'material-icons', name: 'settings', text: 'settings', source: 'Material Icons' },
+            { class: 'material-icons', name: 'shopping_cart', text: 'shopping_cart', source: 'Material Icons' },
+            { class: 'material-icons', name: 'star', text: 'star', source: 'Material Icons' },
+            { class: 'material-icons', name: 'person', text: 'person', source: 'Material Icons' },
+            { class: 'material-icons', name: 'email', text: 'email', source: 'Material Icons' },
+            { class: 'material-icons', name: 'lock', text: 'lock', source: 'Material Icons' },
+            { class: 'material-icons', name: 'delete', text: 'delete', source: 'Material Icons' },
+            { class: 'material-icons', name: 'camera_alt', text: 'camera_alt', source: 'Material Icons' },
+            { class: 'material-icons', name: 'cloud', text: 'cloud', source: 'Material Icons' },
+            { class: 'material-icons', name: 'download', text: 'download', source: 'Material Icons' },
+            { class: 'material-icons', name: 'search', text: 'search', source: 'Material Icons' },
+            { class: 'material-icons', name: 'menu', text: 'menu', source: 'Material Icons' },
+            { class: 'material-icons', name: 'add', text: 'add', source: 'Material Icons' },
+            { class: 'material-icons', name: 'arrow_back', text: 'arrow_back', source: 'Material Icons' },
+            { class: 'material-icons', name: 'arrow_forward', text: 'arrow_forward', source: 'Material Icons' },
+            { class: 'material-icons', name: 'check', text: 'check', source: 'Material Icons' },
+            { class: 'material-icons', name: 'close', text: 'close', source: 'Material Icons' },
+            { class: 'material-icons', name: 'edit', text: 'edit', source: 'Material Icons' },
+            { class: 'material-icons', name: 'filter', text: 'filter', source: 'Material Icons' },
+            { class: 'material-icons', name: 'folder', text: 'folder', source: 'Material Icons' },
+            { class: 'material-icons', name: 'info', text: 'info', source: 'Material Icons' },
+            { class: 'material-icons', name: 'keyboard', text: 'keyboard', source: 'Material Icons' },
+            { class: 'material-icons', name: 'language', text: 'language', source: 'Material Icons' },
+            { class: 'material-icons', name: 'link', text: 'link', source: 'Material Icons' },
+            { class: 'material-icons', name: 'location_on', text: 'location_on', source: 'Material Icons' },
+            { class: 'material-icons', name: 'mic', text: 'mic', source: 'Material Icons' },
+            { class: 'material-icons', name: 'more_vert', text: 'more_vert', source: 'Material Icons' },
+            { class: 'material-icons', name: 'notifications', text: 'notifications', source: 'Material Icons' },
+            { class: 'material-icons', name: 'phone', text: 'phone', source: 'Material Icons' },
+            { class: 'material-icons', name: 'play_arrow', text: 'play_arrow', source: 'Material Icons' },
+            { class: 'material-icons', name: 'print', text: 'print', source: 'Material Icons' },
+            { class: 'material-icons', name: 'refresh', text: 'refresh', source: 'Material Icons' },
+            { class: 'material-icons', name: 'save', text: 'save', source: 'Material Icons' },
+            { class: 'material-icons', name: 'send', text: 'send', source: 'Material Icons' },
+            { class: 'material-icons', name: 'share', text: 'share', source: 'Material Icons' },
+            { class: 'material-icons', name: 'thumb_up', text: 'thumb_up', source: 'Material Icons' },
+            { class: 'material-icons', name: 'visibility', text: 'visibility', source: 'Material Icons' },
+            { class: 'material-icons', name: 'warning', text: 'warning', source: 'Material Icons' },
+            { class: 'material-icons', name: 'wifi', text: 'wifi', source: 'Material Icons' },
+            { class: 'material-icons', name: 'zoom_in', text: 'zoom_in', source: 'Material Icons' },
+            { class: 'material-icons', name: 'zoom_out', text: 'zoom_out', source: 'Material Icons' },
+            { class: 'material-icons', name: 'account_circle', text: 'account_circle', source: 'Material Icons' },
+            { class: 'material-icons', name: 'build', text: 'build', source: 'Material Icons' },
+            { class: 'material-icons', name: 'call', text: 'call', source: 'Material Icons' },
+            { class: 'material-icons', name: 'chat', text: 'chat', source: 'Material Icons' },
+            { class: 'material-icons', name: 'dashboard', text: 'dashboard', source: 'Material Icons' },
+
+            // Bootstrap Icons - 50 ícones
+            { class: 'bi bi-bootstrap', name: 'bi-bootstrap', source: 'Bootstrap Icons' },
+            { class: 'bi bi-alarm', name: 'bi-alarm', source: 'Bootstrap Icons' },
+            { class: 'bi bi-basket', name: 'bi-basket', source: 'Bootstrap Icons' },
+            { class: 'bi bi-calendar', name: 'bi-calendar', source: 'Bootstrap Icons' },
+            { class: 'bi bi-chat', name: 'bi-chat', source: 'Bootstrap Icons' },
+            { class: 'bi bi-gear', name: 'bi-gear', source: 'Bootstrap Icons' },
+            { class: 'bi bi-house', name: 'bi-house', source: 'Bootstrap Icons' },
+            { class: 'bi bi-lock', name: 'bi-lock', source: 'Bootstrap Icons' },
+            { class: 'bi bi-person', name: 'bi-person', source: 'Bootstrap Icons' },
+            { class: 'bi bi-trash', name: 'bi-trash', source: 'Bootstrap Icons' },
+            { class: 'bi bi-arrow-left', name: 'bi-arrow-left', source: 'Bootstrap Icons' },
+            { class: 'bi bi-arrow-right', name: 'bi-arrow-right', source: 'Bootstrap Icons' },
+            { class: 'bi bi-bell', name: 'bi-bell', source: 'Bootstrap Icons' },
+            { class: 'bi bi-book', name: 'bi-book', source: 'Bootstrap Icons' },
+            { class: 'bi bi-briefcase', name: 'bi-briefcase', source: 'Bootstrap Icons' },
+            { class: 'bi bi-camera', name: 'bi-camera', source: 'Bootstrap Icons' },
+            { class: 'bi bi-cart', name: 'bi-cart', source: 'Bootstrap Icons' },
+            { class: 'bi bi-check', name: 'bi-check', source: 'Bootstrap Icons' },
+            { class: 'bi bi-cloud', name: 'bi-cloud', source: 'Bootstrap Icons' },
+            { class: 'bi bi-download', name: 'bi-download', source: 'Bootstrap Icons' },
+            { class: 'bi bi-envelope', name: 'bi-envelope', source: 'Bootstrap Icons' },
+            { class: 'bi bi-eye', name: 'bi-eye', source: 'Bootstrap Icons' },
+            { class: 'bi bi-file', name: 'bi-file', source: 'Bootstrap Icons' },
+            { class: 'bi bi-flag', name: 'bi-flag', source: 'Bootstrap Icons' },
+            { class: 'bi bi-folder', name: 'bi-folder', source: 'Bootstrap Icons' },
+            { class: 'bi bi-globe', name: 'bi-globe', source: 'Bootstrap Icons' },
+            { class: 'bi bi-heart', name: 'bi-heart', source: 'Bootstrap Icons' },
+            { class: 'bi bi-image', name: 'bi-image', source: 'Bootstrap Icons' },
+            { class: 'bi bi-key', name: 'bi-key', source: 'Bootstrap Icons' },
+            { class: 'bi bi-laptop', name: 'bi-laptop', source: 'Bootstrap Icons' },
+            { class: 'bi bi-lightning', name: 'bi-lightning', source: 'Bootstrap Icons' },
+            { class: 'bi bi-link', name: 'bi-link', source: 'Bootstrap Icons' },
+            { class: 'bi bi-map', name: 'bi-map', source: 'Bootstrap Icons' },
+            { class: 'bi bi-mic', name: 'bi-mic', source: 'Bootstrap Icons' },
+            { class: 'bi bi-music-note', name: 'bi-music-note', source: 'Bootstrap Icons' },
+            { class: 'bi bi-pencil', name: 'bi-pencil', source: 'Bootstrap Icons' },
+            { class: 'bi bi-phone', name: 'bi-phone', source: 'Bootstrap Icons' },
+            { class: 'bi bi-play', name: 'bi-play', source: 'Bootstrap Icons' },
+            { class: 'bi bi-plus', name: 'bi-plus', source: 'Bootstrap Icons' },
+            { class: 'bi bi-printer', name: 'bi-printer', source: 'Bootstrap Icons' },
+            { class: 'bi bi-search', name: 'bi-search', source: 'Bootstrap Icons' },
+            { class: 'bi bi-shield', name: 'bi-shield', source: 'Bootstrap Icons' },
+            { class: 'bi bi-star', name: 'bi-star', source: 'Bootstrap Icons' },
+            { class: 'bi bi-tag', name: 'bi-tag', source: 'Bootstrap Icons' },
+            { class: 'bi bi-telephone', name: 'bi-telephone', source: 'Bootstrap Icons' },
+            { class: 'bi bi-upload', name: 'bi-upload', source: 'Bootstrap Icons' },
+            { class: 'bi bi-wallet', name: 'bi-wallet', source: 'Bootstrap Icons' },
+            { class: 'bi bi-wrench', name: 'bi-wrench', source: 'Bootstrap Icons' },
+            { class: 'bi bi-zoom-in', name: 'bi-zoom-in', source: 'Bootstrap Icons' }
+        ];
+
+        const grid = document.getElementById('iconGrid');
+        const searchBar = document.querySelector('.search-bar');
+        const filterSelect = document.querySelector('.filter-select');
+
+        function renderIcons(filteredIcons) {
+            grid.innerHTML = '';
+            if (filteredIcons.length === 0) {
+                grid.innerHTML = '<p class="error-message">Nenhum ícone encontrado.</p>';
+                return;
+            }
+            filteredIcons.forEach(icon => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="icon-preview">
+                        ${icon.text ? `<i class="${icon.class}">${icon.text}</i>` : `<i class="${icon.class}"></i>`}
+                    </div>
+                    <div class="icon-name">${icon.name} (${icon.source})</div>
+                    <button class="copy-btn" data-icon='<i class="${icon.class}">${icon.text || ''}</i>'>Copiar</button>
+                `;
+                grid.appendChild(card);
+            });
+            setupCopyButtons();
+        }
+
+        function filterAndSearch() {
+            try {
+                const searchTerm = searchBar.value.toLowerCase();
+                const selectedSource = filterSelect.value;
+
+                let filteredIcons = [...icons];
+
+                // Aplicar filtro de fonte
+                if (selectedSource !== 'all') {
+                    filteredIcons = filteredIcons.filter(icon => icon.source === selectedSource);
+                }
+
+                // Aplicar pesquisa se houver termo
+                if (searchTerm) {
+                    filteredIcons = filteredIcons.filter(icon => 
+                        icon.name.toLowerCase().includes(searchTerm) || 
+                        (icon.text && icon.text.toLowerCase().includes(searchTerm))
+                    );
+                }
+
+                renderIcons(filteredIcons);
+            } catch (error) {
+                grid.innerHTML = '<p class="error-message">Erro ao carregar os ícones: ' + error.message + '</p>';
+                console.error(error);
+            }
+        }
+
+        function setupCopyButtons() {
+            const buttons = document.querySelectorAll('.copy-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const iconCode = this.getAttribute('data-icon');
+                    navigator.clipboard.writeText(iconCode).then(() => {
+                        this.textContent = 'Copiado!';
+                        this.classList.add('copied');
+                        setTimeout(() => {
+                            this.textContent = 'Copiar';
+                            this.classList.remove('copied');
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Erro ao copiar: ', err);
+                    });
+                });
+            });
+        }
+
+        // Verificar se os elementos existem antes de adicionar eventos
+        if (!grid || !searchBar || !filterSelect) {
+            document.body.innerHTML = '<p class="error-message">Erro: Elementos HTML não encontrados.</p>';
+        } else {
+            searchBar.addEventListener('input', filterAndSearch);
+            filterSelect.addEventListener('change', filterAndSearch);
+            renderIcons(icons); // Renderizar inicialmente
+        }
+
+        // Verificar carregamento das bibliotecas
+        window.addEventListener('load', () => {
+            if (!window.FontAwesome || !window.google || !window.bootstrap) {
+                grid.innerHTML = '<p class="error-message">Erro: Uma ou mais bibliotecas de ícones não foram carregadas. Verifique sua conexão com a internet.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
