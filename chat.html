@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Local</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .chat-container {
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+    .message {
+      max-width: 70%;
+      margin: 8px 16px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      word-wrap: break-word;
+    }
+    .message.sent {
+      background-color: #3B82F6;
+      color: white;
+      margin-left: auto;
+    }
+    .message.received {
+      background-color: #F3F4F6;
+      color: black;
+    }
+    .username {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <!-- Modal de Boas-Vindas -->
+  <div id="welcomeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">Bem-vindo ao Chat Local</h2>
+      <input id="usernameInput" type="text" placeholder="Digite seu nome" class="w-full p-2 mb-4 border rounded-lg">
+      <label class="block mb-2 text-gray-600">Escolha a cor do seu nome:</label>
+      <input id="colorInput" type="color" class="w-full h-10 mb-4">
+      <button id="startChat" class="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600">Entrar no Chat</button>
+    </div>
+  </div>
+
+  <!-- Interface do Chat -->
+  <div id="chatInterface" class="hidden w-full max-w-2xl bg-white rounded-lg shadow-lg flex flex-col h-[90vh]">
+    <div class="bg-blue-500 text-white p-4 rounded-t-lg">
+      <h1 class="text-xl font-bold">Chat Local</h1>
+    </div>
+    <div id="chatMessages" class="chat-container p-4 flex-1"></div>
+    <div class="p-4 border-t flex">
+      <input id="messageInput" type="text" placeholder="Digite sua mensagem..." class="flex-1 p-2 border rounded-l-lg focus:outline-none">
+      <button id="sendButton" class="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA5m65LSJQDKFTdbl_iB71URRIhXWYhUcQ",
+      authDomain: "chat-alpha-e-beta.firebaseapp.com",
+      projectId: "chat-alpha-e-beta",
+      storageBucket: "chat-alpha-e-beta.firebasestorage.app",
+      messagingSenderId: "873372870268",
+      appId: "1:873372870268:web:74a0711b5f3840dc350bf9",
+      measurementId: "G-8HXRW3F6Q8"
+    };
+
+    // Inicializa Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Elementos DOM
+    const welcomeModal = document.getElementById('welcomeModal');
+    const chatInterface = document.getElementById('chatInterface');
+    const usernameInput = document.getElementById('usernameInput');
+    const colorInput = document.getElementById('colorInput');
+    const startChat = document.getElementById('startChat');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const chatMessages = document.getElementById('chatMessages');
+
+    // Estado do usuário
+    let username = '';
+    let userColor = '#000000';
+    let userId = Math.random().toString(36).substring(2); // ID único para sessão
+
+    // Iniciar chat
+    startChat.addEventListener('click', () => {
+      username = usernameInput.value.trim();
+      userColor = colorInput.value;
+      if (username) {
+        welcomeModal.classList.add('hidden');
+        chatInterface.classList.remove('hidden');
+        loadMessages();
+      } else {
+        alert('Por favor, digite um nome.');
+      }
+    });
+
+    // Enviar mensagem
+    async function sendMessage() {
+      const messageText = messageInput.value.trim();
+      if (messageText && username) {
+        try {
+          await addDoc(collection(db, 'messages'), {
+            username,
+            message: messageText,
+            color: userColor,
+            timestamp: new Date(),
+            userId
+          });
+          messageInput.value = '';
+        } catch (error) {
+          console.error('Erro ao enviar mensagem:', error);
+        }
+      }
+    }
+
+    // Enviar com botão
+    sendButton.addEventListener('click', sendMessage);
+
+    // Enviar com Enter
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    // Carregar mensagens em tempo real
+    function loadMessages() {
+      const q = query(collection(db, 'messages'), orderBy('timestamp', 'asc'));
+      onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === 'added') {
+            const data = change.doc.data();
+            const messageDiv = document.createElement('div');
+            const isSent = data.userId === userId;
+            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+            messageDiv.innerHTML = `
+              <div class="username" style="color: ${data.color}">${data.username}</div>
+              <div>${data.message}</div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }
+        });
+      });
+    }
+  </script>
+</body>
+</html>
