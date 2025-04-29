@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-
     <title>Jogos trazidos ao canal Eletrickz100</title>
 <style>
     :root {
@@ -43,6 +41,7 @@
     }
 
     p {
+       margin-bottom: 0px;
         font-size: 1.2em;
     }
 
@@ -75,8 +74,8 @@
 
     .grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr); /* 4 colunas padrão */
-        gap: 20px; /* Padrão original para celulares */
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
         margin-top: 30px;
     }
 
@@ -176,12 +175,58 @@
         color: var(--text-color-dark);
     }
 
+    /* Estilização do rodapé */
+    footer {
+        background-color: var(--bg-color-light);
+        color: var(--text-color-light);
+        padding: 20px 0;
+        margin-top: 40px;
+        border-top: 1px solid #ccc;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .dark-mode footer {
+        background-color: var(--bg-color-dark);
+        color: var(--text-color-dark);
+        border-top: 1px solid #444;
+    }
+
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .ad-container {
+        margin: 20px auto;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .ad-container ins {
+        display: block !important;
+        margin: 0 auto;
+    }
+
+    .footer-text {
+        font-size: 0.9em;
+        margin-top: 20px;
+    }
+
+    .footer-text a {
+        color: #1a73e8;
+    }
+
+    .footer-text a:hover {
+        text-decoration: underline;
+    }
+
     /* Media Queries para PCs (acima de 1440px) */
     @media (min-width: 1441px) {
         .grid {
             grid-template-columns: repeat(4, 1fr);
-            gap: 35px; /* Espaçamento maior entre colunas */
-            max-width: 1400px; /* Centraliza em telas grandes */
+            gap: 35px;
+            max-width: 1400px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -191,7 +236,7 @@
     @media (min-width: 1025px) and (max-width: 1440px) {
         .grid {
             grid-template-columns: repeat(3, 1fr);
-            gap: 30px; /* Espaçamento maior entre colunas */
+            gap: 30px;
             max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
@@ -202,7 +247,7 @@
     @media (max-width: 1024px) and (min-width: 769px) {
         .grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 25px; /* Espaçamento intermediário */
+            gap: 25px;
         }
 
         .search-bar {
@@ -218,11 +263,11 @@
         }
     }
 
-    /* Media Queries para celulares (até 768px) - Mantido como no original */
+    /* Media Queries para celulares (até 768px) */
     @media (max-width: 768px) {
         .grid {
             grid-template-columns: 1fr;
-            gap: 20px; /* Exatamente como no original */
+            gap: 20px;
         }
 
         .search-bar {
@@ -243,6 +288,10 @@
 
         p {
             font-size: 1em;
+        }
+
+        .ad-container {
+            padding: 0 10px;
         }
     }
 </style>
@@ -356,7 +405,25 @@
 <button class="mode-toggle" onclick="toggleMode()">
     <i class="fas fa-moon"></i> <!-- Ícone da lua -->
 </button>
-
+<footer>
+        <div class="footer-content">
+            <div class="ad-container">
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5715350873085221"
+                        crossorigin="anonymous"></script>
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-format="autorelaxed"
+                     data-ad-client="ca-pub-5715350873085221"
+                     data-ad-slot="7795155534"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+            <div class="footer-text">
+                &copy; 2025 Eletrickz100. Todos os direitos reservados. <a href="/sobre">Sobre</a> | <a href="/contato">Contato</a>
+            </div>
+        </div>
+    </footer>
 <script>
     let darkMode = false;
 
