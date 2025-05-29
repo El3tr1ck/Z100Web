@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload de Imagem para PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        .input-container {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        input[type="file"], select {
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #preview {
+            max-width: 300px;
+            max-height: 300px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload de Imagem para Gerar PDF</h1>
+    <div class="input-container">
+        <input type="file" id="imageInput" accept="image/*">
+        <select id="paperSize">
+            <option value="a4">A4 (210 x 297 mm)</option>
+            <option value="a3">A3 (297 x 420 mm)</option>
+            <option value="letter">Letter (215.9 x 279.4 mm)</option>
+        </select>
+        <select id="orientation">
+            <option value="landscape">Paisagem</option>
+            <option value="portrait">Retrato</option>
+        </select>
+        <img id="preview" alt="Pré-visualização da Imagem">
+        <button onclick="generatePDF()">Gerar PDF</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
+        const paperSizeSelect = document.getElementById('paperSize');
+        const orientationSelect = document.getElementById('orientation');
+
+        imageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function generatePDF() {
+            const file = imageInput.files[0];
+            if (!file) {
+                alert('Por favor, selecione uma imagem primeiro!');
+                return;
+            }
+
+            const paperSize = paperSizeSelect.value;
+            const orientation = orientationSelect.value;
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: orientation,
+                unit: 'mm',
+                format: paperSize
+            });
+
+            const img = new Image();
+            img.src = preview.src;
+            img.onload = function() {
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+
+                const imgWidth = img.width;
+                const imgHeight = img.height;
+                const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+
+                const scaledWidth = imgWidth * ratio;
+                const scaledHeight = imgHeight * ratio;
+
+                const x = (pdfWidth - scaledWidth) / 2;
+                const y = (pdfHeight - scaledHeight) / 2;
+
+                pdf.addImage(img, 'JPEG', x, y, scaledWidth, scaledHeight);
+                pdf.save(file.name.replace(/\.[^/.]+$/, '') + '.pdf');
+            };
+        }
+    </script>
+</body>
+</html>
