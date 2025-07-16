@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="icon" href="../img/book.png" type="image/png">
-    <title>Projeto novel:Eletrickz100</title>
+    <title>Projeto novel: Eletrickz100</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,6 +18,9 @@
             height: 100vh;
             padding-top: 10vh;
             text-align: center;
+        }
+        body.no-scroll {
+            overflow: hidden;
         }
         .header-text {
             font-size: 20px;
@@ -112,166 +115,295 @@
             margin: 3px 0;
         }
         .card-date {
-            font-size: 12px;
+            font-size: 12px; 
             color: gray;
         }
         .theme-toggle {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 100;
-}
-
-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 24px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-body.dark-mode {
-    background-color: #121212;
-    color: white;
-}
-
-body.dark-mode .header-text {
-    color: #d3d3d3;
-}
-
-body.dark-mode .card {
-    background: #333;
-    color: white;
-}
-
-body.dark-mode .card:hover {
-    transform: scale(1.03);
-    background-color: #444;
-}
-
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+        .theme-toggle button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .theme-toggle button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: white;
+        }
+        body.dark-mode .header-text {
+            color: #d3d3d3;
+        }
+        body.dark-mode .card {
+            background: #333;
+            color: white;
+        }
+        body.dark-mode .card:hover {
+            transform: scale(1.03);
+            background-color: #444;
+        }
+        /* Estilos para o modal de escolha */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 90%;
+            max-width: 300px;
+        }
+        body.dark-mode .modal-content {
+            background: #333;
+            color: white;
+        }
+        .modal-content p {
+            margin: 0 0 15px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .modal-buttons button {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+        /* Estilos para o modal do iframe */
+        .iframe-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .iframe-modal-content {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            width: 95%;
+            max-width: 800px;
+            max-height: 95vh;
+            overflow: auto;
+        }
+        body.dark-mode .iframe-modal-content {
+            background: #333;
+        }
+        .iframe-modal-content iframe {
+            width: 100%;
+            height: 90vh;
+            border: none;
+        }
+        .close-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            color: white;
+            font-size: 24px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, color 0.2s ease;
+            z-index: 1100;
+        }
+        .close-button:hover {
+            transform: scale(1.2);
+            color: #007BFF;
+        }
+        @media (max-width: 600px) {
+            .iframe-modal-content {
+                width: 90%;
+            }
+            .iframe-modal-content iframe {
+                height: 80vh;
+            }
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNEhT3G5r1r/1rV7bDbCt0NoXxYAgJuZ1rO2A90O+/WsuW1vTkc1O0V2lMy8v9Ci8FQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
     <div class="theme-toggle">
-    <button onclick="toggleTheme()">
-        <i id="theme-icon" class="fas fa-sun"></i>
-    </button>
-</div>
+        <button onclick="toggleTheme()">
+            <i id="theme-icon" class="fas fa-sun"></i>
+        </button>
+    </div>
     <div class="header-text">Desfrute do projeto Novel, leia e baixe os capítulos aqui</div>
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="Buscar..." onkeyup="searchCards()">
-       <button onclick="searchCards()"><i class="fas fa-search"></i></button>
+        <button onclick="searchCards()"><i class="fas fa-search"></i></button>
     </div>
     <div class="card-list" id="cardList"></div>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5715350873085221"
-     crossorigin="anonymous"></script>
-<!-- novel anuncio"s -->
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-5715350873085221"
-     data-ad-slot="2489792302"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-<script>
-    function createCardElement(chapterNumber, title, date, link) {
-        const card = document.createElement('div');
-        card.classList.add('card');
-        card.onclick = () => window.open(link, '_blank');
-        card.setAttribute('data-title', title.toLowerCase());
-        card.setAttribute('data-chapter', chapterNumber);
-        
-        const icon = document.createElement('div');
-        icon.classList.add('card-icon');
-        icon.innerHTML = '<i class="fas fa-download"></i>';
-        
-        const content = document.createElement('div');
-        content.classList.add('card-content');
-        
-        const cardTitle = document.createElement('div');
-        cardTitle.classList.add('card-title');
-        cardTitle.textContent = title;
-        
-        const cardSubtitle = document.createElement('div');
-        cardSubtitle.classList.add('card-subtitle');
-        cardSubtitle.textContent = `Capítulo ${chapterNumber}`;
-        
-        const cardDate = document.createElement('div');
-        cardDate.classList.add('card-date');
-        cardDate.textContent = `Adicionado em ${date}`;
-        
-        content.appendChild(cardTitle);
-        content.appendChild(cardSubtitle);
-        content.appendChild(cardDate);
-        card.appendChild(icon);
-        card.appendChild(content);
-        
-        return card;
-    }
-    
-    function addCard(chapterNumber, title, link) {
-        const cardList = document.getElementById('cardList');
-        const date = new Date().toLocaleDateString();
-        const cardElement = createCardElement(chapterNumber, title, date, link);
-        cardList.appendChild(cardElement);
-    }  
-function searchCards() {
-    const query = document.getElementById('searchInput').value.toLowerCase();
+    <!-- Modal de escolha -->
+    <div id="choiceModal" class="modal" onclick="closeChoiceModal(event)">
+        <div class="modal-content">
+            <p>Como você prefere visualizar o capítulo?</p>
+            <div class="modal-buttons">
+                <button onclick="openIframe()">No site</button>
+                <button onclick="openDriveLink()">No Google Drive</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal do iframe -->
+    <div id="iframeModal" class="iframe-modal">
+        <button class="close-button" onclick="closeIframeModal()">X</button>
+        <div class="iframe-modal-content">
+            <iframe id="pdfIframe" src="" allow="autoplay"></iframe>
+        </div>
+    </div>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5715350873085221" crossorigin="anonymous"></script>
+    <!-- novel anuncios -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-5715350873085221"
+         data-ad-slot="2489792302"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    <script>
+        let currentDriveLink = '';
+        let currentIframeSrc = '';
 
-    // Se o valor da pesquisa for "secrets", redireciona para historical_concepts.html
-    if (query === "secrets") {
-        window.location.href = "concepts_historical.html";
-    } else {
-        // Pesquisa normal nos cards
-        const cards = document.querySelectorAll('.card');
-        
-        cards.forEach(card => {
-            const title = card.getAttribute('data-title');
-            const chapter = card.getAttribute('data-chapter');
-            
-            if (title.includes(query) || chapter.includes(query)) {
-                card.style.display = "flex";
-            } else {
-                card.style.display = "none";
+        function createCardElement(chapterNumber, title, date, driveLink, iframeSrc) {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.setAttribute('data-title', title.toLowerCase());
+            card.setAttribute('data-chapter', chapterNumber);
+            card.onclick = () => showChoiceModal(driveLink, iframeSrc || driveLink.replace('/view?usp=drive_link', '/preview'));
+
+            const icon = document.createElement('div');
+            icon.classList.add('card-icon');
+            icon.innerHTML = '<i class="fas fa-download"></i>';
+
+            const content = document.createElement('div');
+            content.classList.add('card-content');
+
+            const cardTitle = document.createElement('div');
+            cardTitle.classList.add('card-title');
+            cardTitle.textContent = title;
+
+            const cardSubtitle = document.createElement('div');
+            cardSubtitle.classList.add('card-subtitle');
+            cardSubtitle.textContent = `Capítulo ${chapterNumber}`;
+
+            const cardDate = document.createElement('div');
+            cardDate.classList.add('card-date');
+            cardDate.textContent = `Adicionado em ${date}`;
+
+            content.appendChild(cardTitle);
+            content.appendChild(cardSubtitle);
+            content.appendChild(cardDate);
+            card.appendChild(icon);
+            card.appendChild(content);
+
+            return card;
+        }
+
+        function addCard(chapterNumber, title, driveLink, iframeSrc) {
+            const cardList = document.getElementById('cardList');
+            const date = new Date().toLocaleDateString();
+            const cardElement = createCardElement(chapterNumber, title, date, driveLink, iframeSrc);
+            cardList.appendChild(cardElement);
+        }
+
+        function showChoiceModal(driveLink, iframeSrc) {
+            currentDriveLink = driveLink;
+            currentIframeSrc = iframeSrc;
+            const modal = document.getElementById('choiceModal');
+            modal.style.display = 'flex';
+        }
+
+        function openIframe() {
+            const modal = document.getElementById('choiceModal');
+            const iframeModal = document.getElementById('iframeModal');
+            const iframe = document.getElementById('pdfIframe');
+            iframe.src = currentIframeSrc;
+            modal.style.display = 'none';
+            iframeModal.style.display = 'flex';
+            document.body.classList.add('no-scroll');
+        }
+
+        function openDriveLink() {
+            window.open(currentDriveLink, '_blank');
+            document.getElementById('choiceModal').style.display = 'none';
+        }
+
+        function closeIframeModal() {
+            const iframeModal = document.getElementById('iframeModal');
+            const iframe = document.getElementById('pdfIframe');
+            iframe.src = '';
+            iframeModal.style.display = 'none';
+            document.body.classList.remove('no-scroll');
+        }
+
+        function closeChoiceModal(event) {
+            const modal = document.getElementById('choiceModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
             }
-        });
-    }
-}
+        }
 
+        function searchCards() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (query === "secrets") {
+                window.location.href = "concepts_historical.html";
+            } else {
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => {
+                    const title = card.getAttribute('data-title');
+                    const chapter = card.getAttribute('data-chapter');
+                    if (title.includes(query) || chapter.includes(query)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+        }
 
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        }
 
-    
-    addCard(1, 'O passado em ruinas,um verão de começos', 'https://drive.google.com/file/d/18nNcYB6TtHuMEIj9mEAuE52rXlitSjnh/view?usp=drive_link');
-    addCard(2, 'Perguntas e incertezas,o destino falso', 'https://drive.google.com/file/d/1Fp717e2X7jfji2-6OtfjRE0l1PdxJRfl/view?usp=drive_link');
-    addCard(3, 'Um escuro na luz se manifesta,o passado de Eletrick e Lilie!!', 'https://drive.google.com/file/d/17rMhrkr2nvc58rbnWUEha3U0I1i4r_9n/view?usp=drive_link');
-    addCard(4, 'lembranças incompletas...', 'https://drive.google.com/file/d/1gj6fDly39qReA4eyoeZe23Jq1SxlZ0EE/view?usp=drive_link');
-    addCard(5, 'sorrisos desejaveis,traumas indesejaveis', 'https://drive.google.com/file/d/1ixfowttz-ZNmXga3r-2AVtva2gQaFMIr/view?usp=drive_link');
-</script>
-<script>
-    function toggleTheme() {
-    const body = document.body;
-    const icon = document.getElementById('theme-icon');
-    
-    body.classList.toggle('dark-mode');
-    
-    // Alternar o ícone entre sol e lua
-    if (body.classList.contains('dark-mode')) {
-        icon.classList.remove('fa-sun');
-        icon.classList.add('fa-moon');
-    } else {
-        icon.classList.remove('fa-moon');
-        icon.classList.add('fa-sun');
-    }
-}
-
-</script>
+        // Adicionando os cards com links e iframes
+        addCard(1, 'O passado em ruinas, um verão de começos', 'https://drive.google.com/file/d/18nNcYB6TtHuMEIj9mEAuE52rXlitSjnh/view?usp=drive_link', 'https://drive.google.com/file/d/18nNcYB6TtHuMEIj9mEAuE52rXlitSjnh/preview');
+        addCard(2, 'Perguntas e incertezas, o destino falso', 'https://drive.google.com/file/d/1Fp717e2X7jfji2-6OtfjRE0l1PdxJRfl/view?usp=drive_link', '');
+        addCard(3, 'Um escuro na luz se manifesta, o passado de Eletrick e Lilie!!', 'https://drive.google.com/file/d/17rMhrkr2nvc58rbnWUEha3U0I1i4r_9n/view?usp=drive_link', '');
+        addCard(4, 'Lembranças incompletas...', 'https://drive.google.com/file/d/1gj6fDly39qReA4eyoeZe23Jq1SxlZ0EE/view?usp=drive_link', '');
+        addCard(5, 'Sorrisos desejáveis, traumas indesejáveis', 'https://drive.google.com/file/d/1ixfowttz-ZNmXga3r-2AVtva2gQaFMIr/view?usp=drive_link', '');
+    </script>
 </body>
 </html>
