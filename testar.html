@@ -1,94 +1,1566 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Testador de Código</title>
+  <meta charset="UTF-8">
+  <title>Testador de Código com Janelas</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+  <style>
+    body {
+      background-color: #1e1e1e;
+      color: white;
+      margin: 0;
+      font-family: sans-serif;
+    }
 
-    <!-- CodeMirror CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    h2 {
+      text-align: center;
+      padding: 15px 0;
+      margin: 0;
+    }
 
-    <!-- CodeMirror JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+    #tabs {
+      display: flex;
+      align-items: center;
+      padding: 5px;
+      background-color: #282a36;
+      overflow-x: auto;
+    }
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1e1e1e;
-            color: white;
-            text-align: center;
-            margin: 20px;
-        }
-        .editor-container {
-            width: 90%;
-            margin: auto;
-            text-align: left;
-        }
-        .CodeMirror {
-            height: 300px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            background: #282a36;
-            color: white;
-        }
-        button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-    </style>
+    .tab {
+      padding: 8px 12px;
+      margin-right: 5px;
+      background-color: #444;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      opacity: 0;
+      transform: scale(0.9);
+      animation: tabEnter 0.2s forwards;
+    }
+
+    .tab.active {
+      background-color: #61dafb;
+      color: black;
+    }
+
+    .tab .close-btn {
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #addTab {
+      background: none;
+      color: white;
+      font-size: 20px;
+      margin-left: 10px;
+      cursor: pointer;
+      border: none;
+    }
+
+    #contextMenu {
+      position: absolute;
+      background-color: #282a36;
+      color: white;
+      padding: 15px;
+      display: none;
+      border: 1px solid #555;
+      border-radius: 8px;
+      z-index: 999;
+      width: 220px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    #contextMenu label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    #contextMenu input, #contextMenu select {
+      width: calc(100% - 16px);
+      padding: 8px;
+      margin-top: 5px;
+      background-color: #44475a;
+      color: white;
+      border: 1px solid #6272a4;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    #contextMenu input:focus, #contextMenu select:focus {
+      outline: none;
+      border-color: #50fa7b;
+      box-shadow: 0 0 5px rgba(80, 250, 123, 0.5);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+      margin-top: 5px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #44475a;
+      -webkit-transition: .4s;
+      transition: .4s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #50fa7b;
+    }
+
+    input:checked + .slider:before {
+      -webkit-transform: translateX(20px);
+      -ms-transform: translateX(20px);
+      transform: translateX(20px);
+    }
+
+    .editor-container {
+      height: 300px;
+      padding: 10px;
+      position: relative;
+    }
+
+    .CodeMirror {
+      height: 100%;
+      font-size: 16px;
+      background: #282a36;
+      color: white;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    #previewBtn, #consoleBtn, #saveBtn, #archiveBtn, #aboutBtn {
+      padding: 10px 20px;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #saveBtn {
+      background-color: #ff79c6;
+    }
+
+    #saveBtn:hover {
+      background-color: #ff6bb0;
+    }
+
+    #previewBtn {
+      background-color: #28a745;
+    }
+
+    #previewBtn:hover {
+      background-color: #218838;
+    }
+
+    #consoleBtn {
+      background-color: #1e90ff;
+    }
+
+    #consoleBtn:hover {
+      background-color: #187bcd;
+    }
+
+    #archiveBtn {
+      background-color: #ff5555;
+    }
+
+    #archiveBtn:hover {
+      background-color: #ff6b6b;
+    }
+
+    #aboutBtn {
+      background-color: #50fa7b;
+    }
+
+    #aboutBtn:hover {
+      background-color: #40d66b;
+    }
+
+    #consoleWindow {
+      position: fixed;
+      left: 10px;
+      bottom: 10px;
+      width: 350px;
+      height: 250px;
+      background-color: #282a36;
+      border: 1px solid #555;
+      border-radius: 8px;
+      display: none;
+      z-index: 1000;
+      overflow: auto;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      color: white;
+      resize: none;
+    }
+
+    #consoleWindow h4 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+      color: #50fa7b;
+    }
+
+    #consoleWindow .console-input {
+      width: calc(100% - 20px);
+      padding: 5px;
+      margin-top: 10px;
+      background-color: #44475a;
+      color: white;
+      border: 1px solid #6272a4;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    #consoleWindow .console-error {
+      color: #ff5555;
+    }
+
+    #consoleWindow .console-log {
+      color: #f8f8f2;
+    }
+
+    #consoleWindow .console-warn {
+      color: #f1fa8c;
+    }
+
+    #consoleWindow .console-info {
+      color: #1e90ff;
+    }
+
+    @keyframes tabEnter {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes tabExit {
+      to {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .context-menu {
+      position: absolute;
+      background-color: #2d2f3e;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      z-index: 1001;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      font-family: 'Arial', sans-serif;
+    }
+
+    .context-menu button {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      margin-bottom: 5px;
+      background: #3b3f54;
+      border: none;
+      border-radius: 4px;
+      color: #e0e0e0;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.3s;
+    }
+
+    .context-menu button:hover {
+      background-color: #4a5072;
+      color: #ffffff;
+    }
+
+    .context-menu button:last-child {
+      margin-bottom: 0;
+    }
+
+    .ai-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #2d2f3e;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      z-index: 1002;
+      display: none;
+      width: 350px;
+      max-height: 80vh;
+      overflow-y: auto;
+      text-align: center;
+    }
+
+    .ai-panel h3 {
+      margin: 0 0 15px 0;
+      font-size: 18px;
+      color: #50fa7b;
+    }
+
+    .ai-panel textarea {
+      width: 80%;
+      height: 120px;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #44475a;
+      color: white;
+      border: 1px solid #6272a4;
+      border-radius: 4px;
+      resize: vertical;
+      display: inline-block;
+    }
+
+    .ai-panel button {
+      width: 100%;
+      padding: 8px;
+      background-color: #ff79c6;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .ai-panel button:hover {
+      background-color: #ff6bb0;
+    }
+
+    .ai-panel .close-btn {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #ff5555;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 2px 6px;
+      display: none;
+    }
+
+    .ai-panel .close-btn:hover {
+      color: #ff7979;
+    }
+
+    .loader {
+      border: 4px solid #44475a;
+      border-top: 4px solid #50fa7b;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin: 10px auto;
+      display: none;
+    }
+
+    #confirmPanel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #2d2f3e;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      z-index: 1003;
+      display: none;
+      width: 300px;
+      text-align: center;
+      color: white;
+    }
+
+    #confirmPanel button {
+      padding: 8px 16px;
+      margin: 10px 5px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #confirmPanel #yesBtn {
+      background-color: #50fa7b;
+      color: black;
+    }
+
+    #confirmPanel #yesBtn:hover {
+      background-color: #40d66b;
+    }
+
+    #confirmPanel #noBtn {
+      background-color: #ff5555;
+      color: white;
+    }
+
+    #confirmPanel #noBtn:hover {
+      background-color: #ff6b6b;
+    }
+  </style>
 </head>
 <body>
 
-    <h2>Testador de Código HTML, CSS e JavaScript</h2>
-    <div class="editor-container">
-        <textarea id="codeInput"></textarea>
-    </div>
-    <button onclick="abrirJanela()">Abrir Visualização</button>
+<h2>Testador de Código HTML, CSS, JS, PHP</h2>
 
-    <script>
-        let janela = null;
+<div id="tabs">
+  <!-- Abas aparecem aqui -->
+  <button id="addTab">+</button>
+</div>
 
-        // Inicializa o CodeMirror corretamente
-        let editor = CodeMirror.fromTextArea(document.getElementById("codeInput"), {
-            mode: "htmlmixed", // Suporta HTML, CSS e JavaScript no mesmo editor
-            theme: "dracula",  // Tema escuro com cores destacadas
-            lineNumbers: true,
-            autoCloseTags: true
-        });
+<div class="editor-container" id="editorArea"></div>
+<div class="button-container">
+  <button id="saveBtn">Salvar Código</button>
+  <button id="previewBtn">Run!</button>
+  <button id="consoleBtn">Console</button>
+  <button id="archiveBtn">Arquivamento</button>
+  <button id="aboutBtn">Sobre Nós</button>
+</div>
 
-        function abrirJanela() {
-            if (!janela || janela.closed) {
-                janela = window.open();
+<div id="contextMenu">
+  <label>Nome: <input id="fileNameInput" type="text"></label>
+  <label>Tipo:
+    <select id="fileTypeSelect">
+      <option value="html">HTML</option>
+      <option value="css">CSS</option>
+      <option value="js">JavaScript</option>
+    </select>
+  </label>
+  <label>Preservar Aba:
+    <span class="switch">
+      <input type="checkbox" id="preserveTabSwitch">
+      <span class="slider"></span>
+    </span>
+  </label>
+</div>
+
+<div id="consoleWindow">
+  <h4>Shell</h4>
+  <div id="consoleOutput"></div>
+  <input type="text" id="consoleInput" class="console-input" placeholder="Digite um comando...">
+</div>
+
+<div id="codeContextMenu" class="context-menu">
+  <button id="exampleTestBtn">exemplo de teste</button>
+  <button id="html5Btn">Html5</button>
+  <button id="aiBtn">IA</button>
+</div>
+
+<div id="aiPanel" class="ai-panel">
+  <h3>Peça à IA</h3>
+  <button class="close-btn" id="aiCloseBtn" style="display: none;">✕</button>
+  <textarea id="aiInput" placeholder="Descreva uma modificação ou um novo código HTML (ex.: 'mude o botão para azul' ou 'crie um site com botão')"></textarea>
+  <div id="loader" class="loader"></div>
+  <button id="aiSendBtn">Enviar</button>
+</div>
+
+<div id="aboutWindow" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #2d2f3e; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); z-index: 1003; width: 300px; color: white; text-align: center;">
+  <h3>Sobre Nós</h3>
+  <p>Este é um site onde se pode testar a maioria de seus códigos dentro do navegador de forma nativa. No futuro, prometemos fazer algo 100% navegador nativo para ajudar aqueles que não podem instalar nenhum tipo de programa no navegador, além de termos suporte à IA Gemini que é ótima para ajudar na programação!</p>
+  <p>de: Eletrick</p>
+  <button style="margin-top: 10px; padding: 8px; background-color: #ff79c6; border: none; border-radius: 4px; color: white; cursor: pointer;" onclick="this.parentElement.style.display='none';">Fechar</button>
+</div>
+
+<div id="confirmPanel" class="ai-panel">
+  <h3>Confirmação</h3>
+  <p id="confirmMessage"></p>
+  <button id="yesBtn">Sim, eu aceito</button>
+  <button id="noBtn">Não, cancele!</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closetag.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+
+<script>
+  const tabs = [];
+  let activeTab = null;
+  let previewWindow = null;
+  const editorArea = document.getElementById("editorArea");
+  const contextMenu = document.getElementById("contextMenu");
+  const fileNameInput = document.getElementById("fileNameInput");
+  const fileTypeSelect = document.getElementById("fileTypeSelect");
+  const consoleWindow = document.getElementById("consoleWindow");
+  const consoleBtn = document.getElementById("consoleBtn");
+  const saveBtn = document.getElementById("saveBtn");
+  const archiveBtn = document.getElementById("archiveBtn");
+  const preserveTabSwitch = document.getElementById("preserveTabSwitch");
+  const consoleInput = document.getElementById("consoleInput");
+  const consoleOutput = document.getElementById("consoleOutput");
+  const codeContextMenu = document.getElementById("codeContextMenu");
+  const aiPanel = document.getElementById("aiPanel");
+  const aiInput = document.getElementById("aiInput");
+  const aiSendBtn = document.getElementById("aiSendBtn");
+  const loader = document.getElementById("loader");
+  const aiCloseBtn = document.getElementById("aiCloseBtn");
+  const aboutBtn = document.getElementById("aboutBtn");
+  const confirmPanel = document.getElementById("confirmPanel");
+  const confirmMessage = document.getElementById("confirmMessage");
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+  let selectedCode = "";
+  let currentColor = "#f8f8f2"; // Cor padrão inicial
+
+  // Carregar estado salvo ao iniciar
+  window.onload = () => {
+    const savedTabs = JSON.parse(localStorage.getItem("savedTabs") || "[]");
+    if (savedTabs.length === 0) {
+      criarNovaAba("sem-titulo", "html");
+    } else {
+      savedTabs.forEach(tabData => {
+        criarNovaAba(tabData.nome, tabData.tipo, tabData.codigo, tabData.preserved);
+      });
+    }
+  };
+
+  document.getElementById("addTab").addEventListener("click", () => {
+    criarNovaAba("sem-titulo", "html");
+  });
+
+  document.getElementById("previewBtn").addEventListener("click", () => {
+    abrirVisualizacao();
+  });
+
+  consoleBtn.addEventListener("click", () => {
+    consoleWindow.style.display = consoleWindow.style.display === "block" ? "none" : "block";
+  });
+
+  saveBtn.addEventListener("click", () => {
+    salvarEstado();
+  });
+
+  archiveBtn.addEventListener("click", () => {
+    salvarArquivamento();
+  });
+
+  aboutBtn.addEventListener("click", () => {
+    document.getElementById("aboutWindow").style.display = "block";
+  });
+
+  consoleInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      processarComando(consoleInput.value.trim());
+      consoleInput.value = "";
+    }
+  });
+
+  function salvarEstado() {
+    const tabsToSave = tabs.filter(tab => tab.preserved || tabs.length === 1);
+    const savedData = tabsToSave.map(tab => ({
+      nome: tab.nome,
+      tipo: tab.tipo,
+      codigo: tab.editor.getValue(),
+      preserved: tab.preserved
+    }));
+    localStorage.setItem("savedTabs", JSON.stringify(savedData));
+  }
+
+  function criarNovaAba(nome, tipo, codigo = "", preserved = false) {
+    const tab = {
+      nome,
+      tipo,
+      codigo,
+      preserved,
+      elemento: null,
+      editor: null
+    };
+
+    const tabBtn = document.createElement("div");
+    tabBtn.className = "tab";
+    tabBtn.innerHTML = `<span>${nome}.${tipo}</span><span class="close-btn">✕</span>`;
+
+    tabBtn.addEventListener("click", (e) => {
+      if (!e.target.classList.contains("close-btn")) ativarTab(tab);
+    });
+
+    tabBtn.querySelector(".close-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      fecharAba(tab);
+    });
+
+    tabBtn.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      abrirMenuContexto(e, tab);
+    });
+
+    document.getElementById("tabs").insertBefore(tabBtn, document.getElementById("addTab"));
+    tab.elemento = tabBtn;
+
+    const mode = tipo === "html" ? "htmlmixed" : 
+                 tipo === "css" ? "css" : 
+                 "javascript";
+
+    tab.editor = CodeMirror(editorArea, {
+      value: codigo,
+      mode: mode,
+      theme: "dracula",
+      lineNumbers: true,
+      matchBrackets: true,
+      autoCloseTags: tipo === "html",
+      autoCloseBrackets: tipo === "js",
+      extraKeys: { "Ctrl-Space": "autocomplete" }
+    });
+    tab.editor.getWrapperElement().style.display = "none";
+    tab.editor.on("change", () => {
+      tab.codigo = tab.editor.getValue();
+      atualizarVisualizacao();
+    });
+
+    tabs.push(tab);
+    ativarTab(tab);
+  }
+
+  function ativarTab(tab) {
+    if (activeTab) {
+      activeTab.elemento.classList.remove("active");
+      activeTab.editor.getWrapperElement().style.display = "none";
+    }
+    activeTab = tab;
+    tab.elemento.classList.add("active");
+    tab.editor.getWrapperElement().style.display = "block";
+    tab.editor.refresh();
+    atualizarVisualizacao();
+  }
+
+  function fecharAba(tab) {
+    tab.elemento.style.animation = "tabExit 0.2s forwards";
+    setTimeout(() => {
+      tab.elemento.remove();
+      tab.editor.getWrapperElement().remove();
+      const i = tabs.indexOf(tab);
+      if (i !== -1) tabs.splice(i, 1);
+      if (activeTab === tab) {
+        if (tabs[i]) ativarTab(tabs[i]);
+        else if (tabs[i - 1]) ativarTab(tabs[i - 1]);
+        else if (tabs.length === 0) criarNovaAba("sem-titulo", "html");
+        else activeTab = null;
+      }
+      atualizarVisualizacao();
+      salvarEstado();
+    }, 200);
+  }
+
+  function abrirMenuContexto(e, tab) {
+    contextMenu.style.display = "block";
+    contextMenu.style.left = `${e.pageX}px`;
+    contextMenu.style.top = `${e.pageY}px`;
+
+    fileNameInput.value = tab.nome;
+    fileTypeSelect.value = tab.tipo;
+    preserveTabSwitch.checked = tab.preserved;
+
+    fileNameInput.oninput = () => {
+      tab.nome = fileNameInput.value;
+      atualizarNomeTab(tab);
+      atualizarVisualizacao();
+      salvarEstado();
+    };
+    fileTypeSelect.onchange = () => {
+      tab.tipo = fileTypeSelect.value;
+      const mode = tab.tipo === "html" ? "htmlmixed" : 
+                   tab.tipo === "css" ? "css" : 
+                   "javascript";
+      tab.editor.setOption("mode", mode);
+      atualizarNomeTab(tab);
+      atualizarVisualizacao();
+      salvarEstado();
+    };
+
+    preserveTabSwitch.onchange = () => {
+      tab.preserved = preserveTabSwitch.checked;
+      salvarEstado();
+    };
+
+    contextMenu.addEventListener("click", e => e.stopPropagation());
+    setTimeout(() => {
+      document.addEventListener("click", fecharMenuContexto, { once: true });
+    }, 10);
+  }
+
+  function fecharMenuContexto() {
+    contextMenu.style.display = "none";
+  }
+
+  function atualizarNomeTab(tab) {
+    tab.elemento.querySelector("span").textContent = `${tab.nome}.${tab.tipo}`;
+  }
+
+  function checarLinks(tab) {
+    if (tab.tipo !== "html") return;
+
+    const links = tab.codigo.match(/(src|href)=["']([^"']+)["']/g) || [];
+    links.forEach(link => {
+      const caminho = link.match(/["']([^"']+)["']/)[1];
+      const nomeArquivo = caminho.split("/").pop();
+      const existe = tabs.some(t => `${t.nome}.${t.tipo}` === nomeArquivo);
+      if (!existe) {
+        consoleWindow.innerHTML += `<div class="console-warn">⚠ Arquivo referenciado não encontrado: ${nomeArquivo}</div>`;
+        consoleWindow.scrollTop = consoleWindow.scrollHeight;
+        console.warn(`Arquivo referenciado não encontrado: ${nomeArquivo}`);
+      } else {
+        const arquivo = tabs.find(t => `${t.nome}.${t.tipo}` === nomeArquivo);
+        if (arquivo) {
+          const refContent = arquivo.codigo;
+          tab.codigo = tab.codigo.replace(caminho, `data:${arquivo.tipo === "css" ? "text/css" : "application/javascript"};base64,${btoa(refContent)}`);
+        }
+      }
+    });
+  }
+
+  function abrirVisualizacao() {
+    if (previewWindow && !previewWindow.closed) {
+      previewWindow.close();
+    }
+    previewWindow = window.open("", "_blank");
+    overrideConsole();
+    atualizarVisualizacao();
+  }
+
+  function overrideConsole() {
+    if (!previewWindow || previewWindow.closed) return;
+
+    const originalConsole = console;
+    previewWindow.console = {
+      log: (...args) => {
+        const formatted = args.map(arg => typeof arg === "object" ? JSON.stringify(arg, null, 2) : arg).join(" ");
+        consoleOutput.innerHTML += `<div class="console-log">${formatted}</div>`;
+        consoleWindow.scrollTop = consoleWindow.scrollHeight;
+        if (shellWindow && !shellWindow.closed) {
+          shellWindow.document.getElementById("shellOutput").innerHTML += `<div>${formatted}</div>`;
+          shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+        }
+        originalConsole.log(...args);
+      },
+      error: (...args) => {
+        const formatted = args.map(arg => typeof arg === "object" ? JSON.stringify(arg, null, 2) : arg).join(" ");
+        consoleOutput.innerHTML += `<div class="console-error">${formatted}</div>`;
+        consoleWindow.scrollTop = consoleWindow.scrollHeight;
+        if (shellWindow && !shellWindow.closed) {
+          shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #ff5555">${formatted}</div>`;
+          shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+        }
+        originalConsole.error(...args);
+      },
+      warn: (...args) => {
+        const formatted = args.map(arg => typeof arg === "object" ? JSON.stringify(arg, null, 2) : arg).join(" ");
+        consoleOutput.innerHTML += `<div class="console-warn">${formatted}</div>`;
+        consoleWindow.scrollTop = consoleWindow.scrollHeight;
+        if (shellWindow && !shellWindow.closed) {
+          shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #f1fa8c">${formatted}</div>`;
+          shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+        }
+        originalConsole.warn(...args);
+      },
+      info: (...args) => {
+        const formatted = args.map(arg => typeof arg === "object" ? JSON.stringify(arg, null, 2) : arg).join(" ");
+        consoleOutput.innerHTML += `<div class="console-info">${formatted}</div>`;
+        consoleWindow.scrollTop = consoleWindow.scrollHeight;
+        if (shellWindow && !shellWindow.closed) {
+          shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #1e90ff">${formatted}</div>`;
+          shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+        }
+        originalConsole.info(...args);
+      }
+    };
+
+    previewWindow.onerror = (message, source, lineno, colno, error) => {
+      const errorMsg = `Erro: ${message} (Linha ${lineno}:${colno})`;
+      consoleOutput.innerHTML += `<div class="console-error">${errorMsg}</div>`;
+      consoleWindow.scrollTop = consoleWindow.scrollHeight;
+      if (shellWindow && !shellWindow.closed) {
+        shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #ff5555">${errorMsg}</div>`;
+        shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+      }
+      originalConsole.error(errorMsg);
+    };
+  }
+
+  function atualizarVisualizacao() {
+    if (!previewWindow || previewWindow.closed) return;
+
+    const htmlTab = tabs.find(t => t.tipo === "html") || tabs[0];
+    const cssTabs = tabs.filter(t => t.tipo === "css");
+    const jsTabs = tabs.filter(t => t.tipo === "js");
+
+    let htmlContent = htmlTab ? htmlTab.codigo : "<html><body><h1>Visualização</h1></body></html>";
+
+    const cssContent = cssTabs.map(tab => `<style>${tab.codigo}</style>`).join("\n");
+    const jsContent = jsTabs.map(tab => `<script>try { ${tab.codigo} } catch (e) { console.error("Erro no JavaScript: " + e.message); }<\/script>`).join("\n");
+
+    const fullContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        ${cssContent}
+      </head>
+      <body>
+        ${htmlContent}
+        ${jsContent}
+      </body>
+      </html>
+    `;
+
+    try {
+      previewWindow.document.open();
+      previewWindow.document.write(fullContent);
+      previewWindow.document.close();
+    } catch (e) {
+      consoleOutput.innerHTML += `<div class="console-error">Erro ao renderizar visualização: ${e.message}</div>`;
+      consoleWindow.scrollTop = consoleWindow.scrollHeight;
+      if (shellWindow && !shellWindow.closed) {
+        shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #ff5555">Erro ao renderizar visualização: ${e.message}</div>`;
+        shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+      }
+      console.error(`Erro ao renderizar visualização: ${e.message}`);
+    }
+  }
+
+  function processarComando(comando) {
+    if (!comando) return;
+
+    if (comando.startsWith("f>")) {
+      const comment = comando.replace("f>", "").trim();
+      if (comment) {
+        consoleOutput.innerHTML += `<div style="color: ${currentColor}">${comment}</div>`;
+        consoleWindow.scrollTop = consoleWindow.scrollHeight;
+        if (shellWindow && !shellWindow.closed) {
+          shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: ${currentColor}">${comment}</div>`;
+          shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+        }
+        console.log(`%c${comment}`, `color: ${currentColor}`);
+      }
+      return;
+    }
+
+    const dyeMatch = comando.match(/^dye_user\s+(\d+)/);
+    if (dyeMatch) {
+      const value = parseInt(dyeMatch[1]);
+      const colors = {
+        1: "red",
+        2: "orange",
+        3: "yellow",
+        4: "green",
+        5: "blue",
+        6: "indigo",
+        7: "violet",
+        8: "pink",
+        9: "purple"
+      };
+      if (value >= 1 && value <= 9) {
+        currentColor = colors[value];
+        consoleOutput.innerHTML += `<div class="console-log">Cor alterada com sucesso para ${colors[value]}.</div>`;
+        consoleWindow.scrollTop = consoleWindow.scrollHeight;
+        if (shellWindow && !shellWindow.closed) {
+          shellWindow.document.getElementById("shellOutput").innerHTML += `<div>Cor alterada com sucesso para ${colors[value]}.</div>`;
+          shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+        }
+        console.log(`Cor alterada com sucesso para ${colors[value]}.`);
+      } else {
+        consoleOutput.innerHTML += `<div class="console-warn">Valor deve estar entre 1 e 9.</div>`;
+        consoleWindow.scrollTop = consoleWindow.scrollHeight;
+        if (shellWindow && !shellWindow.closed) {
+          shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #f1fa8c">Valor deve estar entre 1 e 9.</div>`;
+          shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+        }
+        console.warn("Valor deve estar entre 1 e 9.");
+      }
+      return;
+    }
+
+    const [cmd, ...args] = comando.split(" ");
+    switch (cmd.toLowerCase()) {
+      case "shell_window":
+        abrirShellWindow();
+        consoleOutput.innerHTML += `<div class="console-log">Comando shell_window executado com sucesso.</div>`;
+        consoleWindow.scrollTop = consoleWindow.scrollHeight;
+        if (shellWindow && !shellWindow.closed) {
+          shellWindow.document.getElementById("shellOutput").innerHTML += `<div>Comando shell_window executado com sucesso.</div>`;
+          shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+        }
+        console.log("Comando shell_window executado com sucesso.");
+        break;
+      case "reload":
+        if (previewWindow && !previewWindow.closed) {
+          try {
+            previewWindow.location.reload();
+            setTimeout(() => {
+              if (!previewWindow.closed) {
+                overrideConsole();
+                atualizarVisualizacao();
+                consoleOutput.innerHTML += `<div class="console-log">Comando reload executado com sucesso.</div>`;
+                consoleWindow.scrollTop = consoleWindow.scrollHeight;
+                if (shellWindow && !shellWindow.closed) {
+                  shellWindow.document.getElementById("shellOutput").innerHTML += `<div>Comando reload executado com sucesso.</div>`;
+                  shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+                }
+                console.log("Comando reload executado com sucesso.");
+              } else {
+                const msg = "A janela de visualização foi fechada.";
+                consoleOutput.innerHTML += `<div class="console-warn">${msg}</div>`;
+                consoleWindow.scrollTop = consoleWindow.scrollHeight;
+                if (shellWindow && !shellWindow.closed) {
+                  shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #f1fa8c">${msg}</div>`;
+                  shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+                }
+                console.warn(msg);
+                abrirVisualizacao();
+              }
+            }, 500);
+          } catch (e) {
+            const msg = `Erro ao recarregar: ${e.message}`;
+            consoleOutput.innerHTML += `<div class="console-error">${msg}</div>`;
+            consoleWindow.scrollTop = consoleWindow.scrollHeight;
+            if (shellWindow && !shellWindow.closed) {
+              shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #ff5555">${msg}</div>`;
+              shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
             }
-            atualizarCodigo();
+            console.error(msg);
+          }
+        } else {
+          const msg = "Nenhuma janela de visualização aberta.";
+          consoleOutput.innerHTML += `<div class="console-warn">${msg}</div>`;
+          consoleWindow.scrollTop = consoleWindow.scrollHeight;
+          if (shellWindow && !shellWindow.closed) {
+            shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #f1fa8c">${msg}</div>`;
+            shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+          }
+          console.warn(msg);
+          abrirVisualizacao();
+          consoleOutput.innerHTML += `<div class="console-log">Comando reload executado com sucesso.</div>`;
+          consoleWindow.scrollTop = consoleWindow.scrollHeight;
+          if (shellWindow && !shellWindow.closed) {
+            shellWindow.document.getElementById("shellOutput").innerHTML += `<div>Comando reload executado com sucesso.</div>`;
+            shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+          }
+          console.log("Comando reload executado com sucesso.");
+        }
+        break;
+      case "shell_tc":
+        abrirGerenciadorArquivamento();
+        break;
+      default:
+        const msg = `Comando desconhecido: ${cmd}`;
+        consoleOutput.innerHTML += `<div class="console-warn">${msg}</div>`;
+        consoleWindow.scrollTop = consoleWindow.scrollHeight;
+        if (shellWindow && !shellWindow.closed) {
+          shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #f1fa8c">${msg}</div>`;
+          shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+        }
+        console.warn(msg);
+    }
+  }
+
+  let shellWindow = null;
+  function abrirShellWindow() {
+    if (shellWindow && !shellWindow.closed) {
+      shellWindow.focus();
+      return;
+    }
+    shellWindow = window.open("", "ShellWindow", "width=400,height=300");
+    if (shellWindow) {
+      shellWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { background-color: #282a36; color: white; font-family: monospace; margin: 10px; }
+            .console-output { height: 80%; overflow-y: auto; }
+            .console-input { width: 100%; padding: 5px; background-color: #44475a; color: white; border: 1px solid #6272a4; border-radius: 4px; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="console-output" id="shellOutput"></div>
+          <input type="text" id="shellInput" class="console-input" placeholder="Digite um comando...">
+        </body>
+        </html>
+      `);
+      shellWindow.document.close();
+
+      const shellOutput = shellWindow.document.getElementById("shellOutput");
+      const shellInput = shellWindow.document.getElementById("shellInput");
+
+      shellInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          processarComandoShell(shellInput.value.trim());
+          shellInput.value = "";
+        }
+      });
+
+      function processarComandoShell(comando) {
+        if (!comando) return;
+
+        if (comando.startsWith("f>")) {
+          const comment = comando.replace("f>", "").trim();
+          if (comment) {
+            shellOutput.innerHTML += `<div style="color: ${currentColor}">${comment}</div>`;
+            shellWindow.scrollTo(0, shellOutput.scrollHeight);
+            consoleOutput.innerHTML += `<div style="color: ${currentColor}">${comment}</div>`;
+            consoleWindow.scrollTop = consoleWindow.scrollHeight;
+            console.log(`%c${comment}`, `color: ${currentColor}`);
+          }
+          return;
         }
 
-        function atualizarCodigo() {
-            if (janela && !janela.closed) {
-                let codigo = editor.getValue();
-                janela.document.open();
-                janela.document.write(codigo);
-                janela.document.close();
-            }
+        const dyeMatch = comando.match(/^dye_user\s+(\d+)/);
+        if (dyeMatch) {
+          const value = parseInt(dyeMatch[1]);
+          const colors = {
+            1: "red",
+            2: "orange",
+            3: "yellow",
+            4: "green",
+            5: "blue",
+            6: "indigo",
+            7: "violet",
+            8: "pink",
+            9: "purple"
+          };
+          if (value >= 1 && value <= 9) {
+            currentColor = colors[value];
+            shellOutput.innerHTML += `<div>Cor alterada com sucesso para ${colors[value]}.</div>`;
+            shellWindow.scrollTo(0, shellOutput.scrollHeight);
+            consoleOutput.innerHTML += `<div class="console-log">Cor alterada com sucesso para ${colors[value]}.</div>`;
+            consoleWindow.scrollTop = consoleWindow.scrollHeight;
+            console.log(`Cor alterada com sucesso para ${colors[value]}.`);
+          } else {
+            shellOutput.innerHTML += `<div style="color: #f1fa8c">Valor deve estar entre 1 e 9.</div>`;
+            shellWindow.scrollTo(0, shellOutput.scrollHeight);
+            consoleOutput.innerHTML += `<div class="console-warn">Valor deve estar entre 1 e 9.</div>`;
+            consoleWindow.scrollTop = consoleWindow.scrollHeight;
+            console.warn("Valor deve estar entre 1 e 9.");
+          }
+          return;
         }
 
-        // Atualiza automaticamente a visualização ao modificar o código
-        editor.on("change", atualizarCodigo);
-    </script>
+        const [cmd, ...args] = comando.split(" ");
+        switch (cmd.toLowerCase()) {
+          case "reload":
+            if (previewWindow && !previewWindow.closed) {
+              previewWindow.location.reload();
+              shellOutput.innerHTML += `<div>Recarregando janela de visualização...</div>`;
+              consoleOutput.innerHTML += `<div class="console-log">Recarregando janela de visualização...</div>`;
+              consoleWindow.scrollTop = consoleWindow.scrollHeight;
+              console.log("Recarregando janela de visualização...");
+              setTimeout(() => {
+                if (!previewWindow.closed) {
+                  atualizarVisualizacao();
+                  shellOutput.innerHTML += `<div>Janela recarregada com sucesso.</div>`;
+                  consoleOutput.innerHTML += `<div class="console-log">Janela recarregada com sucesso.</div>`;
+                  consoleWindow.scrollTop = consoleWindow.scrollHeight;
+                  console.log("Janela recarregada com sucesso.");
+                } else {
+                  const msg = "A janela de visualização foi fechada.";
+                  shellOutput.innerHTML += `<div style="color: #f1fa8c">${msg}</div>`;
+                  consoleOutput.innerHTML += `<div class="console-warn">${msg}</div>`;
+                  consoleWindow.scrollTop = consoleWindow.scrollHeight;
+                  console.warn(msg);
+                  abrirVisualizacao();
+                }
+              }, 500);
+            } else {
+              const msg = "Nenhuma janela de visualização aberta.";
+              shellOutput.innerHTML += `<div style="color: #f1fa8c">${msg}</div>`;
+              consoleOutput.innerHTML += `<div class="console-warn">${msg}</div>`;
+              consoleWindow.scrollTop = consoleWindow.scrollHeight;
+              console.warn(msg);
+              abrirVisualizacao();
+              shellOutput.innerHTML += `<div>Janela recarregada com sucesso.</div>`;
+              consoleOutput.innerHTML += `<div class="console-log">Janela recarregada com sucesso.</div>`;
+              consoleWindow.scrollTop = consoleWindow.scrollHeight;
+              console.log("Janela recarregada com sucesso.");
+            }
+            break;
+          case "shell_tc":
+            shellOutput.innerHTML += `<div style="color: #ff5555">esse comando deve ser executado no console do site</div>`;
+            shellWindow.scrollTo(0, shellOutput.scrollHeight);
+            consoleOutput.innerHTML += `<div class="console-error">esse comando deve ser executado no console do site</div>`;
+            consoleWindow.scrollTop = consoleWindow.scrollHeight;
+            console.error("esse comando deve ser executado no console do site");
+            break;
+          default:
+            const msg = `Comando desconhecido: ${cmd}`;
+            shellOutput.innerHTML += `<div style="color: #f1fa8c">${msg}</div>`;
+            shellWindow.scrollTo(0, shellOutput.scrollHeight);
+            consoleOutput.innerHTML += `<div class="console-warn">${msg}</div>`;
+            consoleWindow.scrollTop = consoleWindow.scrollHeight;
+            console.warn(msg);
+        }
+      }
 
+      if (previewWindow && !previewWindow.closed) {
+        const originalConsole = console;
+        previewWindow.console = {
+          log: (...args) => {
+            const formatted = args.map(arg => typeof arg === "object" ? JSON.stringify(arg, null, 2) : arg).join(" ");
+            shellOutput.innerHTML += `<div>${formatted}</div>`;
+            shellWindow.scrollTo(0, shellOutput.scrollHeight);
+            consoleOutput.innerHTML += `<div class="console-log">${formatted}</div>`;
+            consoleWindow.scrollTop = consoleWindow.scrollHeight;
+            originalConsole.log(...args);
+          },
+          error: (...args) => {
+            const formatted = args.map(arg => typeof arg === "object" ? JSON.stringify(arg, null, 2) : arg).join(" ");
+            shellOutput.innerHTML += `<div style="color: #ff5555">${formatted}</div>`;
+            shellWindow.scrollTo(0, shellOutput.scrollHeight);
+            consoleOutput.innerHTML += `<div class="console-error">${formatted}</div>`;
+            consoleWindow.scrollTop = consoleWindow.scrollHeight;
+            originalConsole.error(...args);
+          },
+          warn: (...args) => {
+            const formatted = args.map(arg => typeof arg === "object" ? JSON.stringify(arg, null, 2) : arg).join(" ");
+            shellOutput.innerHTML += `<div style="color: #f1fa8c">${formatted}</div>`;
+            shellWindow.scrollTo(0, shellOutput.scrollHeight);
+            consoleOutput.innerHTML += `<div class="console-warn">${formatted}</div>`;
+            consoleWindow.scrollTop = consoleWindow.scrollHeight;
+            originalConsole.warn(...args);
+          }
+        };
+
+        previewWindow.onerror = (message, source, lineno, colno, error) => {
+          const errorMsg = `Erro: ${message} (Linha ${lineno}:${colno})`;
+          shellOutput.innerHTML += `<div style="color: #ff5555">${errorMsg}</div>`;
+          shellWindow.scrollTo(0, shellOutput.scrollHeight);
+          consoleOutput.innerHTML += `<div class="console-error">${errorMsg}</div>`;
+          consoleWindow.scrollTop = consoleWindow.scrollHeight;
+          originalConsole.error(errorMsg);
+        };
+      }
+    } else {
+      const msg = "Falha ao abrir janela de shell.";
+      consoleOutput.innerHTML += `<div class="console-error">${msg}</div>`;
+      consoleWindow.scrollTop = consoleWindow.scrollHeight;
+      if (shellWindow && !shellWindow.closed) {
+        shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #ff5555">${msg}</div>`;
+        shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+      }
+      console.error(msg);
+    }
+  }
+
+  function salvarArquivamento() {
+    const tabsToSave = tabs.filter(tab => tab.preserved || tabs.length === 1);
+    const data = {
+      tabs: tabsToSave.map(tab => ({
+        nome: tab.nome,
+        tipo: tab.tipo,
+        codigo: tab.editor.getValue(),
+        preserved: tab.preserved
+      })),
+      console: consoleOutput.innerHTML
+    };
+    const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "arquivamento.tc";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function abrirGerenciadorArquivamento() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".tc";
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const fileName = file.name;
+      if (!fileName.endsWith(".tc")) {
+        consoleOutput.innerHTML += `<div class="console-error">Erro: Formato de arquivo inválido. Use apenas arquivos .tc.</div>`;
+        consoleWindow.scrollTop = consoleWindow.scrollHeight;
+        if (shellWindow && !shellWindow.closed) {
+          shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #ff5555">Erro: Formato de arquivo inválido. Use apenas arquivos .tc.</div>`;
+          shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+        }
+        console.error("Erro: Formato de arquivo inválido. Use apenas arquivos .tc.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = JSON.parse(e.target.result);
+          if (!content.tabs || !Array.isArray(content.tabs) || !content.console) {
+            throw new Error("Conteúdo inválido ou corrompido.");
+          }
+
+          confirmMessage.textContent = `Deseja carregar o arquivamento "${fileName}"? Isso apagará as alterações atuais e restaurará o estado salvo.`;
+          confirmPanel.style.display = "block";
+
+          yesBtn.onclick = () => {
+            limparEstadoAtual();
+            content.tabs.forEach(tabData => {
+              criarNovaAba(tabData.nome, tabData.tipo, tabData.codigo, tabData.preserved);
+            });
+            consoleOutput.innerHTML = content.console;
+            consoleWindow.scrollTop = consoleWindow.scrollHeight;
+            if (shellWindow && !shellWindow.closed) {
+              shellWindow.document.getElementById("shellOutput").innerHTML = content.console;
+              shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+            }
+            confirmPanel.style.display = "none";
+            salvarEstado();
+          };
+
+          noBtn.onclick = () => {
+            confirmPanel.style.display = "none";
+          };
+        } catch (error) {
+          consoleOutput.innerHTML += `<div class="console-error">Erro: Arquivo corrompido ou conteúdo inválido.</div>`;
+          consoleWindow.scrollTop = consoleWindow.scrollHeight;
+          if (shellWindow && !shellWindow.closed) {
+            shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #ff5555">Erro: Arquivo corrompido ou conteúdo inválido.</div>`;
+            shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+          }
+          console.error("Erro: Arquivo corrompido ou conteúdo inválido.");
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+
+  function limparEstadoAtual() {
+    tabs.forEach(tab => {
+      fecharAba(tab);
+    });
+    consoleOutput.innerHTML = "";
+    if (shellWindow && !shellWindow.closed) {
+      shellWindow.document.getElementById("shellOutput").innerHTML = "";
+    }
+    localStorage.removeItem("savedTabs");
+  }
+
+  editorArea.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    if (activeTab) {
+      const selection = activeTab.editor.getSelection();
+      selectedCode = selection || activeTab.editor.getValue();
+    }
+    codeContextMenu.style.display = "block";
+    codeContextMenu.style.left = `${e.pageX}px`;
+    codeContextMenu.style.top = `${e.pageY}px`;
+
+    document.addEventListener("click", () => {
+      codeContextMenu.style.display = "none";
+    }, { once: true });
+  });
+
+  document.getElementById("exampleTestBtn").addEventListener("click", () => {
+    if (activeTab) {
+      activeTab.editor.setValue(`
+        <!DOCTYPE html>
+        <html lang="pt">
+        <head>
+          <meta charset="UTF-8">
+          <title>Exemplo Interativo</title>
+          <style>
+            body {
+              background: linear-gradient(45deg, #1e1e1e, #2d2f3e);
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              margin: 0;
+            }
+            .box {
+              width: 100px;
+              height: 100px;
+              background: #ff6b6b;
+              border-radius: 10px;
+              animation: bounce 2s infinite;
+              transition: transform 0.3s;
+            }
+            .box:hover {
+              transform: scale(1.2);
+            }
+            @keyframes bounce {
+              0%, 100% { transform: translateY(0); }
+              50% { transform: translateY(-20px); }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="box"></div>
+        </body>
+        </html>
+      `);
+    }
+    codeContextMenu.style.display = "none";
+  });
+
+  document.getElementById("html5Btn").addEventListener("click", () => {
+    if (activeTab) {
+      activeTab.editor.setValue(`
+        <!DOCTYPE html>
+        <html lang="pt">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Documento HTML5</title>
+        </head>
+        <body>
+          <h1>Conteúdo inicial</h1>
+        </body>
+        </html>
+      `);
+    }
+    codeContextMenu.style.display = "none";
+  });
+
+  document.getElementById("aiBtn").addEventListener("click", () => {
+    aiPanel.style.display = "block";
+    setTimeout(() => {
+      document.addEventListener("click", fecharPainelAoClicarFora, { once: true });
+    }, 0);
+  });
+
+  function fecharPainelAoClicarFora(e) {
+    if (!aiPanel.contains(e.target) && aiPanel.style.display === "block") {
+      aiPanel.style.display = "none";
+    }
+  }
+
+  aiInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      enviarParaIA();
+    }
+  });
+
+  aiSendBtn.addEventListener("click", enviarParaIA);
+
+  function enviarParaIA() {
+    const prompt = aiInput.value.trim();
+    if (!prompt) {
+      const requestBody = {
+        contents: [{
+          parts: [{
+            text: `Gere um código HTML completo para um site simples com um botão. Adicione "[" em uma linha antes do código e "]" em uma linha depois do código. Qualquer comentário, explicação ou texto adicional deve ser incluído como comentários HTML (<!-- -->) fora do bloco [ ], precedido por "IA:" dentro do comentário. O código deve ser um único arquivo HTML válido, incluindo HTML, CSS e JavaScript se necessário, sem referências externas. Inclua mais comentários frequentes com "IA:" para guiar o usuário.`
+          }]
+        }]
+      };
+      loader.style.display = "block";
+      fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-goog-api-key": "AIzaSyAEQdYJjz4jaYzX8k2FOQ7mCCJgQBHyEQU"
+        },
+        body: JSON.stringify(requestBody)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0].text) {
+          const responseText = data.candidates[0].content.parts[0].text.trim();
+          const codeMatch = responseText.match(/\[(.*?)\]/s);
+          if (codeMatch && codeMatch[1]) {
+            const code = codeMatch[1].trim();
+            if (activeTab) {
+              activeTab.editor.setValue(code);
+            }
+            const outsideContent = responseText.replace(/\[(.*?)\]/s, '').trim();
+            if (outsideContent) {
+              const comments = outsideContent.match(/<!--(.*?)-->/gs);
+              if (comments) {
+                comments.forEach(comment => {
+                  const iaComment = comment.replace(/<!--|-->/g, '').trim();
+                  if (iaComment.startsWith("IA:")) {
+                    consoleOutput.innerHTML += `<div class="console-info">${iaComment}</div>`;
+                    consoleWindow.style.display = "block";
+                    consoleWindow.scrollTop = consoleWindow.scrollHeight;
+                    if (shellWindow && !shellWindow.closed) {
+                      shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #1e90ff">${iaComment}</div>`;
+                      shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+                    }
+                    console.info(iaComment);
+                  }
+                });
+              }
+            }
+          } else {
+            consoleOutput.innerHTML += `<div class="console-error">Erro: Resposta da IA não contém código entre [ ].</div>`;
+            consoleWindow.style.display = "block";
+            consoleWindow.scrollTop = consoleWindow.scrollHeight;
+            if (shellWindow && !shellWindow.closed) {
+              shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #ff5555">Erro: Resposta da IA não contém código entre [ ].</div>`;
+              shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+            }
+            console.error("Erro: Resposta da IA não contém código entre [ ].");
+          }
+        } else {
+          consoleOutput.innerHTML += `<div class="console-error">Erro: Resposta da IA inválida.</div>`;
+          consoleWindow.style.display = "block";
+          consoleWindow.scrollTop = consoleWindow.scrollHeight;
+          if (shellWindow && !shellWindow.closed) {
+            shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #ff5555">Erro: Resposta da IA inválida.</div>`;
+            shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+          }
+          console.error("Erro: Resposta da IA inválida.");
+        }
+      })
+      .catch(error => {
+        consoleOutput.innerHTML += `<div class="console-error">Erro na requisição à IA: ${error.message}</div>`;
+        consoleWindow.style.display = "block";
+        consoleWindow.scrollTop = consoleWindow.scrollHeight;
+        if (shellWindow && !shellWindow.closed) {
+          shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #ff5555">Erro na requisição à IA: ${error.message}</div>`;
+          shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+        }
+        console.error(`Erro na requisição à IA: ${error.message}`);
+      })
+      .finally(() => {
+        loader.style.display = "none";
+        aiPanel.style.display = "none";
+        aiInput.value = "";
+      });
+      return;
+    }
+
+    loader.style.display = "block";
+    const fullCode = activeTab ? activeTab.editor.getValue() : "";
+    const requestBody = {
+      contents: [{
+        parts: [{
+          text: `Modifique apenas o seguinte código HTML selecionado: "${selectedCode}". A modificação solicitada é: "${prompt}". Adicione "[" em uma linha antes do código modificado e "]" em uma linha depois do código modificado. Qualquer comentário, explicação ou texto adicional deve ser incluído como comentários HTML (<!-- -->) fora do bloco [ ], precedido por "IA:" dentro do comentário. Retorne apenas o código modificado exato que substituirá a seleção, sem incluir o restante do documento HTML. Inclua mais comentários frequentes com "IA:" para guiar o usuário.`
+        }]
+      }]
+    };
+
+    fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-goog-api-key": "AIzaSyAEQdYJjz4jaYzX8k2FOQ7mCCJgQBHyEQU"
+      },
+      body: JSON.stringify(requestBody)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0].text) {
+        const responseText = data.candidates[0].content.parts[0].text.trim();
+        const codeMatch = responseText.match(/\[(.*?)\]/s);
+        if (codeMatch && codeMatch[1]) {
+          const modifiedCode = codeMatch[1].trim();
+          if (activeTab) {
+            const startPos = fullCode.indexOf(selectedCode);
+            if (startPos !== -1) {
+              const endPos = startPos + selectedCode.length;
+              activeTab.editor.replaceRange(modifiedCode, activeTab.editor.posFromIndex(startPos), activeTab.editor.posFromIndex(endPos));
+            } else {
+              activeTab.editor.setValue(modifiedCode);
+            }
+          }
+          const outsideContent = responseText.replace(/\[(.*?)\]/s, '').trim();
+          if (outsideContent) {
+            const comments = outsideContent.match(/<!--(.*?)-->/gs);
+            if (comments) {
+              comments.forEach(comment => {
+                const iaComment = comment.replace(/<!--|-->/g, '').trim();
+                if (iaComment.startsWith("IA:")) {
+                  consoleOutput.innerHTML += `<div class="console-info">${iaComment}</div>`;
+                  consoleWindow.style.display = "block";
+                  consoleWindow.scrollTop = consoleWindow.scrollHeight;
+                  if (shellWindow && !shellWindow.closed) {
+                    shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #1e90ff">${iaComment}</div>`;
+                    shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+                  }
+                  console.info(iaComment);
+                }
+              });
+            }
+          }
+        } else {
+          consoleOutput.innerHTML += `<div class="console-error">Erro: Resposta da IA não contém código entre [ ].</div>`;
+          consoleWindow.style.display = "block";
+          consoleWindow.scrollTop = consoleWindow.scrollHeight;
+          if (shellWindow && !shellWindow.closed) {
+            shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #ff5555">Erro: Resposta da IA não contém código entre [ ].</div>`;
+            shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+          }
+          console.error("Erro: Resposta da IA não contém código entre [ ].");
+        }
+      } else {
+        consoleOutput.innerHTML += `<div class="console-error">Erro: Resposta da IA inválida.</div>`;
+        consoleWindow.style.display = "block";
+        consoleWindow.scrollTop = consoleWindow.scrollHeight;
+        if (shellWindow && !shellWindow.closed) {
+          shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #ff5555">Erro: Resposta da IA inválida.</div>`;
+          shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+        }
+        console.error("Erro: Resposta da IA inválida.");
+      }
+    })
+    .catch(error => {
+      consoleOutput.innerHTML += `<div class="console-error">Erro na requisição à IA: ${error.message}</div>`;
+      consoleWindow.style.display = "block";
+      consoleWindow.scrollTop = consoleWindow.scrollHeight;
+      if (shellWindow && !shellWindow.closed) {
+        shellWindow.document.getElementById("shellOutput").innerHTML += `<div style="color: #ff5555">Erro na requisição à IA: ${error.message}</div>`;
+        shellWindow.scrollTo(0, shellWindow.document.getElementById("shellOutput").scrollHeight);
+      }
+      console.error(`Erro na requisição à IA: ${error.message}`);
+    })
+    .finally(() => {
+      loader.style.display = "none";
+      aiPanel.style.display = "none";
+      aiInput.value = "";
+      selectedCode = "";
+    });
+  }
+</script>
 </body>
 </html>
+		
