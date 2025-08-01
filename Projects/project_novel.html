@@ -86,8 +86,15 @@
             cursor: pointer;
             transition: transform 0.2s ease;
         }
+        .card.not-clickable {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
         .card:hover {
             transform: scale(1.03);
+        }
+        .card.not-clickable:hover {
+            transform: none;
         }
         .card-icon {
             width: 50px;
@@ -118,22 +125,46 @@
             font-size: 12px; 
             color: gray;
         }
+        .card-date.coming-soon {
+            font-weight: bold;
+            color: #333;
+        }
+        body.dark-mode .card-date.coming-soon {
+            color: #d3d3d3;
+        }
         .theme-toggle {
-            position: absolute;
+            position: fixed;
             top: 20px;
             left: 20px;
-            z-index: 100;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            padding: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
         .theme-toggle button {
             background: none;
             border: none;
             cursor: pointer;
             font-size: 24px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+        }
+        .theme-toggle button i.fa-sun {
+            color: #000000; /* Ícone de sol preto no modo claro */
         }
         .theme-toggle button:hover {
             transform: scale(1.1);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            color: #007BFF;
+        }
+        body.dark-mode .theme-toggle {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        body.dark-mode .theme-toggle button i.fa-moon {
+            color: #ffffff; /* Ícone de lua branco no modo escuro */
         }
         body.dark-mode {
             background-color: #121212;
@@ -150,6 +181,10 @@
             transform: scale(1.03);
             background-color: #444;
         }
+        body.dark-mode .card.not-clickable:hover {
+            transform: none;
+            background-color: #333;
+        }
         /* Estilos para o modal de escolha */
         .modal {
             display: none;
@@ -159,7 +194,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            z-index: 900;
             justify-content: center;
             align-items: center;
         }
@@ -175,8 +210,15 @@
             background: #333;
             color: white;
         }
-        .modal-content p {
-            margin: 0 0 15px;
+        .modal-content .synopsis-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .modal-content .synopsis-text {
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-align: left;
         }
         .modal-buttons {
             display: flex;
@@ -196,7 +238,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
+            z-index: 900;
             justify-content: center;
             align-items: center;
         }
@@ -242,12 +284,12 @@
             }
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNEhT3G5r1r/1rV7bDbCt0NoXxYAgJuZ1rO2A90O+/WsuW1vTkc1O0V2lMy8v9Ci8FQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
     <div class="theme-toggle">
-        <button onclick="toggleTheme()">
+        <button onclick="toggleTheme()" title="Alternar tema">
             <i id="theme-icon" class="fas fa-sun"></i>
+            <span class="fallback-text" style="display: none;">Tema</span>
         </button>
     </div>
     <div class="header-text">Desfrute do projeto Novel, leia e baixe os capítulos aqui</div>
@@ -259,7 +301,8 @@
     <!-- Modal de escolha -->
     <div id="choiceModal" class="modal" onclick="closeChoiceModal(event)">
         <div class="modal-content">
-            <p>Como você prefere visualizar o capítulo?</p>
+            <div class="synopsis-title">Sinopse</div>
+            <div class="synopsis-text" id="synopsisText"></div>
             <div class="modal-buttons">
                 <button onclick="openIframe()">No site</button>
                 <button onclick="openDriveLink()">No Google Drive</button>
@@ -287,13 +330,19 @@
     <script>
         let currentDriveLink = '';
         let currentIframeSrc = '';
+        let currentSynopsis = '';
 
-        function createCardElement(chapterNumber, title, date, driveLink, iframeSrc) {
+        function createCardElement(chapterNumber, title, date, driveLink, iframeSrc, clickable, synopsis) {
             const card = document.createElement('div');
             card.classList.add('card');
+            if (clickable === 'disabled') {
+                card.classList.add('not-clickable');
+            }
             card.setAttribute('data-title', title.toLowerCase());
             card.setAttribute('data-chapter', chapterNumber);
-            card.onclick = () => showChoiceModal(driveLink, iframeSrc || driveLink.replace('/view?usp=drive_link', '/preview'));
+            if (clickable === 'enabled') {
+                card.onclick = () => showChoiceModal(driveLink, iframeSrc || driveLink.replace('/view?usp=drive_link', '/preview'), synopsis);
+            }
 
             const icon = document.createElement('div');
             icon.classList.add('card-icon');
@@ -312,7 +361,12 @@
 
             const cardDate = document.createElement('div');
             cardDate.classList.add('card-date');
-            cardDate.textContent = `Adicionado em ${date}`;
+            if (clickable === 'disabled') {
+                cardDate.classList.add('coming-soon');
+                cardDate.textContent = 'Em breve';
+            } else {
+                cardDate.textContent = `Adicionado em ${date}`;
+            }
 
             content.appendChild(cardTitle);
             content.appendChild(cardSubtitle);
@@ -323,17 +377,20 @@
             return card;
         }
 
-        function addCard(chapterNumber, title, driveLink, iframeSrc) {
+        function addCard(chapterNumber, title, driveLink, iframeSrc, clickable = 'enabled', synopsis = '') {
             const cardList = document.getElementById('cardList');
             const date = new Date().toLocaleDateString();
-            const cardElement = createCardElement(chapterNumber, title, date, driveLink, iframeSrc);
+            const cardElement = createCardElement(chapterNumber, title, date, driveLink, iframeSrc, clickable, synopsis);
             cardList.appendChild(cardElement);
         }
 
-        function showChoiceModal(driveLink, iframeSrc) {
+        function showChoiceModal(driveLink, iframeSrc, synopsis) {
             currentDriveLink = driveLink;
             currentIframeSrc = iframeSrc;
+            currentSynopsis = synopsis;
             const modal = document.getElementById('choiceModal');
+            const synopsisText = document.getElementById('synopsisText');
+            synopsisText.textContent = synopsis || 'Sinopse não disponível.';
             modal.style.display = 'flex';
         }
 
@@ -376,7 +433,7 @@
                 cards.forEach(card => {
                     const title = card.getAttribute('data-title');
                     const chapter = card.getAttribute('data-chapter');
-                    if (title.includes(query) || chapter.includes(query)) {
+                    if (query === '' || title.includes(query) || chapter.includes(query)) {
                         card.style.display = 'flex';
                     } else {
                         card.style.display = 'none';
@@ -388,6 +445,7 @@
         function toggleTheme() {
             const body = document.body;
             const icon = document.getElementById('theme-icon');
+            const fallbackText = document.querySelector('.theme-toggle .fallback-text');
             body.classList.toggle('dark-mode');
             if (body.classList.contains('dark-mode')) {
                 icon.classList.remove('fa-sun');
@@ -396,14 +454,18 @@
                 icon.classList.remove('fa-moon');
                 icon.classList.add('fa-sun');
             }
+            // Fallback para caso o Font Awesome não carregue
+            if (!icon.classList.contains('fa-sun') && !icon.classList.contains('fa-moon')) {
+                fallbackText.style.display = 'inline';
+            } else {
+                fallbackText.style.display = 'none';
+            }
         }
 
-        // Adicionando os cards com links e iframes
-        addCard(1, 'O passado em ruinas, um verão de começos', 'https://drive.google.com/file/d/18nNcYB6TtHuMEIj9mEAuE52rXlitSjnh/view?usp=drive_link', 'https://drive.google.com/file/d/18nNcYB6TtHuMEIj9mEAuE52rXlitSjnh/preview');
-        addCard(2, 'Perguntas e incertezas, o destino falso', 'https://drive.google.com/file/d/1Fp717e2X7jfji2-6OtfjRE0l1PdxJRfl/view?usp=drive_link', '');
-        addCard(3, 'Um escuro na luz se manifesta, o passado de Eletrick e Lilie!!', 'https://drive.google.com/file/d/17rMhrkr2nvc58rbnWUEha3U0I1i4r_9n/view?usp=drive_link', '');
-        addCard(4, 'Lembranças incompletas...', 'https://drive.google.com/file/d/1gj6fDly39qReA4eyoeZe23Jq1SxlZ0EE/view?usp=drive_link', '');
-        addCard(5, 'Sorrisos desejáveis, traumas indesejáveis', 'https://drive.google.com/file/d/1ixfowttz-ZNmXga3r-2AVtva2gQaFMIr/view?usp=drive_link', '');
+        // Adicionando os cards com links, iframes, clicabilidade e sinopse
+        addCard(1, 'O passado em ruinas, um verão de começos', 'https://drive.google.com/file/d/18nNcYB6TtHuMEIj9mEAuE52rXlitSjnh/view?usp=drive_link', 'https://drive.google.com/file/d/18nNcYB6TtHuMEIj9mEAuE52rXlitSjnh/preview', 'disabled', 'Neste capítulo inicial, somos apresentados a um mundo em ruínas onde um verão marca o início de novas jornadas e desafios.');
     </script>
 </body>
 </html>
+
+		
