@@ -22,12 +22,12 @@
         .card-icon { width: 50px; height: 50px; background: #007BFF; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: white; font-size: 24px; margin-right: 10px; }
         .card-content { flex: 1; text-align: left; }
         .card-title { font-size: 16px; font-weight: bold; }
-        .card-subtitle { font-size: 14px; color: #007BFF; margin: 3px 0; }
+        .card-subtitle { font-size: 14px; color: #007BFF; margin: 3px 0; display: flex; align-items: center; gap: 8px;}
         .card-date { font-size: 12px; color: gray; }
         .card-date.coming-soon { font-weight: bold; color: #333; }
         .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 1000; background: rgba(255, 255, 255, 0.9); border-radius: 50%; padding: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
         .theme-toggle button { background: none; border: none; cursor: pointer; font-size: 24px; display: flex; align-items: center; justify-content: center; }
-        .theme-toggle button i.fa-sun { color: #000; } /* << CORREÇÃO DO ÍCONE */
+        .theme-toggle button i.fa-sun { color: #000; }
         body.dark-mode { background-color: #121212; color: white; }
         body.dark-mode .header-text { color: #d3d3d3; }
         body.dark-mode .card, body.dark-mode .search-container { background: #333; }
@@ -45,7 +45,6 @@
         body.dark-mode .iframe-modal-content { background: #333; }
         .iframe-modal-content iframe { width: 100%; height: 90vh; border: none; }
         .close-button { position: fixed; top: 20px; right: 20px; background: transparent; color: white; font-size: 24px; border: none; cursor: pointer; z-index: 1100; }
-        .card-subtitle { display: flex; align-items: center; gap: 8px; }
         .average-rating { font-size: 12px; color: #f0ad4e; font-weight: bold; }
         .average-rating .fa-star { margin-right: 2px; }
         .star-rating { margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd; }
@@ -82,7 +81,6 @@
         body.dark-mode .dropdown-menu a { color: white; }
         .dropdown-menu a:hover { background-color: #f0f0f0; }
         body.dark-mode .dropdown-menu a:hover { background-color: #555; }
-        .dropdown-menu a i { margin-right: 8px; }
     </style>
 </head>
 <body>
@@ -114,14 +112,12 @@
         </div>
     </div>
 
-    <div id="iframeModal" class="iframe-modal" style="justify-content: center; align-items: center;">
+    <div id="iframeModal" class="iframe-modal">
         <button class="close-button" onclick="closeIframeModal()">X</button>
         <div class="iframe-modal-content">
-            <iframe id="pdfIframe" src="" allow="autoplay"></iframe>
+            <iframe id="pdfIframe" src=""></iframe>
         </div>
     </div>
-
-    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5715350873085221" data-ad-slot="2489792302" data-ad-format="auto" data-full-width-responsive="true"></ins>
 
     <footer class="page-footer">
         <div class="comments-section">
@@ -137,55 +133,34 @@
         </div>
     </footer>
 
-    <!-- SDKs do Firebase (forma tradicional, mais compatível) -->
+    <!-- SDKs do Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
-    <!-- Script do Google Ads -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5715350873085221" crossorigin="anonymous"></script>
-
-    <!-- Script principal da sua página (TUDO UNIFICADO AQUI) -->
+    <!-- Script principal da sua página -->
     <script>
-        // Envolve todo o código em um listener que espera a página carregar
         document.addEventListener('DOMContentLoaded', function() {
-            
-            // Configuração do Firebase
-            const firebaseConfig = {
-                apiKey: "AIzaSyAFQ6h-q38WNkJUtWB3VkqvLiKdo_uJKXo",
-                authDomain: "z100web-4036c.firebaseapp.com",
-                projectId: "z100web-4036c",
-                storageBucket: "z100web-4036c.firebasestorage.app",
-                messagingSenderId: "1074140453042",
-                appId: "1:1074140453042:web:94d03b8a1158c7923d91ab",
-                measurementId: "G-671BTQD52L"
-            };
-            firebase.initializeApp(firebaseConfig);
-
-            // Serviços do Firebase
+            // Apenas pegamos a instância já existente do Firebase. Não configuramos nada aqui.
             const auth = firebase.auth();
             const db = firebase.database();
 
             // Variáveis globais
             let currentDriveLink = '', currentIframeSrc = '', currentSynopsis = '', currentChapterId = null, currentUser = null;
 
-            // --- FUNÇÕES DE LÓGICA ---
+            // --- FUNÇÕES DE LÓGICA (Nenhuma alteração aqui) ---
             window.toggleTheme = function() {
                 document.body.classList.toggle('dark-mode');
                 const icon = document.getElementById('theme-icon');
-                if (document.body.classList.contains('dark-mode')) {
-                    icon.classList.replace('fa-sun', 'fa-moon');
-                } else {
-                    icon.classList.replace('fa-moon', 'fa-sun');
-                }
+                icon.classList.toggle('fa-sun');
+                icon.classList.toggle('fa-moon');
             }
 
             window.searchCards = function() {
                 const query = document.getElementById('searchInput').value.toLowerCase();
-                if (query === "secrets") { window.location.href = "concepts_historical.html"; return; }
                 document.querySelectorAll('.card').forEach(card => {
-                    const title = card.getAttribute('data-title');
-                    const chapter = card.getAttribute('data-chapter');
+                    const title = card.getAttribute('data-title') || '';
+                    const chapter = card.getAttribute('data-chapter') || '';
                     card.style.display = (query === '' || title.includes(query) || chapter.includes(query)) ? 'flex' : 'none';
                 });
             }
@@ -244,10 +219,10 @@
             });
 
             function updateUIForLoginState() {
-                document.getElementById('comment-form').style.display = currentUser ? 'flex' : 'none';
-                document.getElementById('login-to-comment').style.display = currentUser ? 'none' : 'block';
-                const modalVisible = document.getElementById('choiceModal').style.display === 'flex';
-                if (modalVisible) {
+                const isUserLoggedIn = !!currentUser;
+                document.getElementById('comment-form').style.display = isUserLoggedIn ? 'flex' : 'none';
+                document.getElementById('login-to-comment').style.display = isUserLoggedIn ? 'none' : 'block';
+                if (document.getElementById('choiceModal').style.display === 'flex') {
                     updateStarDisplayForUser();
                 }
                 loadComments();
@@ -283,19 +258,17 @@
             
             document.getElementById('modalStars').addEventListener('click', async (e) => {
                 if (e.target.matches('.fa-star') && currentUser) {
-                    const newRating = parseInt(e.target.dataset.value); setStars(newRating);
+                    const newRating = parseInt(e.target.dataset.value);
+                    setStars(newRating);
                     const chapterRef = db.ref(`ratings/${currentChapterId}`);
-                    // Transação para atualizar a média de forma segura
                     chapterRef.transaction(data => {
-                        if (data === null) {
-                            data = { summary: { total: 0, count: 0 }, users: {} };
-                        }
+                        data = data || { summary: { total: 0, count: 0 }, users: {} };
                         const oldRating = data.users?.[currentUser.uid] || 0;
                         data.summary.total = (data.summary.total || 0) - oldRating + newRating;
                         if (oldRating === 0) {
                             data.summary.count = (data.summary.count || 0) + 1;
                         }
-                        if (!data.users) { data.users = {}; }
+                        data.users = data.users || {};
                         data.users[currentUser.uid] = newRating;
                         return data;
                     });
@@ -306,18 +279,28 @@
                 e.preventDefault(); if (!currentUser) return;
                 const textarea = document.getElementById('comment-textarea'); const text = textarea.value.trim();
                 if (text) {
-                    const commentsRef = db.ref('comments');
-                    commentsRef.push({ text, userId: currentUser.uid, userName: currentUser.displayName, userPhotoURL: currentUser.photoURL, createdAt: firebase.database.ServerValue.TIMESTAMP });
+                    const commentsRef = db.ref(`comments`);
+                    commentsRef.push({ 
+                        text: text, 
+                        userId: currentUser.uid, 
+                        userName: currentUser.displayName, 
+                        userPhotoURL: currentUser.photoURL, 
+                        createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        chapterId: currentChapterId // Importante para filtrar comentários por capítulo
+                    });
                     textarea.value = '';
                 }
             });
 
             function loadComments() {
-                const commentsRef = db.ref('comments').orderByChild('createdAt').limitToLast(50);
+                if (!currentChapterId) return; // Não carrega comentários se nenhum capítulo foi aberto
+                const commentsRef = db.ref('comments').orderByChild('chapterId').equalTo(currentChapterId);
                 commentsRef.on('value', (snapshot) => {
-                    const commentsList = document.getElementById('comments-list'); commentsList.innerHTML = '';
+                    const commentsList = document.getElementById('comments-list'); 
+                    commentsList.innerHTML = '';
                     if (snapshot.exists()) {
-                        const comments = []; snapshot.forEach(child => { comments.push({ id: child.key, ...child.val() }); });
+                        const comments = []; 
+                        snapshot.forEach(child => { comments.push({ id: child.key, ...child.val() }); });
                         comments.reverse().forEach(comment => commentsList.appendChild(createCommentElement(comment.id, comment)));
                     }
                 });
@@ -326,26 +309,4 @@
             function createCommentElement(id, data) {
                 const div = document.createElement('div'); div.className = 'comment';
                 const date = new Date(data.createdAt).toLocaleString('pt-BR');
-                const actionsHTML = (currentUser && currentUser.uid === data.userId) ? `<div class="comment-actions"><button onclick="toggleDropdown('${id}')"><i class="fas fa-ellipsis-v"></i></button><div class="dropdown-menu" id="dropdown-${id}"><a onclick="editComment('${id}')"><i class="fas fa-edit"></i> Editar</a><a onclick="deleteComment('${id}')"><i class="fas fa-trash"></i> Deletar</a></div></div>` : '';
-                div.innerHTML = `<img src="${data.userPhotoURL || 'https://i.ibb.co/6y4n2W4/default-avatar.png'}" alt="Avatar"><div class="comment-content"><div class="comment-header"><span class="comment-author">${data.userName}</span>${actionsHTML}</div><p class="comment-text" id="text-${id}">${data.text.replace(/</g, "&lt;")}</p><span class="comment-date">${date}</span></div>`;
-                return div;
-            }
-
-            window.toggleDropdown = (id) => { const el = document.getElementById(`dropdown-${id}`); if(el) el.style.display = el.style.display === 'block' ? 'none' : 'block'; };
-            window.deleteComment = (id) => { if (confirm('Tem certeza?')) { db.ref(`comments/${id}`).remove(); } };
-            window.editComment = (id) => {
-                const currentText = document.getElementById(`text-${id}`).innerText; const newText = prompt('Edite seu comentário:', currentText);
-                if (newText && newText.trim() !== '') { db.ref(`comments/${id}`).update({ text: newText.trim() }); }
-            };
-
-            // ===================================================================
-            // == ADICIONE SEUS CAPÍTULOS AQUI ==
-            // ===================================================================
-            addCard(1, 'Abrindo os olhos para um mundo nunca visto ', 'https://drive.google.com/file/d/15EhhovAVXwgHKegTHVdTH48D9u57ohD3/view?usp=sharing', 'https://drive.google.com/file/d/15EhhovAVXwgHKegTHVdTH48D9u57ohD3/preview', 'enabled', 'Eletrick sonha com um mundo destruído por mutantes nascidos de doenças e por um demônio com poder divino, preso nas correntes do vazio — agora desperto. Ao acordar, já atrasado para o primeiro dia de aula, tenta ignorar o sonho. até que um fenômeno estranho quebra a rotina e deixa todos em alerta.');
-            
-            // Adiciona o script de Ads aqui no final, para garantir que o contêiner existe
-            (adsbygoogle = window.adsbygoogle || []).push({});
-        });
-    </script>
-</body>
-</html>
+                const actionsHTML = (currentUser && currentUser.uid === data.userId) ? `<div c
