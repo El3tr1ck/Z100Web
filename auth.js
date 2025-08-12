@@ -1,3 +1,19 @@
+// Configuração e Inicialização do Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyAFQ6h-q38WNkJUtWB3VkqvLiKdo_uJKXo",
+    authDomain: "z100web-4036c.firebaseapp.com",
+    projectId: "z100web-4036c",
+    storageBucket: "z100web-4036c.firebasestorage.app",
+    messagingSenderId: "1074140453042",
+    appId: "1:1074140453042:web:94d03b8a1158c7923d91ab"
+};
+
+// Inicializa o Firebase apenas uma vez.
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const auth = firebase.auth();
+
 // auth.js
 function protectPage() {
     const user = localStorage.getItem("user");
@@ -25,12 +41,24 @@ function updateUserInfo() {
 }
 
 function handleCredentialResponse(response) {
+    // SEU CÓDIGO ORIGINAL (PERMANECE IGUAL)
     const data = JSON.parse(atob(response.credential.split('.')[1]));
     localStorage.setItem("user", JSON.stringify(data));
     updateUserInfo();
+
+    // A "PONTE" PARA O FIREBASE (CÓDIGO NOVO ADICIONADO)
+    console.log("auth.js: Avisando o Firebase sobre o login...");
+    const credential = firebase.auth.GoogleAuthProvider.credential(response.credential);
+    auth.signInWithCredential(credential).catch(error => {
+        console.error("auth.js: Erro ao sincronizar login com Firebase:", error);
+    });
 }
 
 function logout() {
+    // AVISO PARA O FIREBASE (CÓDIGO NOVO ADICIONADO)
+    auth.signOut(); 
+
+    // SEU CÓDIGO ORIGINAL (PERMANECE IGUAL)
     localStorage.removeItem("user");
     updateUserInfo();
     window.location.href = "index.html";
