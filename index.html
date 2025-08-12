@@ -979,81 +979,6 @@
 
             detectAdblock();
         });
-<!-- SDKs do Firebase -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
-<!-- Script de Inicialização e Login -->
-<script>
-    // Configuração do Firebase (deve ser a mesma em todas as páginas)
-    const firebaseConfig = {
-        apiKey: "AIzaSyAFQ6h-q38WNkJUtWB3VkqvLiKdo_uJKXo",
-        authDomain: "z100web-4036c.firebaseapp.com",
-        projectId: "z100web-4036c",
-        storageBucket: "z100web-4036c.firebasestorage.app",
-        messagingSenderId: "1074140453042",
-        appId: "1:1074140453042:web:94d03b8a1158c7923d91ab"
-    };
-    
-    // Inicializa o Firebase
-    firebase.initializeApp(firebaseConfig);
-
-    // --- LÓGICA DE LOGIN PARA O index.html ---
-
-    const auth = firebase.auth();
-    const provider = new firebase.auth.GoogleAuthProvider();
-
-    // **IMPORTANTE:** Coloque aqui o ID do seu botão de login.
-    // Se o seu botão não tiver um ID, adicione um. Ex: <button id="meuBotaoLogin">Login</button>
-    const loginButton = document.getElementById('seu-botao-de-login-aqui');
-    
-    // (Opcional) Se você tiver um botão de logout, coloque o ID dele aqui
-    const logoutButton = document.getElementById('seu-botao-de-logout-aqui');
-
-
-    // Adiciona a função de clique ao botão de login
-    if (loginButton) {
-        loginButton.onclick = () => {
-            auth.signInWithPopup(provider)
-                .then((result) => {
-                    console.log(result.user.displayName + " logado com sucesso!");
-                    // A interface será atualizada pelo 'onAuthStateChanged' abaixo.
-                })
-                .catch((error) => {
-                    console.error("Erro durante o login:", error.message);
-                });
-        };
-    }
-
-    // Adiciona a função de clique ao botão de logout (se existir)
-    if (logoutButton) {
-        logoutButton.onclick = () => {
-            auth.signOut().then(() => {
-                console.log("Usuário deslogado.");
-            });
-        };
-    }
-
-    // Gerencia a interface, mostrando/escondendo botões conforme o estado de login.
-    // Esta função é a "ponte" que faltava.
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            // Usuário está logado.
-            console.log("Estado na página INDEX: Logado como", user.displayName);
-            if (loginButton) loginButton.style.display = 'none'; // Esconde o botão de login
-            if (logoutButton) logoutButton.style.display = 'block'; // Mostra o de logout
-            
-            // Você pode adicionar mais lógicas aqui, como mostrar a foto do usuário
-            // const userPhoto = document.getElementById('foto-do-usuario');
-            // if(userPhoto) userPhoto.src = user.photoURL;
-
-        } else {
-            // Usuário está deslogado.
-            console.log("Estado na página INDEX: Deslogado");
-            if (loginButton) loginButton.style.display = 'block'; // Mostra o botão de login
-            if (logoutButton) logoutButton.style.display = 'none'; // Esconde o de logout
-        }
-    });
     </script>
     <footer style="background: rgba(255, 255, 255, 0.05); padding: 40px 20px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px);">
         <div style="max-width: 900px; margin: 0 auto;">
@@ -1081,4 +1006,3 @@
     </div>
 </body>
 </html>
-
