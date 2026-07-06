@@ -1,0 +1,1122 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ProjectPack Studio</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f7f8;
+      --panel: #ffffff;
+      --ink: #15202b;
+      --muted: #647789;
+      --line: #d9e2e8;
+      --teal: #007c89;
+      --teal-dark: #005f69;
+      --green: #147a50;
+      --amber: #805000;
+      --rose: #b42342;
+      --blue-soft: #e8f5f8;
+      --amber-soft: #fff4df;
+      --rose-soft: #fff0f3;
+      --shadow: 0 18px 44px rgba(21, 32, 43, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, input, textarea { font: inherit; }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: minmax(220px, auto) 1fr;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: var(--teal);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    h1, h2 { margin: 0; line-height: 1.15; }
+    h1 { font-size: 18px; }
+    h2 { font-size: 15px; }
+
+    .subtitle {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 9px;
+    }
+
+    button, .file-button {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      min-height: 38px;
+      border-radius: 8px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    button:hover, .file-button:hover { border-color: #a9bbc8; }
+    .primary { background: var(--teal); border-color: var(--teal); color: white; }
+    .primary:hover { background: var(--teal-dark); border-color: var(--teal-dark); }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(360px, 1.15fr) minmax(340px, 0.85fr);
+      gap: 18px;
+      padding: 18px;
+      min-height: 0;
+    }
+
+    .pane {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .pane-head {
+      border-bottom: 1px solid var(--line);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    textarea {
+      flex: 1;
+      width: 100%;
+      min-height: 610px;
+      resize: none;
+      border: 0;
+      outline: 0;
+      padding: 16px;
+      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--ink);
+      background: #fbfcfd;
+    }
+
+    .right {
+      display: grid;
+      grid-template-rows: auto auto minmax(180px, 1fr) minmax(160px, 0.85fr);
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .content {
+      padding: 14px 16px 16px;
+      overflow: auto;
+      min-height: 0;
+    }
+
+    .drop, .security {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    label.field {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    input[type="text"], input[type="password"] {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 10px;
+      color: var(--ink);
+      background: #fbfcfd;
+      min-width: 0;
+    }
+
+    input[type="file"] { display: none; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0 16px 16px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfd;
+      min-width: 0;
+    }
+
+    .stat strong { display: block; font-size: 20px; }
+    .stat span { color: var(--muted); font-size: 12px; }
+
+    .tree {
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .messages { display: grid; gap: 8px; }
+
+    .message {
+      border-radius: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      background: #fbfcfd;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .message.ok { background: #ecf8f2; border-color: #b7e1cd; color: var(--green); }
+    .message.warn { background: var(--amber-soft); border-color: #f4d59a; color: var(--amber); }
+    .message.error { background: var(--rose-soft); border-color: #f0b7c4; color: var(--rose); }
+
+    .pill-list {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: var(--blue-soft);
+      color: #175b66;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 980px) {
+      header { grid-template-columns: 1fr; }
+      .actions { justify-content: flex-start; }
+      .workspace { grid-template-columns: 1fr; }
+      textarea { min-height: 460px; }
+    }
+
+    @media (max-width: 560px) {
+      .workspace { padding: 12px; gap: 12px; }
+      .right { gap: 12px; }
+      .fields, .stats { grid-template-columns: 1fr; }
+      .pane-head, .row { align-items: flex-start; flex-direction: column; }
+      button, .file-button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="brand">
+        <div class="mark">PP</div>
+        <div>
+          <h1>ProjectPack Studio</h1>
+          <p class="subtitle">Leitor, empacotador e conversor local</p>
+        </div>
+      </div>
+      <div class="actions">
+        <label class="file-button" for="openPackInput">Abrir .ppack/.ppackc</label>
+        <label class="file-button" for="zipInput">Importar ZIP</label>
+        <button id="sampleBtn" type="button">Exemplo</button>
+        <button id="miniSampleBtn" type="button">Mini projeto</button>
+        <button id="validateBtn" type="button">Validar</button>
+        <button id="downloadTextBtn" type="button">Salvar .ppack</button>
+        <button id="downloadPackedBtn" type="button">Salvar .ppackc</button>
+        <button id="downloadZipBtn" class="primary" type="button">Gerar ZIP</button>
+      </div>
+    </header>
+
+    <input id="openPackInput" type="file" accept=".ppack,.ppackc,text/plain,application/octet-stream">
+    <input id="zipInput" type="file" accept=".zip,application/zip">
+
+    <section class="workspace">
+      <section class="pane">
+        <div class="pane-head">
+          <h2>Arquivo ProjectPack</h2>
+          <span class="hint">Blocos, estrutura e conteudo do projeto</span>
+        </div>
+        <textarea id="source" spellcheck="false"></textarea>
+      </section>
+
+      <section class="right">
+        <section class="pane">
+          <div class="pane-head">
+            <h2>Assets enviados</h2>
+            <span class="hint">Usados por ::asset ou (.///.)</span>
+          </div>
+          <div class="drop">
+            <div class="row">
+              <label class="file-button" for="assetInput">Selecionar assets</label>
+              <span class="hint" id="uploadCount">Nenhum arquivo enviado</span>
+            </div>
+            <input id="assetInput" type="file" multiple>
+            <div class="pill-list" id="assetList"></div>
+          </div>
+          <div class="stats">
+            <div class="stat"><strong id="folderCount">0</strong><span>pastas</span></div>
+            <div class="stat"><strong id="fileCount">0</strong><span>arquivos</span></div>
+            <div class="stat"><strong id="assetCount">0</strong><span>assets</span></div>
+            <div class="stat"><strong id="byteCount">0</strong><span>bytes texto</span></div>
+          </div>
+        </section>
+
+        <section class="pane">
+          <div class="pane-head">
+            <h2>Protecao do pacote</h2>
+            <span class="hint">Opcional para .ppackc</span>
+          </div>
+          <div class="security">
+            <div class="fields">
+              <label class="field">Senha de criptografia
+                <input id="passwordInput" type="password" autocomplete="off" placeholder="AES-GCM">
+              </label>
+              <label class="field">Chave de assinatura
+                <input id="signKeyInput" type="password" autocomplete="off" placeholder="HMAC-SHA256">
+              </label>
+            </div>
+            <span class="hint">Sem senha, o .ppackc fica apenas comprimido. Com chave, ele recebe assinatura verificavel.</span>
+          </div>
+        </section>
+
+        <section class="pane">
+          <div class="pane-head">
+            <h2>Previa da arvore</h2>
+            <span class="hint" id="projectName">Sem projeto</span>
+          </div>
+          <div class="content">
+            <div class="tree" id="treePreview"></div>
+          </div>
+        </section>
+
+        <section class="pane">
+          <div class="pane-head">
+            <h2>Validacao</h2>
+            <span class="hint">Erros bloqueiam exportacao</span>
+          </div>
+          <div class="content">
+            <div class="messages" id="messages"></div>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const sourceEl = document.querySelector("#source");
+    const assetInput = document.querySelector("#assetInput");
+    const openPackInput = document.querySelector("#openPackInput");
+    const zipInput = document.querySelector("#zipInput");
+    const passwordInput = document.querySelector("#passwordInput");
+    const signKeyInput = document.querySelector("#signKeyInput");
+    const assetListEl = document.querySelector("#assetList");
+    const uploadCountEl = document.querySelector("#uploadCount");
+    const treePreviewEl = document.querySelector("#treePreview");
+    const messagesEl = document.querySelector("#messages");
+    const folderCountEl = document.querySelector("#folderCount");
+    const fileCountEl = document.querySelector("#fileCount");
+    const assetCountEl = document.querySelector("#assetCount");
+    const byteCountEl = document.querySelector("#byteCount");
+    const projectNameEl = document.querySelector("#projectName");
+
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+    const placeholder = "(.///.)";
+    const packedMagic = "PPACKC/1\n";
+    let uploadedAssets = new Map();
+    let runtimeMessages = [];
+
+    const sample = `::meta
+name: demo-projectpack
+version: 1
+author: voce
+encoding: utf-8
+::endmeta
+
+::tree
+src/
+  main.js
+  script.js
+assets/
+  logo.png
+README.md
+::endtree
+
+::deps
+npm: vite
+::enddeps
+
+::file src/main.js
+import { hello } from "./script.js";
+
+document.body.innerHTML = "<h1>" + hello() + "</h1>";
+::endfile
+
+::file src/script.js
+export function hello() {
+  return "Projeto recriado pelo ProjectPack";
+}
+::endfile
+
+::file README.md
+# demo-projectpack
+
+Este projeto nasceu de um arquivo unico.
+::endfile
+
+::asset assets/logo.png
+upload: logo.png
+::endasset`;
+
+    sourceEl.value = sample;
+
+    document.querySelector("#sampleBtn").addEventListener("click", () => {
+      sourceEl.value = sample;
+      runtimeMessages = [{ type: "ok", text: "Exemplo carregado." }];
+      render();
+    });
+    document.querySelector("#validateBtn").addEventListener("click", render);
+    document.querySelector("#downloadTextBtn").addEventListener("click", downloadTextPack);
+    document.querySelector("#downloadPackedBtn").addEventListener("click", downloadPacked);
+    document.querySelector("#downloadZipBtn").addEventListener("click", downloadZip);
+    sourceEl.addEventListener("input", debounce(render, 180));
+
+    assetInput.addEventListener("change", () => {
+      uploadedAssets = new Map(Array.from(assetInput.files).map(file => [file.name, file]));
+      renderAssets();
+      render();
+    });
+
+    openPackInput.addEventListener("change", async () => {
+      const file = openPackInput.files[0];
+      if (!file) return;
+      try {
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        if (startsWith(bytes, encoder.encode(packedMagic))) {
+          sourceEl.value = await unpackPpackc(bytes);
+          runtimeMessages = [{ type: "ok", text: `.ppackc aberto: ${file.name}` }];
+        } else {
+          sourceEl.value = decoder.decode(bytes);
+          runtimeMessages = [{ type: "ok", text: `.ppack aberto: ${file.name}` }];
+        }
+      } catch (error) {
+        runtimeMessages = [{ type: "error", text: error.message }];
+      }
+      openPackInput.value = "";
+      render();
+    });
+
+    zipInput.addEventListener("change", async () => {
+      const file = zipInput.files[0];
+      if (!file) return;
+      try {
+        sourceEl.value = await zipToProjectPack(file);
+        runtimeMessages = [{ type: "ok", text: `ZIP convertido para ProjectPack: ${file.name}` }];
+      } catch (error) {
+        runtimeMessages = [{ type: "error", text: error.message }];
+      }
+      zipInput.value = "";
+      render();
+    });
+
+    function debounce(fn, wait) {
+      let timer;
+      return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), wait);
+      };
+    }
+
+    function parseProjectPack(text) {
+      const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
+      const project = { meta: {}, deps: [], folders: new Set(), treeFiles: new Set(), files: new Map(), assets: new Map(), empty: new Set(), messages: [] };
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const open = line.match(/^::([a-zA-Z][\w-]*)(?:\s+(.*))?$/);
+        if (!open) {
+          if (line.trim()) project.messages.push({ type: "warn", text: `Linha ${i + 1}: texto fora de bloco foi ignorado.` });
+          continue;
+        }
+
+        const block = open[1].toLowerCase();
+        const arg = (open[2] || "").trim();
+        const startLine = i + 1;
+        const body = [];
+        i++;
+
+        while (i < lines.length) {
+          const trimmed = lines[i].trim();
+          if (trimmed === `::end${block}`) break;
+          if (block === "file" && trimmed === `\\::end${block}`) body.push(lines[i].replace(/^(\s*)\\::endfile\s*$/, "$1::endfile"));
+          else body.push(lines[i]);
+          i++;
+        }
+
+        if (i >= lines.length) {
+          project.messages.push({ type: "error", text: `Bloco ::${block} iniciado na linha ${startLine} nao foi fechado com ::end${block}.` });
+          break;
+        }
+
+        if (block === "meta") parseKeyValue(body, project.meta);
+        else if (block === "deps") project.deps.push(...body.filter(line => line.trim()));
+        else if (block === "tree") parseTree(body, project);
+        else if (block === "file") parseFileBlock(arg, body, project, startLine);
+        else if (block === "asset") parseAssetBlock(arg, body, project, startLine);
+        else if (block === "empty") parseEmptyBlock(body, project);
+        else project.messages.push({ type: "warn", text: `Bloco ::${block} ainda nao tem acao nesta versao.` });
+      }
+
+      validateProject(project);
+      return project;
+    }
+
+    function parseKeyValue(lines, target) {
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#")) continue;
+        const index = trimmed.indexOf(":");
+        if (index === -1) continue;
+        target[trimmed.slice(0, index).trim()] = trimmed.slice(index + 1).trim();
+      }
+    }
+
+    function parseTree(lines, project) {
+      const stack = [{ indent: -1, path: "" }];
+      for (const raw of lines) {
+        if (!raw.trim() || raw.trim().startsWith("#")) continue;
+        const indent = raw.match(/^\s*/)[0].length;
+        const name = raw.trim();
+        if (name === "|") continue;
+        while (stack.length && indent <= stack[stack.length - 1].indent) stack.pop();
+        const parent = stack[stack.length - 1] || { path: "" };
+        const cleanName = name.replace(/\/$/, "");
+        const path = normalizePath(parent.path ? `${parent.path}/${cleanName}` : cleanName);
+        if (!path) continue;
+        if (name.endsWith("/")) {
+          project.folders.add(path + "/");
+          stack.push({ indent, path });
+        } else {
+          project.treeFiles.add(path);
+          addParentFolders(path, project.folders);
+        }
+      }
+    }
+
+    function parseFileBlock(arg, body, project, line) {
+      const path = normalizePath(arg);
+      if (!path) {
+        project.messages.push({ type: "error", text: `Linha ${line}: ::file precisa receber um caminho.` });
+        return;
+      }
+      project.files.set(path, body.join("\n"));
+      addParentFolders(path, project.folders);
+    }
+
+    function parseAssetBlock(arg, body, project, line) {
+      const path = normalizePath(arg);
+      if (!path) {
+        project.messages.push({ type: "error", text: `Linha ${line}: ::asset precisa receber um caminho.` });
+        return;
+      }
+      const info = {};
+      parseKeyValue(body, info);
+      project.assets.set(path, info.upload || path.split("/").pop());
+      addParentFolders(path, project.folders);
+    }
+
+    function parseEmptyBlock(body, project) {
+      for (const raw of body) {
+        const path = normalizePath(raw.trim());
+        if (path) {
+          project.empty.add(path);
+          addParentFolders(path, project.folders);
+        }
+      }
+    }
+
+    function addParentFolders(path, folders) {
+      const parts = path.split("/");
+      for (let i = 1; i < parts.length; i++) folders.add(parts.slice(0, i).join("/") + "/");
+    }
+
+    function normalizePath(path) {
+      return String(path || "").trim().replace(/^["']|["']$/g, "").replace(/\\/g, "/").replace(/\/+/g, "/").replace(/^\.\//, "").replace(/^\/+/, "").replace(/\/+$/, "");
+    }
+
+    function isUnsafePath(path) {
+      return !path || path.split("/").includes("..") || /^[a-zA-Z]:\//.test(path) || path.includes("\0");
+    }
+
+    function validateProject(project) {
+      const allPaths = [...project.folders, ...project.treeFiles, ...project.files.keys(), ...project.assets.keys(), ...project.empty];
+      const seen = new Map();
+      for (const path of allPaths) {
+        if (isUnsafePath(path)) project.messages.push({ type: "error", text: `Caminho bloqueado por seguranca: ${path}` });
+        const key = path.toLowerCase().replace(/\/$/, "");
+        seen.set(key, (seen.get(key) || 0) + 1);
+      }
+      for (const [path, count] of seen) {
+        if (count > 2) project.messages.push({ type: "warn", text: `Caminho repetido ou ambiguo: ${path}` });
+      }
+      for (const path of project.files.keys()) {
+        if (!project.treeFiles.has(path) && !project.empty.has(path)) project.messages.push({ type: "warn", text: `Conteudo declarado fora da arvore: ${path}` });
+      }
+      for (const path of project.treeFiles) {
+        const hasContent = project.files.has(path) || project.assets.has(path) || project.empty.has(path);
+        if (!hasContent) project.messages.push({ type: "warn", text: `Arquivo sem conteudo declarado: ${path}. Ele sera criado vazio.` });
+      }
+      for (const [path, uploadName] of project.assets) {
+        if (!uploadedAssets.has(uploadName)) project.messages.push({ type: "warn", text: `Asset aguardando upload: ${path} usa ${uploadName}.` });
+      }
+      for (const [path, content] of project.files) {
+        if (content.trim() === placeholder && !uploadedAssets.has(path.split("/").pop())) project.messages.push({ type: "warn", text: `Placeholder de midia aguardando upload: ${path.split("/").pop()}.` });
+      }
+      if (!project.treeFiles.size && !project.folders.size) project.messages.push({ type: "error", text: "Nenhuma estrutura encontrada. Adicione um bloco ::tree." });
+      if (!project.messages.some(message => message.type === "error")) project.messages.unshift({ type: "ok", text: "Arquivo ProjectPack valido para exportacao." });
+    }
+
+    function renderAssets() {
+      assetListEl.innerHTML = "";
+      const files = [...uploadedAssets.values()];
+      uploadCountEl.textContent = files.length ? `${files.length} arquivo(s) enviado(s)` : "Nenhum arquivo enviado";
+      for (const file of files) {
+        const pill = document.createElement("span");
+        pill.className = "pill";
+        pill.textContent = `${file.name} (${formatBytes(file.size)})`;
+        assetListEl.appendChild(pill);
+      }
+    }
+
+    function render() {
+      const project = parseProjectPack(sourceEl.value);
+      const allFiles = new Set([...project.treeFiles, ...project.files.keys(), ...project.assets.keys(), ...project.empty]);
+      const treeLines = [];
+      for (const folder of [...project.folders].sort()) treeLines.push(`dir  ${folder}`);
+      for (const file of [...allFiles].sort()) treeLines.push(`file ${file}`);
+      treePreviewEl.textContent = treeLines.length ? treeLines.join("\n") : "Nenhuma arvore encontrada.";
+      projectNameEl.textContent = project.meta.name || "Projeto sem nome";
+      folderCountEl.textContent = project.folders.size;
+      fileCountEl.textContent = allFiles.size;
+      assetCountEl.textContent = project.assets.size + [...project.files.values()].filter(value => value.trim() === placeholder).length;
+      byteCountEl.textContent = encoder.encode(sourceEl.value).length;
+      messagesEl.innerHTML = "";
+      for (const message of [...runtimeMessages, ...project.messages]) {
+        const div = document.createElement("div");
+        div.className = `message ${message.type}`;
+        div.textContent = message.text;
+        messagesEl.appendChild(div);
+      }
+    }
+
+    function formatBytes(bytes) {
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+      return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+    }
+
+    function currentProjectOrThrow() {
+      const project = parseProjectPack(sourceEl.value);
+      render();
+      if (project.messages.some(message => message.type === "error")) throw new Error("Corrija os erros antes de exportar.");
+      return project;
+    }
+
+    function downloadTextPack() {
+      try {
+        const project = currentProjectOrThrow();
+        downloadBlob(new Blob([sourceEl.value], { type: "text/plain;charset=utf-8" }), `${safeName(project.meta.name || "project")}.ppack`);
+      } catch (error) {
+        runtimeMessages = [{ type: "error", text: error.message }];
+        render();
+      }
+    }
+
+    async function downloadPacked() {
+      try {
+        const project = currentProjectOrThrow();
+        const packed = await packPpackc(sourceEl.value, passwordInput.value, signKeyInput.value);
+        downloadBlob(new Blob([packed], { type: "application/octet-stream" }), `${safeName(project.meta.name || "project")}.ppackc`);
+      } catch (error) {
+        runtimeMessages = [{ type: "error", text: error.message }];
+        render();
+      }
+    }
+
+    async function downloadZip() {
+      try {
+        const project = currentProjectOrThrow();
+        const entries = await projectToEntries(project);
+        const zip = createZip(entries);
+        downloadBlob(new Blob([zip], { type: "application/zip" }), `${safeName(project.meta.name || "project")}.zip`);
+      } catch (error) {
+        runtimeMessages = [{ type: "error", text: error.message }];
+        render();
+      }
+    }
+
+    async function projectToEntries(project) {
+      const entries = [];
+      for (const folder of project.folders) entries.push({ path: folder, data: new Uint8Array(), directory: true });
+      const allFiles = new Set([...project.treeFiles, ...project.files.keys(), ...project.assets.keys(), ...project.empty]);
+      for (const path of allFiles) {
+        let data = new Uint8Array();
+        if (project.assets.has(path)) {
+          const file = uploadedAssets.get(project.assets.get(path));
+          if (file) data = new Uint8Array(await file.arrayBuffer());
+        } else if (project.files.has(path)) {
+          const content = project.files.get(path);
+          if (content.trim() === placeholder) {
+            const file = uploadedAssets.get(path.split("/").pop());
+            if (file) data = new Uint8Array(await file.arrayBuffer());
+          } else {
+            data = encoder.encode(content);
+          }
+        }
+        entries.push({ path, data, directory: false });
+      }
+      return entries;
+    }
+
+    async function packPpackc(text, password, signKey) {
+      const payload = pplzCompress(encoder.encode(text));
+      const checksum = await sha256Hex(payload);
+      let body = payload;
+      let salt = "";
+      let iv = "";
+      if (password) {
+        const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+        const ivBytes = crypto.getRandomValues(new Uint8Array(12));
+        const key = await passwordKey(password, saltBytes, ["encrypt"]);
+        body = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: ivBytes }, key, payload));
+        salt = base64(saltBytes);
+        iv = base64(ivBytes);
+      }
+      const manifest = {
+        format: "ProjectPack Compact",
+        version: 1,
+        compression: "pplz-lz77",
+        encryption: password ? "AES-GCM" : "none",
+        kdf: password ? "PBKDF2-SHA256-100000" : "none",
+        salt,
+        iv,
+        checksum,
+        created: new Date().toISOString()
+      };
+      if (signKey) manifest.signature = await hmacHex(signKey, body);
+      const manifestBytes = encoder.encode(JSON.stringify(manifest));
+      const header = encoder.encode(packedMagic);
+      const size = new Uint8Array(4);
+      new DataView(size.buffer).setUint32(0, manifestBytes.length, true);
+      return concatUint8([header, size, manifestBytes, body]);
+    }
+
+    async function unpackPpackc(bytes) {
+      let offset = encoder.encode(packedMagic).length;
+      const manifestSize = new DataView(bytes.buffer, bytes.byteOffset + offset, 4).getUint32(0, true);
+      offset += 4;
+      const manifest = JSON.parse(decoder.decode(bytes.slice(offset, offset + manifestSize)));
+      offset += manifestSize;
+      let body = bytes.slice(offset);
+      if (manifest.signature && signKeyInput.value) {
+        const actual = await hmacHex(signKeyInput.value, body);
+        if (actual !== manifest.signature) throw new Error("Assinatura invalida para a chave informada.");
+      } else if (manifest.signature) {
+        runtimeMessages.push({ type: "warn", text: "Pacote assinado. Informe a chave de assinatura para verificar." });
+      }
+      if (manifest.encryption === "AES-GCM") {
+        if (!passwordInput.value) throw new Error("Este .ppackc precisa da senha de criptografia.");
+        const key = await passwordKey(passwordInput.value, fromBase64(manifest.salt), ["decrypt"]);
+        body = new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: fromBase64(manifest.iv) }, key, body));
+      }
+      const checksum = await sha256Hex(body);
+      if (checksum !== manifest.checksum) throw new Error("Checksum invalido. O pacote pode estar corrompido.");
+      if (manifest.compression !== "pplz-lz77") throw new Error(`Compressao nao suportada: ${manifest.compression}`);
+      return decoder.decode(pplzDecompress(body));
+    }
+
+    async function streamToUint8(stream) {
+      const reader = stream.getReader();
+      const chunks = [];
+      let total = 0;
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        total += value.length;
+      }
+      const out = new Uint8Array(total);
+      let offset = 0;
+      for (const chunk of chunks) {
+        out.set(chunk, offset);
+        offset += chunk.length;
+      }
+      return out;
+    }
+
+    function pplzCompress(input) {
+      const out = [80, 80, 76, 90, 49];
+      for (let i = 0; i < input.length;) {
+        const controlIndex = out.length;
+        out.push(0);
+        let control = 0;
+        for (let bit = 0; bit < 8 && i < input.length; bit++) {
+          const match = findMatch(input, i);
+          if (match.length >= 4) {
+            control |= 1 << bit;
+            const packed = ((match.offset - 1) << 6) | (match.length - 4);
+            out.push(packed & 255, packed >> 8);
+            i += match.length;
+          } else {
+            out.push(input[i]);
+            i++;
+          }
+        }
+        out[controlIndex] = control;
+      }
+      return new Uint8Array(out);
+    }
+
+    function findMatch(input, index) {
+      const windowStart = Math.max(0, index - 4096);
+      const maxLength = Math.min(67, input.length - index);
+      let bestLength = 0;
+      let bestOffset = 0;
+      for (let pos = windowStart; pos < index; pos++) {
+        let length = 0;
+        while (length < maxLength && input[pos + length] === input[index + length]) length++;
+        if (length > bestLength) {
+          bestLength = length;
+          bestOffset = index - pos;
+          if (length === maxLength) break;
+        }
+      }
+      return { offset: bestOffset, length: bestLength };
+    }
+
+    function pplzDecompress(input) {
+      if (input[0] !== 80 || input[1] !== 80 || input[2] !== 76 || input[3] !== 90 || input[4] !== 49) throw new Error("Payload PPLZ invalido.");
+      const out = [];
+      let i = 5;
+      while (i < input.length) {
+        const control = input[i++];
+        for (let bit = 0; bit < 8 && i < input.length; bit++) {
+          if (control & (1 << bit)) {
+            const packed = input[i] | (input[i + 1] << 8);
+            i += 2;
+            const offset = (packed >> 6) + 1;
+            const length = (packed & 63) + 4;
+            for (let k = 0; k < length; k++) out.push(out[out.length - offset]);
+          } else {
+            out.push(input[i++]);
+          }
+        }
+      }
+      return new Uint8Array(out);
+    }
+
+    async function passwordKey(password, salt, usages) {
+      const baseKey = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveKey"]);
+      return crypto.subtle.deriveKey({ name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" }, baseKey, { name: "AES-GCM", length: 256 }, false, usages);
+    }
+
+    async function hmacHex(secret, bytes) {
+      const key = await crypto.subtle.importKey("raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+      return hex(new Uint8Array(await crypto.subtle.sign("HMAC", key, bytes)));
+    }
+
+    async function sha256Hex(bytes) {
+      return hex(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)));
+    }
+
+    function hex(bytes) {
+      return [...bytes].map(byte => byte.toString(16).padStart(2, "0")).join("");
+    }
+
+    function base64(bytes) {
+      let text = "";
+      for (const byte of bytes) text += String.fromCharCode(byte);
+      return btoa(text);
+    }
+
+    function fromBase64(text) {
+      return Uint8Array.from(atob(text), char => char.charCodeAt(0));
+    }
+
+    async function zipToProjectPack(file) {
+      const entries = await readZip(new Uint8Array(await file.arrayBuffer()));
+      const folders = new Set();
+      const files = [];
+      const assets = [];
+      const textFiles = [];
+      for (const entry of entries) {
+        const path = normalizePath(entry.path);
+        if (!path || isUnsafePath(path)) continue;
+        if (entry.directory) {
+          folders.add(path + "/");
+          continue;
+        }
+        addParentFolders(path, folders);
+        files.push(path);
+        if (looksText(path, entry.data)) textFiles.push({ path, text: decoder.decode(entry.data) });
+        else assets.push(path);
+      }
+      const name = safeName(file.name.replace(/\.zip$/i, ""));
+      let out = `::meta\nname: ${name}\nversion: 1\nsource: imported-zip\n::endmeta\n\n::tree\n`;
+      out += treeFromPaths([...folders], files);
+      out += "::endtree\n\n";
+      for (const item of textFiles) out += `::file ${item.path}\n${escapeProjectPackContent(item.text)}\n::endfile\n\n`;
+      for (const path of assets) out += `::asset ${path}\nupload: ${path.split("/").pop()}\n::endasset\n\n`;
+      return out.trimEnd();
+    }
+
+    function treeFromPaths(folders, files) {
+      const nodes = {};
+      for (const folder of folders) addNode(folder.replace(/\/$/, ""), true);
+      for (const file of files) addNode(file, false);
+      function addNode(path, directory) {
+        const parts = path.split("/").filter(Boolean);
+        let cursor = nodes;
+        for (let i = 0; i < parts.length; i++) {
+          const part = parts[i];
+          cursor[part] ||= { directory: i < parts.length - 1 || directory, children: {} };
+          cursor = cursor[part].children;
+        }
+      }
+      function print(children, depth) {
+        return Object.entries(children).sort(([a], [b]) => a.localeCompare(b)).map(([name, node]) => {
+          const line = `${"  ".repeat(depth)}${name}${node.directory ? "/" : ""}\n`;
+          return line + print(node.children, depth + 1);
+        }).join("");
+      }
+      return print(nodes, 0);
+    }
+
+    function escapeProjectPackContent(text) {
+      return text.replace(/^::endfile$/gm, "\\::endfile");
+    }
+
+    function looksText(path, bytes) {
+      if (/\.(png|jpe?g|gif|webp|ico|mp3|mp4|woff2?|ttf|pdf|zip|exe|dll)$/i.test(path)) return false;
+      const sample = bytes.slice(0, Math.min(bytes.length, 512));
+      return !sample.some(byte => byte === 0 || (byte < 8) || (byte > 13 && byte < 32));
+    }
+
+    async function readZip(bytes) {
+      const entries = [];
+      let offset = 0;
+      while (offset + 30 <= bytes.length && getUint32(bytes, offset) === 0x04034b50) {
+        const flags = getUint16(bytes, offset + 6);
+        const method = getUint16(bytes, offset + 8);
+        const compressedSize = getUint32(bytes, offset + 18);
+        const nameLength = getUint16(bytes, offset + 26);
+        const extraLength = getUint16(bytes, offset + 28);
+        const name = decoder.decode(bytes.slice(offset + 30, offset + 30 + nameLength));
+        const dataStart = offset + 30 + nameLength + extraLength;
+        const dataEnd = dataStart + compressedSize;
+        if (flags & 0x08) throw new Error("ZIP com data descriptor ainda nao e suportado.");
+        let data = bytes.slice(dataStart, dataEnd);
+        if (method === 8) data = await inflateRaw(data);
+        else if (method !== 0) throw new Error(`Metodo ZIP nao suportado: ${method}.`);
+        entries.push({ path: name, directory: name.endsWith("/"), data });
+        offset = dataEnd;
+      }
+      if (!entries.length) throw new Error("Nenhum arquivo foi encontrado no ZIP.");
+      return entries;
+    }
+
+    async function inflateRaw(bytes) {
+      if (!("DecompressionStream" in window)) throw new Error("Este navegador nao descompacta ZIP deflate.");
+      return streamToUint8(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw")));
+    }
+
+    function getUint16(bytes, offset) {
+      return new DataView(bytes.buffer, bytes.byteOffset + offset, 2).getUint16(0, true);
+    }
+
+    function getUint32(bytes, offset) {
+      return new DataView(bytes.buffer, bytes.byteOffset + offset, 4).getUint32(0, true);
+    }
+
+    function safeName(name) {
+      return String(name).trim().replace(/[^\w.-]+/g, "-").replace(/^-+|-+$/g, "") || "project";
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function createZip(entries) {
+      const localParts = [];
+      const centralParts = [];
+      let offset = 0;
+      const now = new Date();
+      const dosTime = ((now.getHours() & 31) << 11) | ((now.getMinutes() & 63) << 5) | (Math.floor(now.getSeconds() / 2) & 31);
+      const dosDate = (((now.getFullYear() - 1980) & 127) << 9) | (((now.getMonth() + 1) & 15) << 5) | (now.getDate() & 31);
+      for (const entry of entries) {
+        const nameBytes = encoder.encode(entry.directory && !entry.path.endsWith("/") ? `${entry.path}/` : entry.path);
+        const data = entry.data;
+        const crc = crc32(data);
+        const local = new Uint8Array(30 + nameBytes.length);
+        const view = new DataView(local.buffer);
+        view.setUint32(0, 0x04034b50, true);
+        view.setUint16(4, 20, true);
+        view.setUint16(6, 0x0800, true);
+        view.setUint16(8, 0, true);
+        view.setUint16(10, dosTime, true);
+        view.setUint16(12, dosDate, true);
+        view.setUint32(14, crc, true);
+        view.setUint32(18, data.length, true);
+        view.setUint32(22, data.length, true);
+        view.setUint16(26, nameBytes.length, true);
+        local.set(nameBytes, 30);
+        localParts.push(local, data);
+        const central = new Uint8Array(46 + nameBytes.length);
+        const cview = new DataView(central.buffer);
+        cview.setUint32(0, 0x02014b50, true);
+        cview.setUint16(4, 20, true);
+        cview.setUint16(6, 20, true);
+        cview.setUint16(8, 0x0800, true);
+        cview.setUint16(10, 0, true);
+        cview.setUint16(12, dosTime, true);
+        cview.setUint16(14, dosDate, true);
+        cview.setUint32(16, crc, true);
+        cview.setUint32(20, data.length, true);
+        cview.setUint32(24, data.length, true);
+        cview.setUint16(28, nameBytes.length, true);
+        cview.setUint32(38, entry.directory ? 0x10 : 0, true);
+        cview.setUint32(42, offset, true);
+        central.set(nameBytes, 46);
+        centralParts.push(central);
+        offset += local.length + data.length;
+      }
+      const centralSize = centralParts.reduce((sum, part) => sum + part.length, 0);
+      const end = new Uint8Array(22);
+      const eview = new DataView(end.buffer);
+      eview.setUint32(0, 0x06054b50, true);
+      eview.setUint16(8, entries.length, true);
+      eview.setUint16(10, entries.length, true);
+      eview.setUint32(12, centralSize, true);
+      eview.setUint32(16, offset, true);
+      return concatUint8([...localParts, ...centralParts, end]);
+    }
+
+    function concatUint8(parts) {
+      const total = parts.reduce((sum, part) => sum + part.length, 0);
+      const out = new Uint8Array(total);
+      let offset = 0;
+      for (const part of parts) {
+        out.set(part, offset);
+        offset += part.length;
+      }
+      return out;
+    }
+
+    function startsWith(bytes, prefix) {
+      return prefix.every((byte, index) => bytes[index] === byte);
+    }
+
+    const crcTable = (() => {
+      const table = new Uint32Array(256);
+      for (let i = 0; i < 256; i++) {
+        let c = i;
+        for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+        table[i] = c >>> 0;
+      }
+      return table;
+    })();
+
+    function crc32(bytes) {
+      let crc = 0xffffffff;
+      for (let i = 0; i < bytes.length; i++) crc = crcTable[(crc ^ bytes[i]) & 0xff] ^ (crc >>> 8);
+      return (crc ^ 0xffffffff) >>> 0;
+    }
+
+    renderAssets();
+    render();
+  </script>
+</body>
+</html>
