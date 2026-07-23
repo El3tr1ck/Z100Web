@@ -3,22 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft 3D Skin Vault</title>
+    <title>Minecraft 3D Skin Vault - EletrickZ100</title>
     
-    <!-- 
-        BIBLIOTECAS EXTERNAS (THREE.JS E ORBITCONTROLS)
-        Para uso local/offline sem depender da CDN, basta baixar os arquivos
-        e alterar os caminhos dos scripts abaixo para o seu diretório local, por exemplo:
-        <script src="js/three.min.js"></script>
-        <script src="js/OrbitControls.js"></script>
-    -->
+    <!-- BIBLIOTECAS THREE.JS E ORBITCONTROLS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <style>
-        /* ==========================================================================
-           1. ESTILOS GERAIS E VARIÁVEIS DE TEMA
-           ========================================================================== */
         :root {
             --bg-color: #0f172a;
             --card-bg: rgba(30, 41, 59, 0.7);
@@ -49,9 +40,6 @@
             overflow-x: hidden;
         }
 
-        /* ==========================================================================
-           2. CABEÇALHO E BARRA SUPERIOR
-           ========================================================================== */
         header {
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(12px);
@@ -157,15 +145,6 @@
             background: transparent;
         }
 
-        .color-picker-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
-            padding: 0;
-        }
-
-        .color-picker-wrapper input[type="color"]::-webkit-color-swatch {
-            border: 2px solid #fff;
-            border-radius: 50%;
-        }
-
         .btn {
             background: var(--accent-color);
             color: #0f172a;
@@ -205,24 +184,6 @@
             border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
-        /* ==========================================================================
-           3. PAINEL INFORMATIVO DE DETECÇÃO AUTOMÁTICA
-           ========================================================================== */
-        .info-banner {
-            background: rgba(30, 41, 59, 0.5);
-            border-bottom: 1px solid var(--border-color);
-            padding: 0.75rem 2rem;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        /* ==========================================================================
-           4. GRADE RESPONSIVA DE CARDS (GRID)
-           ========================================================================== */
         main {
             flex: 1;
             padding: 2rem;
@@ -318,15 +279,7 @@
             color: var(--text-muted);
         }
 
-        .empty-state h3 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: var(--text-main);
-        }
-
-        /* ==========================================================================
-           5. PAINEL MODAL E EDITOR 3D
-           ========================================================================== */
+        /* MODAL */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -476,7 +429,6 @@
             margin-bottom: 0.5rem;
         }
 
-        /* CONTROLES DE POSE E ANIMAÇÃO */
         .pose-presets {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -540,11 +492,6 @@
             border-radius: 50%;
             background: var(--accent-color);
             cursor: pointer;
-            transition: transform 0.1s ease;
-        }
-
-        .slider-group input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
         }
 
         .modal-actions {
@@ -558,28 +505,10 @@
             flex: 1;
             justify-content: center;
         }
-
-        /* SCROLLBAR PERSONALIZADO */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-color);
-        }
     </style>
 </head>
 <body>
 
-    <!-- ==========================================================================
-       BARRA SUPERIOR (HEADER)
-       ========================================================================== -->
     <header>
         <div class="logo-container">
             <div class="logo-icon">3D</div>
@@ -587,22 +516,19 @@
         </div>
 
         <div class="header-controls">
-            <!-- Pesquisa em tempo real -->
             <div class="search-box">
                 <svg class="search-icon" viewBox="0 0 24 24">
                     <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
                 </svg>
-                <input type="text" id="searchInput" placeholder="Buscar skin por nome...">
+                <input type="text" id="searchInput" placeholder="Buscar por outfit ou nome...">
             </div>
 
-            <!-- Seletor de cor de fundo em tempo real -->
             <div class="color-picker-wrapper">
                 <span>Fundo:</span>
                 <input type="color" id="bgColorPicker" value="#0f172a" title="Escolher cor de fundo">
             </div>
 
-            <!-- Botão de Atualizar Biblioteca -->
-            <button class="btn btn-secondary" id="btnRefresh" title="Recarregar pasta de skins">
+            <button class="btn btn-secondary" id="btnRefresh" title="Recarregar biblioteca de skins">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M23 4v6h-6M1 20v-6h6"></path>
                     <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
@@ -610,35 +536,17 @@
                 Atualizar
             </button>
 
-            <!-- Contador de Skins -->
             <div class="badge" id="skinCounter">0 Skins Carregadas</div>
         </div>
     </header>
 
-    <!-- BANNER DE EXPLICAÇÃO DA DETECÇÃO AUTOMÁTICA -->
-    <div class="info-banner">
-        <span>📁 Diretório monitorado: <strong>img/skins/</strong></span>
-        <span>
-            💡 <strong>Nota técnica de detecção:</strong> Em navegadores web e GitHub Pages, a listagem do sistema de arquivos é feita automaticamente via API do repositório/varredura dinâmica. Para servidores locais Node.js, veja as instruções comentadas no código JS.
-        </span>
-    </div>
-
-    <!-- ==========================================================================
-       CONTEÚDO PRINCIPAL (GRADE DE CARDS)
-       ========================================================================== -->
     <main>
-        <div class="skin-grid" id="skinGrid">
-            <!-- Os cards de skins serão gerados dinamicamente via JS -->
-        </div>
+        <div class="skin-grid" id="skinGrid"></div>
     </main>
 
-    <!-- ==========================================================================
-       PAINEL MODAL (VISUALIZADOR 3D + EDITOR DE POSES)
-       ========================================================================== -->
+    <!-- PAINEL MODAL -->
     <div class="modal-overlay" id="skinModal">
         <div class="modal-container">
-            
-            <!-- Canvas 3D Interativo -->
             <div class="modal-viewport" id="viewportContainer">
                 <canvas id="modalCanvas"></canvas>
                 <div class="viewport-controls-hint">
@@ -646,7 +554,6 @@
                 </div>
             </div>
 
-            <!-- Sidebar de Controles e Informações -->
             <div class="modal-sidebar">
                 <div class="modal-header">
                     <div class="modal-title-group">
@@ -656,7 +563,6 @@
                     <button class="btn-close" id="btnCloseModal">&times;</button>
                 </div>
 
-                <!-- Detalhes do arquivo -->
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="info-label">Modelo</span>
@@ -668,7 +574,6 @@
                     </div>
                 </div>
 
-                <!-- Editor de Poses -->
                 <div>
                     <div class="section-title">Editor de Poses</div>
                     
@@ -713,7 +618,6 @@
                     </div>
                 </div>
 
-                <!-- Botões de Ação -->
                 <div class="modal-actions">
                     <button class="btn btn-secondary" id="btnResetPose">Resetar Pose</button>
                     <button class="btn" id="btnDownload">
@@ -729,21 +633,50 @@
         </div>
     </div>
 
-    <!-- ==========================================================================
-       CÓDIGO JAVASCRIPT (LÓGICA DO SISTEMA, THREE.JS E DETECÇÃO)
-       ========================================================================== -->
     <script>
-       // State Global da Aplicação
+        /**
+         * ==========================================================================
+         * 📌 BLOCO DE CONFIGURAÇÃO CENTRAL DE SKINS (FÁCIL E FLEXÍVEL)
+         * ==========================================================================
+         * Para adicionar uma nova skin especial manualmente, basta colar o nome
+         * do arquivo dentro da lista `SKINS_ESPECIAIS` abaixo:
+         */
+        const SKINS_ESPECIAIS = [
+            "EletrickZ100_outfit#10.png",
+            "EletrickZ100_outfit#11.png",
+            "EletrickZ100_outfit#8.png",
+            "EletrickZ100_outfit#9.png",
+            "EletrickZ100_outfit2.png",
+            "EletrickZ100_outfit3.2.png",
+            "EletrickZ100_outfit3.png",
+            "EletrickZ100_outfit4.png",
+            "EletrickZ100_outfit5.png",
+            "EletrickZ100_outfit6.png",
+            "EletrickZ100_outfit7.2.png",
+            "EletrickZ100_outfit7.png",
+            "Eletrickz100.png",
+            
+            // Skins sem numeração
+            "T3usHD.jpeg",
+            "Davzz29.png"
+        ];
+
+        /**
+         * Configuração do Gerador Automático de Numerações para EletrickZ100_outfit#
+         * O site varre e detecta automaticamente os números no intervalo abaixo:
+         */
+        const OUTFIT_PREFIX = "EletrickZ100_outfit#";
+        const OUTFIT_MAX_NUMBER = 50; // Busca do #1 até #50 dinamicamente
+
+        // State Global
         const state = {
             skins: [],
             filteredSkins: [],
             activeSkin: null,
-            textureCache: new Map(),
             autoRotate: false,
             currentPose: 'default'
         };
 
-        // Elementos DOM
         const DOM = {
             skinGrid: document.getElementById('skinGrid'),
             searchInput: document.getElementById('searchInput'),
@@ -763,10 +696,8 @@
             modalCanvas: document.getElementById('modalCanvas')
         };
 
-        // Instâncias 3D da Modal
         let modalScene, modalCamera, modalRenderer, modalControls, characterMeshGroup, characterParts;
 
-        // INICIALIZAÇÃO DA APLICAÇÃO
         window.addEventListener('DOMContentLoaded', () => {
             initBackgroundColor();
             init3DScene();
@@ -774,7 +705,6 @@
             setupEventListeners();
         });
 
-        // Cor de fundo persistente via localStorage
         function initBackgroundColor() {
             const savedColor = localStorage.getItem('mc_vault_bg_color') || '#0f172a';
             DOM.bgColorPicker.value = savedColor;
@@ -791,71 +721,46 @@
         });
 
         // ==========================================================================
-        // DETECÇÃO 100% DINÂMICA E AUTOMÁTICA DE SKINS
+        // CARREGADOR INTELIGENTE DE SKINS
         // ==========================================================================
         async function loadSkinsLibrary() {
-            DOM.skinGrid.innerHTML = `<div class="empty-state"><h3>Escaneando pasta img/skins/...</h3></div>`;
+            DOM.skinGrid.innerHTML = `<div class="empty-state"><h3>Carregando skins...</h3></div>`;
             state.skins = [];
-            const discoveredFiles = new Set();
 
-            // ESTRATÉGIA 1: Tentar ler a listagem do servidor (Auto-Index HTML do Apache/Nginx/LiveServer)
+            const candidateFiles = new Set();
+
+            // 1. Adiciona a lista manual de skins especiais
+            SKINS_ESPECIAIS.forEach(file => candidateFiles.add(file));
+
+            // 2. Gerador Automático de Numeração EletrickZ100_outfit#
+            for (let i = 1; i <= OUTFIT_MAX_NUMBER; i++) {
+                candidateFiles.add(`${OUTFIT_PREFIX}${i}.png`);
+            }
+
+            // 3. Tenta varredura dinâmica via GitHub API (Para GitHub Pages)
             try {
-                const res = await fetch('img/skins/');
-                if (res.ok) {
-                    const htmlText = await res.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(htmlText, 'text/html');
-                    const links = Array.from(doc.querySelectorAll('a'));
-                    
-                    links.forEach(link => {
-                        const href = link.getAttribute('href');
-                        if (href && href.toLowerCase().endsWith('.png')) {
-                            const filename = href.split('/').pop().split('?')[0];
-                            if (filename) discoveredFiles.add(filename);
-                        }
-                    });
-                }
-            } catch (e) {
-                console.log('Buscando via API do repositório...');
-            }
+                const hostname = window.location.hostname;
+                const pathSegments = window.location.pathname.split('/').filter(Boolean);
 
-            // ESTRATÉGIA 2: GitHub API (Lê dinamicamente todos os .png do diretório no GitHub)
-            if (discoveredFiles.size === 0) {
-                try {
-                    const hostname = window.location.hostname;
-                    const pathSegments = window.location.pathname.split('/').filter(Boolean);
-
-                    let owner = '';
-                    let repo = '';
-
-                    if (hostname.includes('github.io')) {
-                        owner = hostname.split('.')[0];
-                        repo = pathSegments[0] || '';
+                if (hostname.includes('github.io') && pathSegments.length > 0) {
+                    const owner = hostname.split('.')[0];
+                    const repo = pathSegments[0];
+                    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/img/skins`;
+                    const res = await fetch(apiUrl);
+                    if (res.ok) {
+                        const files = await res.json();
+                        files.forEach(file => candidateFiles.add(file.name));
                     }
-
-                    if (owner && repo) {
-                        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/img/skins`;
-                        const res = await fetch(apiUrl);
-                        if (res.ok) {
-                            const files = await res.json();
-                            files.forEach(file => {
-                                if (file.name.toLowerCase().endsWith('.png')) {
-                                    discoveredFiles.add(file.name);
-                                }
-                            });
-                        }
-                    }
-                } catch (e) {
-                    console.log('GitHub API não retornou dados.');
                 }
-            }
+            } catch (e) {}
 
-            // CARREGAR TODAS AS SKINS DESCOBERTAS SEM NENHUM NOME PRÉ-DEFINIDO
-            const promises = Array.from(discoveredFiles).map(filename => {
-                return checkAndRegisterSkin(`img/skins/${filename}`, filename);
-            });
+            // Testa e carrega dinamicamente todas as imagens encontradas
+            const loadPromises = Array.from(candidateFiles).map(filename => checkAndRegisterSkin(`img/skins/${filename}`, filename));
+            await Promise.all(loadPromises);
 
-            await Promise.all(promises);
+            // Ordena alfabeticamente/numericamente para organizar os outfits
+            state.skins.sort((a, b) => a.filename.localeCompare(b.filename, undefined, { numeric: true, sensitivity: 'base' }));
+
             state.filteredSkins = [...state.skins];
             renderGrid();
         }
@@ -880,12 +785,11 @@
                     state.skins.push(skinObj);
                     resolve();
                 };
-                img.onerror = () => resolve();
+                img.onerror = () => resolve(); // Descarta se o arquivo não existir na pasta
                 img.src = url;
             });
         }
 
-        // PROCESSAMENTO DE TEXTURAS (SUPORTE STEVE, ALEX, 64x64 E 64x32 LEGACY)
         function processSkinTexture(img) {
             const canvas = document.createElement('canvas');
             canvas.width = 64;
@@ -919,7 +823,6 @@
             ctx.restore();
         }
 
-        // RENDERIZAÇÃO DA GRADE DE CARDS E SNAPSHOTS 3D
         function renderGrid() {
             DOM.skinGrid.innerHTML = '';
             DOM.skinCounter.textContent = `${state.filteredSkins.length} Skins Carregadas`;
@@ -928,7 +831,7 @@
                 DOM.skinGrid.innerHTML = `
                     <div class="empty-state">
                         <h3>Nenhuma skin encontrada</h3>
-                        <p>Certifique-se de adicionar imagens .png dentro da pasta <strong>img/skins/</strong> e clique em "Atualizar".</p>
+                        <p>Adicione suas imagens dentro da pasta <strong>img/skins/</strong> e clique em Atualizar.</p>
                     </div>`;
                 return;
             }
@@ -972,7 +875,6 @@
             return canvas.toDataURL();
         }
 
-        // CONSTRUTOR DO MODELO 3D DO MINECRAFT
         function createMinecraftCharacter(textureCanvas, isAlex) {
             const texture = new THREE.CanvasTexture(textureCanvas);
             texture.magFilter = THREE.NearestFilter;
@@ -1090,7 +992,6 @@
             };
         }
 
-        // CONFIGURAÇÃO DO CENÁRIO 3D PRINCIPAL
         function init3DScene() {
             modalScene = new THREE.Scene();
             modalScene.background = new THREE.Color(DOM.bgColorPicker.value);
@@ -1139,11 +1040,9 @@
 
             function animate() {
                 requestAnimationFrame(animate);
-                
                 if (state.autoRotate && characterMeshGroup) {
                     characterMeshGroup.rotation.y += 0.01;
                 }
-
                 modalControls.update();
                 modalRenderer.render(modalScene, modalCamera);
             }
@@ -1161,7 +1060,6 @@
             modalRenderer.setSize(width, height, false);
         }
 
-        // ABERTURA DA MODAL
         function openModal(skin) {
             state.activeSkin = skin;
             
@@ -1194,7 +1092,6 @@
             DOM.btnToggleAutoRotate.textContent = 'Ativar Auto-Giro';
         }
 
-        // EDITOR DE POSES
         const degToRad = (deg) => (deg * Math.PI) / 180;
 
         function applyPose(poseName) {
@@ -1265,7 +1162,6 @@
             characterParts.leftLeg.rotation.x = degToRad(lLX);
         }
 
-        // LISTENERS E EVENTOS
         function setupEventListeners() {
             DOM.btnCloseModal.addEventListener('click', closeModal);
             DOM.skinModal.addEventListener('click', (e) => {
