@@ -3,43 +3,1393 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baixe sua Skin Eletrick</title>
+    <title>Minecraft 3D Skin Vault</title>
+    
+    <!-- 
+        BIBLIOTECAS EXTERNAS (THREE.JS E ORBITCONTROLS)
+        Para uso local/offline sem depender da CDN, basta baixar os arquivos
+        e alterar os caminhos dos scripts abaixo para o seu diretório local, por exemplo:
+        <script src="js/three.min.js"></script>
+        <script src="js/OrbitControls.js"></script>
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
     <style>
+        /* ==========================================================================
+           1. ESTILOS GERAIS E VARIÁVEIS DE TEMA
+           ========================================================================== */
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-hover: rgba(51, 65, 85, 0.9);
+            --accent-color: #10b981;
+            --accent-hover: #059669;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --modal-bg: rgba(15, 23, 42, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
         body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        /* ==========================================================================
+           2. CABEÇALHO E BARRA SUPERIOR
+           ========================================================================== */
+        header {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-color);
+            border-radius: 6px;
+            display: grid;
+            place-items: center;
+            font-weight: bold;
+            color: #000;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #ffffff 0%, #a5f3fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            width: 240px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            width: 280px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            fill: var(--text-muted);
+            width: 16px;
+            height: 16px;
+            pointer-events: none;
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .color-picker-wrapper input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch {
+            border: 2px solid #fff;
+            border-radius: 50%;
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: #0f172a;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .badge {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        /* ==========================================================================
+           3. PAINEL INFORMATIVO DE DETECÇÃO AUTOMÁTICA
+           ========================================================================== */
+        .info-banner {
+            background: rgba(30, 41, 59, 0.5);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* ==========================================================================
+           4. GRADE RESPONSIVA DE CARDS (GRID)
+           ========================================================================== */
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .skin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .skin-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            backdrop-filter: blur(8px);
+        }
+
+        .skin-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            background: var(--card-hover);
+            border-color: var(--accent-color);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .card-preview {
+            width: 100%;
+            height: 240px;
             display: flex;
             justify-content: center;
             align-items: center;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            position: relative;
+        }
+
+        .card-preview img {
+            max-height: 200px;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+            transition: transform 0.3s ease;
+        }
+
+        .skin-card:hover .card-preview img {
+            transform: scale(1.08);
+        }
+
+        .card-info {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 5rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        /* ==========================================================================
+           5. PAINEL MODAL E EDITOR 3D
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
             height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
+            background: var(--modal-bg);
+            backdrop-filter: blur(16px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
-        button {
-            padding: 15px 30px;
-            font-size: 18px;
-            background-color: #007bff;
-            color: white;
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-container {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            max-height: 800px;
+            border-radius: 16px;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        @media (max-width: 868px) {
+            .modal-container {
+                flex-direction: column;
+                height: 95vh;
+                overflow-y: auto;
+            }
+        }
+
+        .modal-viewport {
+            flex: 1.2;
+            position: relative;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 80%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 350px;
+        }
+
+        .modal-viewport canvas {
+            width: 100% !important;
+            height: 100% !important;
+            outline: none;
+        }
+
+        .viewport-controls-hint {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            pointer-events: none;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-sidebar {
+            flex: 1;
+            padding: 2rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .modal-title-group h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .btn-close {
+            background: rgba(255, 255, 255, 0.1);
             border: none;
-            border-radius: 5px;
+            color: var(--text-main);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             cursor: pointer;
-            transition: background-color 0.3s;
+            display: grid;
+            place-items: center;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
         }
-        button:hover {
-            background-color: #0056b3;
+
+        .btn-close:hover {
+            background: rgba(239, 68, 68, 0.8);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* CONTROLES DE POSE E ANIMAÇÃO */
+        .pose-presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-preset {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.4rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-preset:hover, .btn-preset.active {
+            background: var(--accent-color);
+            color: #000;
+            font-weight: 600;
+            border-color: var(--accent-color);
+        }
+
+        .joint-sliders {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .slider-group input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .slider-group input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .modal-actions {
+            margin-top: auto;
+            display: flex;
+            gap: 0.75rem;
+            padding-top: 1rem;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        /* SCROLLBAR PERSONALIZADO */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
         }
     </style>
 </head>
 <body>
-    <button onclick="downloadSkin()">Baixe sua reserva de Skin Eletrick</button>
 
+    <!-- ==========================================================================
+       BARRA SUPERIOR (HEADER)
+       ========================================================================== -->
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">3D</div>
+            <div class="logo-title">Minecraft Skin Vault</div>
+        </div>
+
+        <div class="header-controls">
+            <!-- Pesquisa em tempo real -->
+            <div class="search-box">
+                <svg class="search-icon" viewBox="0 0 24 24">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+                <input type="text" id="searchInput" placeholder="Buscar skin por nome...">
+            </div>
+
+            <!-- Seletor de cor de fundo em tempo real -->
+            <div class="color-picker-wrapper">
+                <span>Fundo:</span>
+                <input type="color" id="bgColorPicker" value="#0f172a" title="Escolher cor de fundo">
+            </div>
+
+            <!-- Botão de Atualizar Biblioteca -->
+            <button class="btn btn-secondary" id="btnRefresh" title="Recarregar pasta de skins">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 4v6h-6M1 20v-6h6"></path>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                Atualizar
+            </button>
+
+            <!-- Contador de Skins -->
+            <div class="badge" id="skinCounter">0 Skins Carregadas</div>
+        </div>
+    </header>
+
+    <!-- BANNER DE EXPLICAÇÃO DA DETECÇÃO AUTOMÁTICA -->
+    <div class="info-banner">
+        <span>📁 Diretório monitorado: <strong>img/skins/</strong></span>
+        <span>
+            💡 <strong>Nota técnica de detecção:</strong> Em navegadores web e GitHub Pages, a listagem do sistema de arquivos é feita automaticamente via API do repositório/varredura dinâmica. Para servidores locais Node.js, veja as instruções comentadas no código JS.
+        </span>
+    </div>
+
+    <!-- ==========================================================================
+       CONTEÚDO PRINCIPAL (GRADE DE CARDS)
+       ========================================================================== -->
+    <main>
+        <div class="skin-grid" id="skinGrid">
+            <!-- Os cards de skins serão gerados dinamicamente via JS -->
+        </div>
+    </main>
+
+    <!-- ==========================================================================
+       PAINEL MODAL (VISUALIZADOR 3D + EDITOR DE POSES)
+       ========================================================================== -->
+    <div class="modal-overlay" id="skinModal">
+        <div class="modal-container">
+            
+            <!-- Canvas 3D Interativo -->
+            <div class="modal-viewport" id="viewportContainer">
+                <canvas id="modalCanvas"></canvas>
+                <div class="viewport-controls-hint">
+                    🖱️ Arrastar: Rotacionar | Scroll: Zoom | Botão Meio: Mover
+                </div>
+            </div>
+
+            <!-- Sidebar de Controles e Informações -->
+            <div class="modal-sidebar">
+                <div class="modal-header">
+                    <div class="modal-title-group">
+                        <h2 id="modalSkinName">Skin Name</h2>
+                        <span class="tag" id="modalSkinFormat">64x64</span>
+                    </div>
+                    <button class="btn-close" id="btnCloseModal">&times;</button>
+                </div>
+
+                <!-- Detalhes do arquivo -->
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Modelo</span>
+                        <span class="info-value" id="modalModelType">Steve (4px)</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Resolução</span>
+                        <span class="info-value" id="modalResolution">64x64</span>
+                    </div>
+                </div>
+
+                <!-- Editor de Poses -->
+                <div>
+                    <div class="section-title">Editor de Poses</div>
+                    
+                    <div class="pose-presets">
+                        <button class="btn-preset active" data-pose="default">Padrão</button>
+                        <button class="btn-preset" data-pose="walk">Andando</button>
+                        <button class="btn-preset" data-pose="run">Correndo</button>
+                        <button class="btn-preset" data-pose="sit">Sentado</button>
+                        <button class="btn-preset" data-pose="attack">Ataque</button>
+                        <button class="btn-preset" data-pose="custom">Livre</button>
+                    </div>
+
+                    <div class="joint-sliders">
+                        <div class="slider-group">
+                            <div class="slider-header"><span>Auto Rotação</span></div>
+                            <button class="btn btn-secondary" id="btnToggleAutoRotate" style="padding:0.3rem; font-size:0.8rem;">Ativar Auto-Giro</button>
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-header"><span>Cabeça (Inclin.)</span><span id="valHeadX">0°</span></div>
+                            <input type="range" id="slideHeadX" min="-45" max="45" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-header"><span>Cabeça (Giro)</span><span id="valHeadY">0°</span></div>
+                            <input type="range" id="slideHeadY" min="-45" max="45" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-header"><span>Braço D. (Pitch)</span><span id="valArmRX">0°</span></div>
+                            <input type="range" id="slideArmRX" min="-180" max="180" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-header"><span>Braço E. (Pitch)</span><span id="valArmLX">0°</span></div>
+                            <input type="range" id="slideArmLX" min="-180" max="180" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-header"><span>Perna D. (Pitch)</span><span id="valLegRX">0°</span></div>
+                            <input type="range" id="slideLegRX" min="-90" max="90" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-header"><span>Perna E. (Pitch)</span><span id="valLegLX">0°</span></div>
+                            <input type="range" id="slideLegLX" min="-90" max="90" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="btnResetPose">Resetar Pose</button>
+                    <button class="btn" id="btnDownload">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Baixar Textura
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       CÓDIGO JAVASCRIPT (LÓGICA DO SISTEMA, THREE.JS E DETECÇÃO)
+       ========================================================================== -->
     <script>
-        function downloadSkin() {
-            const link = document.createElement('a');
-            link.href = 'img/Eletrickz100.png';
-            link.download = 'Eletrickz100.png';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        /**
+         * ====================================================================
+         * EXPLICAÇÃO TÉCNICA DA DETECÇÃO AUTOMÁTICA DE ARQUIVOS NO NAVEGADOR
+         * ====================================================================
+         * Navegadores por motivos de segurança (CORS/File System Security) não possuem
+         * acesso direto de leitura para listar pastas locais em servidores estáticos.
+         * 
+         * SOLUÇÃO IMPLEMENTADA NESTE PROJETO:
+         * 1. Detecção automática para GitHub Pages usando a API oficial de conteúdos da GitHub.
+         * 2. Varredura dinâmica de arquivos (probes HTTP) para identificar PNGs na pasta img/skins/.
+         * 3. Fallback inteligente com lista estendida para garantir funcionamento imediato.
+         * 
+         * CASO DESEJE EXECUTAR EM UM SERVIDOR NODE.JS LOCAL:
+         * Você pode criar um servidor simples `server.js` com o seguinte trecho:
+         * --------------------------------------------------------------------
+         * const express = require('express');
+         * const fs = require('fs');
+         * const app = express();
+         * app.use(express.static('.'));
+         * app.get('/api/skins', (req, res) => {
+         *     fs.readdir('./img/skins', (err, files) => {
+         *         res.json(files.filter(f => f.endsWith('.png')));
+         *     });
+         * });
+         * app.listen(3000, () => console.log('Servidor ativo em http://localhost:3000'));
+         * --------------------------------------------------------------------
+         */
+
+        // State Global da Aplicação
+        const state = {
+            skins: [],
+            filteredSkins: [],
+            activeSkin: null,
+            textureCache: new Map(),
+            autoRotate: false,
+            currentPose: 'default'
+        };
+
+        // Elementos DOM
+        const DOM = {
+            skinGrid: document.getElementById('skinGrid'),
+            searchInput: document.getElementById('searchInput'),
+            bgColorPicker: document.getElementById('bgColorPicker'),
+            btnRefresh: document.getElementById('btnRefresh'),
+            skinCounter: document.getElementById('skinCounter'),
+            skinModal: document.getElementById('skinModal'),
+            btnCloseModal: document.getElementById('btnCloseModal'),
+            modalSkinName: document.getElementById('modalSkinName'),
+            modalSkinFormat: document.getElementById('modalSkinFormat'),
+            modalModelType: document.getElementById('modalModelType'),
+            modalResolution: document.getElementById('modalResolution'),
+            btnDownload: document.getElementById('btnDownload'),
+            btnResetPose: document.getElementById('btnResetPose'),
+            btnToggleAutoRotate: document.getElementById('btnToggleAutoRotate'),
+            viewportContainer: document.getElementById('viewportContainer'),
+            modalCanvas: document.getElementById('modalCanvas')
+        };
+
+        // Instâncias 3D da Modal
+        let modalScene, modalCamera, modalRenderer, modalControls, characterMeshGroup, characterParts;
+
+        // ==========================================================================
+        // INICIALIZAÇÃO DA APLICAÇÃO
+        // ==========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            initBackgroundColor();
+            init3DScene();
+            loadSkinsLibrary();
+            setupEventListeners();
+        });
+
+        // Cor de fundo persistente via localStorage
+        function initBackgroundColor() {
+            const savedColor = localStorage.getItem('mc_vault_bg_color') || '#0f172a';
+            DOM.bgColorPicker.value = savedColor;
+            document.documentElement.style.setProperty('--bg-color', savedColor);
+        }
+
+        DOM.bgColorPicker.addEventListener('input', (e) => {
+            const color = e.target.value;
+            document.documentElement.style.setProperty('--bg-color', color);
+            localStorage.setItem('mc_vault_bg_color', color);
+            if (modalScene) {
+                modalScene.background = new THREE.Color(color);
+            }
+        });
+
+        // ==========================================================================
+        // MOTOR DE DETECÇÃO AUTOMÁTICA DE SKINS
+        // ==========================================================================
+        async function loadSkinsLibrary() {
+            DOM.skinGrid.innerHTML = `<div class="empty-state"><h3>Carregando biblioteca de skins...</h3></div>`;
+            state.skins = [];
+
+            let discoveredFiles = new Set();
+
+            // Método 1: Tentar detectar via GitHub API se hospedado no GitHub Pages
+            try {
+                const pathParts = window.location.pathname.split('/').filter(Boolean);
+                const host = window.location.hostname;
+                if (host.includes('github.io') && pathParts.length > 0) {
+                    const owner = host.split('.')[0];
+                    const repo = pathParts[0];
+                    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/img/skins`;
+                    const res = await fetch(apiUrl);
+                    if (res.ok) {
+                        const data = await res.json();
+                        data.filter(item => item.name.endsWith('.png')).forEach(item => discoveredFiles.add(item.name));
+                    }
+                }
+            } catch (err) {
+                console.warn('Detecção via GitHub API indisponível, usando método de scanner.');
+            }
+
+            // Método 2: Scanner dinâmico de nomes comuns + padrão skin1.png, skin2.png ...
+            const candidateNames = [
+                'skin1.png', 'skin2.png', 'skin3.png', 'skin4.png', 'skin5.png',
+                'steve.png', 'alex.png', 'cyberpunk.png', 'knight.png', 'enderman.png',
+                'zombie.png', 'creeper.png', 'hero.png', 'ninja.png', 'robot.png'
+            ];
+            
+            // Adiciona padrões sequenciais
+            for (let i = 1; i <= 30; i++) {
+                candidateNames.push(`skin${i}.png`);
+                candidateNames.push(`skin_${i}.png`);
+            }
+
+            candidateNames.forEach(name => discoveredFiles.add(name));
+
+            // Testar existência de cada imagem em paralelo com Lazy Load
+            const loadPromises = Array.from(discoveredFiles).map(filename => checkAndRegisterSkin(`img/skins/${filename}`, filename));
+            await Promise.all(loadPromises);
+
+            state.filteredSkins = [...state.skins];
+            renderGrid();
+        }
+
+        function checkAndRegisterSkin(url, filename) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = () => {
+                    // Skin válida encontrada! Processar textura e dimensões
+                    const processedData = processSkinTexture(img);
+                    const skinObj = {
+                        id: filename,
+                        name: filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
+                        filename: filename,
+                        url: url,
+                        imgElement: img,
+                        processedCanvas: processedData.canvas,
+                        isAlex: processedData.isAlex,
+                        isLegacy: processedData.isLegacy,
+                        resolution: `${img.width}x${img.height}`
+                    };
+                    state.skins.push(skinObj);
+                    resolve();
+                };
+                img.onerror = () => resolve(); // Arquivo não existe na pasta
+                img.src = url;
+            });
+        }
+
+        // ==========================================================================
+        // PROCESSAMENTO DE TEXTURAS (SUPORTE STEVE, ALEX, 64x64 E 64x32 LEGACY)
+        // ==========================================================================
+        function processSkinTexture(img) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+
+            ctx.drawImage(img, 0, 0);
+
+            const isLegacy = (img.height === 32);
+
+            // Converter skins antigas 64x32 para o padrão novo 64x64
+            if (isLegacy) {
+                // Copiar Perna Direita para Perna Esquerda (espelhado)
+                copySkinRect(ctx, img, 0, 16, 16, 16, 16, 48, true);
+                // Copiar Braço Direito para Braço Esquerdo (espelhado)
+                copySkinRect(ctx, img, 40, 16, 16, 16, 32, 48, true);
+            }
+
+            // Detecção Automática de Modelo Alex (3px) vs Steve (4px)
+            // Checa a transparência de pixels na área do braço
+            const pixelData = ctx.getImageData(54, 20, 1, 1).data;
+            const isAlex = (pixelData[3] === 0);
+
+            return { canvas, isLegacy, isAlex };
+        }
+
+        function copySkinRect(ctx, img, sx, sy, sw, sh, dx, dy, flipHorizontally) {
+            ctx.save();
+            if (flipHorizontally) {
+                ctx.translate(dx + sw, dy);
+                ctx.scale(-1, 1);
+                ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+            } else {
+                ctx.drawImage(img, sx, sy, sw, sh, dx, dy, sw, sh);
+            }
+            ctx.restore();
+        }
+
+        // ==========================================================================
+        // RENDERIZAÇÃO DA GRADE DE CARDS E SNAPSHOTS 3D
+        // ==========================================================================
+        function renderGrid() {
+            DOM.skinGrid.innerHTML = '';
+            DOM.skinCounter.textContent = `${state.filteredSkins.length} Skins Carregadas`;
+
+            if (state.filteredSkins.length === 0) {
+                DOM.skinGrid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Nenhuma skin encontrada</h3>
+                        <p>Certifique-se de adicionar imagens .png dentro da pasta <strong>img/skins/</strong></p>
+                    </div>`;
+                return;
+            }
+
+            state.filteredSkins.forEach(skin => {
+                const card = document.createElement('div');
+                card.className = 'skin-card';
+                card.dataset.id = skin.id;
+
+                const thumbnailDataUrl = generateSkinThumbnail(skin);
+
+                card.innerHTML = `
+                    <div class="card-preview">
+                        <img src="${thumbnailDataUrl}" alt="${skin.name}" loading="lazy">
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title" title="${skin.filename}">${skin.filename}</div>
+                        <div class="card-tags">
+                            <span class="tag">${skin.resolution}</span>
+                            <span class="tag">${skin.isAlex ? 'Alex (3px)' : 'Steve (4px)'}</span>
+                        </div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => openModal(skin));
+                DOM.skinGrid.appendChild(card);
+            });
+        }
+
+        // Gerador de Render Snapshot 2D da textura em 3D leve para thumbnail
+        function generateSkinThumbnail(skin) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 160;
+            canvas.height = 200;
+            const ctx = canvas.getContext('2d');
+
+            // Renderiza um preview estilizado da textura diretamente no canvas 2D
+            ctx.imageSmoothingEnabled = false;
+            // Cabeça
+            ctx.drawImage(skin.processedCanvas, 8, 8, 8, 8, 48, 20, 64, 64);
+            // Hat layer se houver
+            ctx.drawImage(skin.processedCanvas, 40, 8, 8, 8, 44, 16, 72, 72);
+            // Corpo
+            ctx.drawImage(skin.processedCanvas, 20, 20, 8, 12, 48, 84, 64, 96);
+
+            return canvas.toDataURL();
+        }
+
+        // ==========================================================================
+        // CONSTRUTOR DO MODELO 3D DO MINECRAFT (THREE.JS COM CAMADAS E UVs)
+        // ==========================================================================
+        function createMinecraftCharacter(textureCanvas, isAlex) {
+            const texture = new THREE.CanvasTexture(textureCanvas);
+            texture.magFilter = THREE.NearestFilter;
+            texture.minFilter = THREE.NearestFilter;
+
+            const baseMat = new THREE.MeshStandardMaterial({
+                map: texture,
+                transparent: true,
+                alphaTest: 0.1,
+                roughness: 0.7,
+                metalness: 0.1
+            });
+
+            const outerMat = new THREE.MeshStandardMaterial({
+                map: texture,
+                transparent: true,
+                alphaTest: 0.1,
+                roughness: 0.7,
+                metalness: 0.1,
+                side: THREE.DoubleSide
+            });
+
+            const characterGroup = new THREE.Group();
+            const armW = isAlex ? 3 : 4;
+            const armOffset = 4 + armW / 2;
+
+            // Função para mapear UVs de caixa do Minecraft perfeitamente no Three.js
+            function createBox(w, h, d, u, v, mat, scaleOffset = 0) {
+                const geo = new THREE.BoxGeometry(w + scaleOffset, h + scaleOffset, d + scaleOffset);
+                
+                const uvs = [];
+                const toUV = (x, y) => [x / 64, 1 - (y / 64)];
+
+                function addFace(x1, y1, x2, y2) {
+                    const [u1, v1] = toUV(x1, y1);
+                    const [u2, v2] = toUV(x2, y2);
+                    uvs.push(u1, v1, u2, v1, u1, v2, u2, v2);
+                }
+
+                // Ordem de faces Three.js BoxGeometry: +X, -X, +Y, -Y, +Z, -Z
+                addFace(u, v + d, u + d, v + d + h);            // Direita
+                addFace(u + d + w, v + d, u + d + w + d, v + d + h); // Esquerda
+                addFace(u + d, v, u + d + w, v + d);            // Topo
+                addFace(u + d + w, v, u + d + w + w, v + d);    // Base
+                addFace(u + d, v + d, u + d + w, v + d + h);    // Frente
+                addFace(u + d + w + d, v + d, u + d + w + d + w, v + d + h); // Costas
+
+                geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                return mesh;
+            }
+
+            // CABEÇA (Pivot no pescoço)
+            const headGroup = new THREE.Group();
+            headGroup.position.set(0, 24, 0);
+            const headMesh = createBox(8, 8, 8, 0, 0, baseMat);
+            headMesh.position.set(0, 4, 0);
+            const hatMesh = createBox(8, 8, 8, 32, 0, outerMat, 0.6);
+            hatMesh.position.set(0, 4, 0);
+            headGroup.add(headMesh, hatMesh);
+
+            // CORPO (Pivot na cintura)
+            const bodyGroup = new THREE.Group();
+            bodyGroup.position.set(0, 12, 0);
+            const bodyMesh = createBox(8, 12, 4, 16, 16, baseMat);
+            bodyMesh.position.set(0, 6, 0);
+            const jacketMesh = createBox(8, 12, 4, 16, 32, outerMat, 0.5);
+            jacketMesh.position.set(0, 6, 0);
+            bodyGroup.add(bodyMesh, jacketMesh);
+
+            // BRAÇO DIREITO (Pivot no ombro)
+            const rightArmGroup = new THREE.Group();
+            rightArmGroup.position.set(-armOffset, 22, 0);
+            const rArmMesh = createBox(armW, 12, 4, 40, 16, baseMat);
+            rArmMesh.position.set(0, -6, 0);
+            const rSleeveMesh = createBox(armW, 12, 4, 40, 32, outerMat, 0.5);
+            rSleeveMesh.position.set(0, -6, 0);
+            rightArmGroup.add(rArmMesh, rSleeveMesh);
+
+            // BRAÇO ESQUERDO (Pivot no ombro)
+            const leftArmGroup = new THREE.Group();
+            leftArmGroup.position.set(armOffset, 22, 0);
+            const lArmMesh = createBox(armW, 12, 4, 32, 48, baseMat);
+            lArmMesh.position.set(0, -6, 0);
+            const lSleeveMesh = createBox(armW, 12, 4, 48, 48, outerMat, 0.5);
+            lSleeveMesh.position.set(0, -6, 0);
+            leftArmGroup.add(lArmMesh, lSleeveMesh);
+
+            // PERNA DIREITA (Pivot no quadril)
+            const rightLegGroup = new THREE.Group();
+            rightLegGroup.position.set(-2, 12, 0);
+            const rLegMesh = createBox(4, 12, 4, 0, 16, baseMat);
+            rLegMesh.position.set(0, -6, 0);
+            const rPantsMesh = createBox(4, 12, 4, 0, 32, outerMat, 0.5);
+            rPantsMesh.position.set(0, -6, 0);
+            rightLegGroup.add(rLegMesh, rPantsMesh);
+
+            // PERNA ESQUERDA (Pivot no quadril)
+            const leftLegGroup = new THREE.Group();
+            leftLegGroup.position.set(2, 12, 0);
+            const lLegMesh = createBox(4, 12, 4, 16, 48, baseMat);
+            lLegMesh.position.set(0, -6, 0);
+            const lPantsMesh = createBox(4, 12, 4, 0, 48, outerMat, 0.5);
+            lPantsMesh.position.set(0, -6, 0);
+            leftLegGroup.add(lLegMesh, lPantsMesh);
+
+            characterGroup.add(headGroup, bodyGroup, rightArmGroup, leftArmGroup, rightLegGroup, leftLegGroup);
+
+            // Ajustar escala global e centralizar
+            characterGroup.scale.set(0.12, 0.12, 0.12);
+            characterGroup.position.set(0, -1.8, 0);
+
+            return {
+                group: characterGroup,
+                parts: {
+                    head: headGroup,
+                    body: bodyGroup,
+                    rightArm: rightArmGroup,
+                    leftArm: leftArmGroup,
+                    rightLeg: rightLegGroup,
+                    leftLeg: leftLegGroup
+                }
+            };
+        }
+
+        // ==========================================================================
+        // CONFIGURAÇÃO DO CENÁRIO 3D PRINCIPAL (VIEWPORT MODAL)
+        // ==========================================================================
+        function init3DScene() {
+            modalScene = new THREE.Scene();
+            modalScene.background = new THREE.Color(DOM.bgColorPicker.value);
+
+            modalCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+            modalCamera.position.set(0, 0.5, 7);
+
+            modalRenderer = new THREE.WebGLRenderer({
+                canvas: DOM.modalCanvas,
+                antialias: true,
+                alpha: true
+            });
+            modalRenderer.setPixelRatio(window.devicePixelRatio);
+            modalRenderer.shadowMap.enabled = true;
+            modalRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+            // Iluminação Estúdio
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            modalScene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(5, 10, 7);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 1024;
+            dirLight.shadow.mapSize.height = 1024;
+            modalScene.add(dirLight);
+
+            const backLight = new THREE.DirectionalLight(0x38bdf8, 0.4);
+            backLight.position.set(-5, 5, -5);
+            modalScene.add(backLight);
+
+            // Sombra no Chão
+            const shadowPlane = new THREE.Mesh(
+                new THREE.PlaneGeometry(10, 10),
+                new THREE.ShadowMaterial({ opacity: 0.3 })
+            );
+            shadowPlane.rotation.x = -Math.PI / 2;
+            shadowPlane.position.y = -3.2;
+            shadowPlane.receiveShadow = true;
+            modalScene.add(shadowPlane);
+
+            // Controles de Órbita (Mouse/Touch)
+            modalControls = new THREE.OrbitControls(modalCamera, DOM.modalCanvas);
+            modalControls.enableDamping = true;
+            modalControls.dampingFactor = 0.05;
+            modalControls.maxPolarAngle = Math.PI / 2 + 0.1;
+            modalControls.minDistance = 2;
+            modalControls.maxDistance = 12;
+
+            // Loop de Animação Render 60 FPS
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                if (state.autoRotate && characterMeshGroup) {
+                    characterMeshGroup.rotation.y += 0.01;
+                }
+
+                modalControls.update();
+                modalRenderer.render(modalScene, modalCamera);
+            }
+            animate();
+
+            // Ajustar tamanho quando a janela for redimensionada
+            window.addEventListener('resize', resizeCanvas);
+        }
+
+        function resizeCanvas() {
+            if (!DOM.viewportContainer) return;
+            const width = DOM.viewportContainer.clientWidth;
+            const height = DOM.viewportContainer.clientHeight;
+            modalCamera.aspect = width / height;
+            modalCamera.updateProjectionMatrix();
+            modalRenderer.setSize(width, height, false);
+        }
+
+        // ==========================================================================
+        // ABERTURA DA MODAL E CARREGAMENTO DA SKIN SELECIONADA
+        // ==========================================================================
+        function openModal(skin) {
+            state.activeSkin = skin;
+            
+            // Atualizar Informações de Texto
+            DOM.modalSkinName.textContent = skin.filename;
+            DOM.modalSkinFormat.textContent = skin.resolution;
+            DOM.modalResolution.textContent = skin.resolution;
+            DOM.modalModelType.textContent = skin.isAlex ? 'Alex (Braços 3px)' : 'Steve (Braços 4px)';
+
+            // Remover personagem anterior do cenário
+            if (characterMeshGroup) {
+                modalScene.remove(characterMeshGroup);
+            }
+
+            // Criar novo personagem 3D com a textura processada
+            const charObj = createMinecraftCharacter(skin.processedCanvas, skin.isAlex);
+            characterMeshGroup = charObj.group;
+            characterParts = charObj.parts;
+            modalScene.add(characterMeshGroup);
+
+            // Resetar Câmera e Pose
+            modalCamera.position.set(0, 0.5, 7);
+            modalControls.target.set(0, 0, 0);
+            applyPose('default');
+
+            // Exibir Modal
+            DOM.skinModal.classList.add('active');
+            setTimeout(resizeCanvas, 50);
+        }
+
+        function closeModal() {
+            DOM.skinModal.classList.remove('active');
+            state.autoRotate = false;
+            DOM.btnToggleAutoRotate.classList.remove('btn-secondary');
+            DOM.btnToggleAutoRotate.textContent = 'Ativar Auto-Giro';
+        }
+
+        // ==========================================================================
+        // SISTEMA DO EDITOR DE POSES (PRESETS + SLIDERS)
+        // ==========================================================================
+        const degToRad = (deg) => (deg * Math.PI) / 180;
+
+        function applyPose(poseName) {
+            if (!characterParts) return;
+
+            state.currentPose = poseName;
+            
+            // Destacar botão ativo
+            document.querySelectorAll('.btn-preset').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.pose === poseName);
+            });
+
+            // Reseta posições das juntas
+            characterParts.body.position.set(0, 12, 0);
+
+            let angles = {
+                headX: 0, headY: 0,
+                armRX: 0, armLX: 0,
+                legRX: 0, legLX: 0
+            };
+
+            switch (poseName) {
+                case 'walk':
+                    angles = { headX: 0, headY: 0, armRX: 30, armLX: -30, legRX: -30, legLX: 30 };
+                    break;
+                case 'run':
+                    angles = { headX: 10, headY: 0, armRX: 60, armLX: -60, legRX: -50, legLX: 50 };
+                    break;
+                case 'sit':
+                    angles = { headX: 0, headY: 0, armRX: 20, armLX: 20, legRX: -90, legLX: -90 };
+                    characterParts.body.position.y = 8;
+                    break;
+                case 'attack':
+                    angles = { headX: 0, headY: 15, armRX: -80, armLX: 20, legRX: -20, legLX: 20 };
+                    break;
+                case 'default':
+                default:
+                    angles = { headX: 0, headY: 0, armRX: 0, armLX: 0, legRX: 0, legLX: 0 };
+                    break;
+            }
+
+            // Atualiza Sliders na Interface
+            document.getElementById('slideHeadX').value = angles.headX;
+            document.getElementById('slideHeadY').value = angles.headY;
+            document.getElementById('slideArmRX').value = angles.armRX;
+            document.getElementById('slideArmLX').value = angles.armLX;
+            document.getElementById('slideLegRX').value = angles.legRX;
+            document.getElementById('slideLegLX').value = angles.legLX;
+
+            updateJointRotations();
+        }
+
+        function updateJointRotations() {
+            if (!characterParts) return;
+
+            const hX = parseInt(document.getElementById('slideHeadX').value);
+            const hY = parseInt(document.getElementById('slideHeadY').value);
+            const aRX = parseInt(document.getElementById('slideArmRX').value);
+            const aLX = parseInt(document.getElementById('slideArmLX').value);
+            const lRX = parseInt(document.getElementById('slideLegRX').value);
+            const lLX = parseInt(document.getElementById('slideLegLX').value);
+
+            // Atualiza textos
+            document.getElementById('valHeadX').textContent = `${hX}°`;
+            document.getElementById('valHeadY').textContent = `${hY}°`;
+            document.getElementById('valArmRX').textContent = `${aRX}°`;
+            document.getElementById('valArmLX').textContent = `${aLX}°`;
+            document.getElementById('valLegRX').textContent = `${lRX}°`;
+            document.getElementById('valLegLX').textContent = `${lLX}°`;
+
+            // Aplica rotações 3D
+            characterParts.head.rotation.x = degToRad(hX);
+            characterParts.head.rotation.y = degToRad(hY);
+            characterParts.rightArm.rotation.x = degToRad(aRX);
+            characterParts.leftArm.rotation.x = degToRad(aLX);
+            characterParts.rightLeg.rotation.x = degToRad(lRX);
+            characterParts.leftLeg.rotation.x = degToRad(lLX);
+        }
+
+        // ==========================================================================
+        // LISTENERS E EVENTOS DA INTERFACE
+        // ==========================================================================
+        function setupEventListeners() {
+            // Fechar Modal
+            DOM.btnCloseModal.addEventListener('click', closeModal);
+            DOM.skinModal.addEventListener('click', (e) => {
+                if (e.target === DOM.skinModal) closeModal();
+            });
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+
+            // Pesquisa em tempo real
+            DOM.searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                state.filteredSkins = state.skins.filter(s => 
+                    s.filename.toLowerCase().includes(query) || 
+                    s.name.toLowerCase().includes(query)
+                );
+                renderGrid();
+            });
+
+            // Botão de recarregar biblioteca
+            DOM.btnRefresh.addEventListener('click', () => {
+                loadSkinsLibrary();
+            });
+
+            // Presets de Pose
+            document.querySelectorAll('.btn-preset').forEach(btn => {
+                btn.addEventListener('click', () => applyPose(btn.dataset.pose));
+            });
+
+            // Sliders de junta
+            const sliders = ['slideHeadX', 'slideHeadY', 'slideArmRX', 'slideArmLX', 'slideLegRX', 'slideLegLX'];
+            sliders.forEach(id => {
+                document.getElementById(id).addEventListener('input', () => {
+                    updateJointRotations();
+                    // Marca preset como customizado quando alterar slider
+                    document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+                });
+            });
+
+            // Resetar Pose
+            DOM.btnResetPose.addEventListener('click', () => applyPose('default'));
+
+            // Auto Rotação Toggle
+            DOM.btnToggleAutoRotate.addEventListener('click', () => {
+                state.autoRotate = !state.autoRotate;
+                DOM.btnToggleAutoRotate.textContent = state.autoRotate ? 'Parar Auto-Giro' : 'Ativar Auto-Giro';
+                DOM.btnToggleAutoRotate.classList.toggle('btn-secondary', !state.autoRotate);
+            });
+
+            // Download da Imagem do Skin PNG
+            DOM.btnDownload.addEventListener('click', () => {
+                if (!state.activeSkin) return;
+                const link = document.createElement('a');
+                link.download = state.activeSkin.filename;
+                link.href = state.activeSkin.processedCanvas.toDataURL('image/png');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
         }
     </script>
 </body>
