@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft 3D Skin Vault - EletrickZ100</title>
+    <title>Minecraft Skin Vault - EletrickZ100</title>
     
-    <!-- BIBLIOTECA OFICIAL SKINVIEW3D (Inclui Three.js e controles de renderização) -->
+    <!-- BIBLIOTECA SKINVIEW3D -->
     <script src="https://cdn.jsdelivr.net/npm/skinview3d@3.0.1/bundles/skinview3d.bundle.js"></script>
 
     <style>
@@ -543,7 +543,7 @@
         <div class="skin-grid" id="skinGrid"></div>
     </main>
 
-    <!-- PAINEL MODAL COM SKINVIEW3D -->
+    <!-- PAINEL MODAL -->
     <div class="modal-overlay" id="skinModal">
         <div class="modal-container">
             <div class="modal-viewport" id="viewportContainer">
@@ -557,19 +557,19 @@
                 <div class="modal-header">
                     <div class="modal-title-group">
                         <h2 id="modalSkinName">Skin Name</h2>
-                        <span class="tag" id="modalSkinFormat">3D Render</span>
+                        <span class="tag" id="modalSkinFormat">Minecraft Skin</span>
                     </div>
                     <button class="btn-close" id="btnCloseModal">&times;</button>
                 </div>
 
                 <div class="info-grid">
                     <div class="info-item">
-                        <span class="info-label">Motor 3D</span>
-                        <span class="info-value">Skinview3D</span>
+                        <span class="info-label">Arquivo</span>
+                        <span class="info-value" id="modalSkinFilename">skin.png</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Status</span>
-                        <span class="info-value">Textura Ativa</span>
+                        <span class="info-value">Pronto</span>
                     </div>
                 </div>
 
@@ -632,7 +632,7 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO MANUAL DE ARQUIVOS (SEM #)
+        // LISTA DE ARQUIVOS DE SKIN (SEM #)
         const SKINS_ESPECIAIS = [
             "EletrickZ100_outfit_10.png",
             "EletrickZ100_outfit_11.png",
@@ -667,6 +667,7 @@
             skinModal: document.getElementById('skinModal'),
             btnCloseModal: document.getElementById('btnCloseModal'),
             modalSkinName: document.getElementById('modalSkinName'),
+            modalSkinFilename: document.getElementById('modalSkinFilename'),
             btnDownload: document.getElementById('btnDownload'),
             btnResetPose: document.getElementById('btnResetPose'),
             btnToggleAutoRotate: document.getElementById('btnToggleAutoRotate'),
@@ -674,7 +675,6 @@
             modalCanvas: document.getElementById('modalCanvas')
         };
 
-        // Instância principal do SkinViewer (Skinview3D)
         let mainViewer = null;
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -702,7 +702,7 @@
         // DETECÇÃO E CARREGAMENTO DE SKINS
         // ==========================================================================
         async function loadSkinsLibrary() {
-            DOM.skinGrid.innerHTML = `<div class="empty-state"><h3>Carregando biblioteca com Skinview3D...</h3></div>`;
+            DOM.skinGrid.innerHTML = `<div class="empty-state"><h3>Processando biblioteca de skins...</h3></div>`;
             state.skins = [];
 
             const candidateFiles = new Set();
@@ -733,61 +733,76 @@
                 }
             } catch (e) {}
 
-            const loadPromises = Array.from(candidateFiles).map(filename => checkAndRegisterSkin(`img/skins/${filename}`, filename));
-            await Promise.all(loadPromises);
+            // Filtra e valida existência das imagens
+            const validSkins = [];
+            const checkPromises = Array.from(candidateFiles).map(filename => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.crossOrigin = 'Anonymous';
+                    img.onload = () => {
+                        validSkins.push({
+                            id: filename,
+                            name: filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
+                            filename: filename,
+                            url: `img/skins/${filename}`
+                        });
+                        resolve();
+                    };
+                    img.onerror = () => resolve();
+                    img.src = `img/skins/${filename}`;
+                });
+            });
 
-            state.skins.sort((a, b) => a.filename.localeCompare(b.filename, undefined, { numeric: true, sensitivity: 'base' }));
+            await Promise.all(checkPromises);
+
+            // Ordena numericamente
+            validSkins.sort((a, b) => a.filename.localeCompare(b.filename, undefined, { numeric: true, sensitivity: 'base' }));
+
+            // Renderiza os Thumbnails 3D sequencialmente para evitar estouro de memória/WebGL
+            await renderThumbnailsSequentially(validSkins);
+
             state.filteredSkins = [...state.skins];
             renderGrid();
         }
 
-        function checkAndRegisterSkin(url, filename) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.crossOrigin = 'Anonymous';
-                img.onload = async () => {
-                    // Renderiza um preview rápido utilizando skinview3d offscreen
-                    const previewUrl = await renderThumbnailWithSkinview3D(url);
+        // ==========================================================================
+        // RENDERIZAÇÃO ESTÁVEL E GARANTIDA DE CARDS (SINGLE WEBGL RENDERER)
+        // ==========================================================================
+        async function renderThumbnailsSequentially(skinList) {
+            // Cria um único canvas reutilizável para gerar os thumbnails
+            const offscreenCanvas = document.createElement('canvas');
+            offscreenCanvas.width = 180;
+            offscreenCanvas.height = 240;
+
+            const thumbViewer = new skinview3d.SkinViewer({
+                canvas: offscreenCanvas,
+                width: 180,
+                height: 240
+            });
+            thumbViewer.camera.position.set(0, 10, 38);
+            thumbViewer.fov = 50;
+
+            for (const item of skinList) {
+                try {
+                    // Garante que a textura carregou 100% antes de extrair a foto
+                    await thumbViewer.loadSkin(item.url);
+                    thumbViewer.render();
+                    const previewUrl = offscreenCanvas.toDataURL('image/png');
+
                     state.skins.push({
-                        id: filename,
-                        name: filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
-                        filename: filename,
-                        url: url,
+                        ...item,
                         previewUrl: previewUrl
                     });
-                    resolve();
-                };
-                img.onerror = () => resolve();
-                img.src = url;
-            });
-        }
+                } catch (err) {
+                    // Se falhar o render, usa a própria imagem PNG como fallback
+                    state.skins.push({
+                        ...item,
+                        previewUrl: item.url
+                    });
+                }
+            }
 
-        // ==========================================================================
-        // GERAÇÃO DE THUMBNAIL COM SKINVIEW3D OFFSCREEN
-        // ==========================================================================
-        async function renderThumbnailWithSkinview3D(skinUrl) {
-            return new Promise((resolve) => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 160;
-                canvas.height = 200;
-
-                const viewer = new skinview3d.SkinViewer({
-                    canvas: canvas,
-                    width: 160,
-                    height: 200,
-                    skin: skinUrl
-                });
-
-                viewer.camera.position.set(0, 10, 40);
-                viewer.fov = 60;
-
-                // Aguarda renderização completa
-                setTimeout(() => {
-                    const dataUrl = canvas.toDataURL('image/png');
-                    viewer.dispose(); // Libera memória WebGL
-                    resolve(dataUrl);
-                }, 100);
-            });
+            thumbViewer.dispose(); // Libera o contexto WebGL do gerador de thumbnails
         }
 
         // ==========================================================================
@@ -817,7 +832,7 @@
                     <div class="card-info">
                         <div class="card-title" title="${skin.filename}">${skin.filename}</div>
                         <div class="card-tags">
-                            <span class="tag">3D Skinview3D</span>
+                            <span class="tag">Minecraft</span>
                         </div>
                     </div>
                 `;
@@ -828,17 +843,17 @@
         }
 
         // ==========================================================================
-        // INICIALIZAÇÃO DO VIEWER PRINCIPAL NA MODAL (SKINVIEW3D)
+        // MODAL E VISUALIZADOR PRINCIPAL
         // ==========================================================================
         function openModal(skin) {
             state.activeSkin = skin;
             DOM.modalSkinName.textContent = skin.filename;
+            DOM.modalSkinFilename.textContent = skin.filename;
 
             const width = DOM.viewportContainer.clientWidth || 500;
             const height = DOM.viewportContainer.clientHeight || 500;
 
             if (!mainViewer) {
-                // Criação do SkinViewer oficial
                 mainViewer = new skinview3d.SkinViewer({
                     canvas: DOM.modalCanvas,
                     width: width,
@@ -854,8 +869,6 @@
             }
 
             mainViewer.background = DOM.bgColorPicker.value;
-
-            // Define pose inicial
             applyPose('idle');
 
             DOM.skinModal.classList.add('active');
@@ -874,9 +887,6 @@
             }
         }
 
-        // ==========================================================================
-        // SISTEMA DE ANIMAÇÕES E POSES COM SKINVIEW3D
-        // ==========================================================================
         const degToRad = (deg) => (deg * Math.PI) / 180;
 
         function applyPose(poseName) {
@@ -886,7 +896,6 @@
                 btn.classList.toggle('active', btn.dataset.pose === poseName);
             });
 
-            // Reseta animação ativa
             mainViewer.animation = null;
 
             switch (poseName) {
@@ -940,7 +949,6 @@
             }
         }
 
-        // LISTENERS DE EVENTOS
         function setupEventListeners() {
             DOM.btnCloseModal.addEventListener('click', closeModal);
             DOM.skinModal.addEventListener('click', (e) => {
@@ -970,7 +978,7 @@
             const sliders = ['slideHeadX', 'slideHeadY', 'slideArmRX', 'slideArmLX', 'slideLegRX', 'slideLegLX'];
             sliders.forEach(id => {
                 document.getElementById(id).addEventListener('input', () => {
-                    if (mainViewer) mainViewer.animation = null; // Pausa animação ao mexer no slider
+                    if (mainViewer) mainViewer.animation = null;
                     document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
                     updateJointSlidersFromModel();
                 });
