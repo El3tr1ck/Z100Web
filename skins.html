@@ -636,16 +636,16 @@
     <script>
         /**
          * ==========================================================================
-         * 📌 BLOCO DE CONFIGURAÇÃO CENTRAL DE SKINS (FÁCIL E FLEXÍVEL)
+         * 📌 CONFIGURAÇÃO CENTRAL DE SKINS (SEM O CARACTERE #)
          * ==========================================================================
-         * Para adicionar uma nova skin especial manualmente, basta colar o nome
-         * do arquivo dentro da lista `SKINS_ESPECIAIS` abaixo:
+         * Todos os arquivos foram renomeados substituindo # por _
+         * para garantir compatibilidade com Netlify e GitHub Pages.
          */
         const SKINS_ESPECIAIS = [
-            "EletrickZ100_outfit#10.png",
-            "EletrickZ100_outfit#11.png",
-            "EletrickZ100_outfit#8.png",
-            "EletrickZ100_outfit#9.png",
+            "EletrickZ100_outfit_10.png",
+            "EletrickZ100_outfit_11.png",
+            "EletrickZ100_outfit_8.png",
+            "EletrickZ100_outfit_9.png",
             "EletrickZ100_outfit2.png",
             "EletrickZ100_outfit3.2.png",
             "EletrickZ100_outfit3.png",
@@ -656,17 +656,10 @@
             "EletrickZ100_outfit7.png",
             "Eletrickz100.png",
             
-            // Skins sem numeração
+            // Skins especiais e formatos customizados (JPG/JPEG/PNG)
             "T3usHD.jpeg",
             "Davzz29.png"
         ];
-
-        /**
-         * Configuração do Gerador Automático de Numerações para EletrickZ100_outfit#
-         * O site varre e detecta automaticamente os números no intervalo abaixo:
-         */
-        const OUTFIT_PREFIX = "EletrickZ100_outfit#";
-        const OUTFIT_MAX_NUMBER = 50; // Busca do #1 até #50 dinamicamente
 
         // State Global
         const state = {
@@ -721,7 +714,7 @@
         });
 
         // ==========================================================================
-        // CARREGADOR INTELIGENTE DE SKINS
+        // CARREGADOR INTELIGENTE DE SKINS (GERADOR SEM #)
         // ==========================================================================
         async function loadSkinsLibrary() {
             DOM.skinGrid.innerHTML = `<div class="empty-state"><h3>Carregando skins...</h3></div>`;
@@ -732,12 +725,22 @@
             // 1. Adiciona a lista manual de skins especiais
             SKINS_ESPECIAIS.forEach(file => candidateFiles.add(file));
 
-            // 2. Gerador Automático de Numeração EletrickZ100_outfit#
-            for (let i = 1; i <= OUTFIT_MAX_NUMBER; i++) {
-                candidateFiles.add(`${OUTFIT_PREFIX}${i}.png`);
+            // 2. Gerador Automático de Numeração (Usa underline _ em vez de #)
+            const PREFIXES = ["EletrickZ100_outfit_", "EletrickZ100_outfit"];
+
+            for (let i = 1; i <= 30; i++) {
+                PREFIXES.forEach(prefix => {
+                    // Testa número inteiro (ex: EletrickZ100_outfit_7.png ou EletrickZ100_outfit7.png)
+                    candidateFiles.add(`${prefix}${i}.png`);
+
+                    // Testa variações decimais (ex: EletrickZ100_outfit_7.1.png, EletrickZ100_outfit7.2.png, etc.)
+                    for (let sub = 1; sub <= 5; sub++) {
+                        candidateFiles.add(`${prefix}${i}.${sub}.png`);
+                    }
+                });
             }
 
-            // 3. Tenta varredura dinâmica via GitHub API (Para GitHub Pages)
+            // 3. Tenta varredura dinâmica via GitHub API
             try {
                 const hostname = window.location.hostname;
                 const pathSegments = window.location.pathname.split('/').filter(Boolean);
@@ -758,7 +761,7 @@
             const loadPromises = Array.from(candidateFiles).map(filename => checkAndRegisterSkin(`img/skins/${filename}`, filename));
             await Promise.all(loadPromises);
 
-            // Ordena alfabeticamente/numericamente para organizar os outfits
+            // Ordena numericamente para organizar os outfits
             state.skins.sort((a, b) => a.filename.localeCompare(b.filename, undefined, { numeric: true, sensitivity: 'base' }));
 
             state.filteredSkins = [...state.skins];
@@ -785,7 +788,7 @@
                     state.skins.push(skinObj);
                     resolve();
                 };
-                img.onerror = () => resolve(); // Descarta se o arquivo não existir na pasta
+                img.onerror = () => resolve();
                 img.src = url;
             });
         }
