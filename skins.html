@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minecraft 3D Skin Vault - EletrickZ100</title>
     
-    <!-- BIBLIOTECAS THREE.JS E ORBITCONTROLS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- BIBLIOTECA OFICIAL SKINVIEW3D (Inclui Three.js e controles de renderização) -->
+    <script src="https://cdn.jsdelivr.net/npm/skinview3d@3.0.1/bundles/skinview3d.bundle.js"></script>
 
     <style>
         :root {
@@ -40,6 +39,7 @@
             overflow-x: hidden;
         }
 
+        /* HEADER E BARRA SUPERIOR */
         header {
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(12px);
@@ -184,6 +184,7 @@
             border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
+        /* GRID PRINCIPAL */
         main {
             flex: 1;
             padding: 2rem;
@@ -207,7 +208,6 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             flex-direction: column;
-            position: relative;
             backdrop-filter: blur(8px);
         }
 
@@ -279,7 +279,7 @@
             color: var(--text-muted);
         }
 
-        /* MODAL */
+        /* MODAL E VIEWPORT 3D */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -327,7 +327,6 @@
         .modal-viewport {
             flex: 1.2;
             position: relative;
-            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 80%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -544,7 +543,7 @@
         <div class="skin-grid" id="skinGrid"></div>
     </main>
 
-    <!-- PAINEL MODAL -->
+    <!-- PAINEL MODAL COM SKINVIEW3D -->
     <div class="modal-overlay" id="skinModal">
         <div class="modal-container">
             <div class="modal-viewport" id="viewportContainer">
@@ -558,32 +557,31 @@
                 <div class="modal-header">
                     <div class="modal-title-group">
                         <h2 id="modalSkinName">Skin Name</h2>
-                        <span class="tag" id="modalSkinFormat">64x64</span>
+                        <span class="tag" id="modalSkinFormat">3D Render</span>
                     </div>
                     <button class="btn-close" id="btnCloseModal">&times;</button>
                 </div>
 
                 <div class="info-grid">
                     <div class="info-item">
-                        <span class="info-label">Modelo</span>
-                        <span class="info-value" id="modalModelType">Steve (4px)</span>
+                        <span class="info-label">Motor 3D</span>
+                        <span class="info-value">Skinview3D</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Resolução</span>
-                        <span class="info-value" id="modalResolution">64x64</span>
+                        <span class="info-label">Status</span>
+                        <span class="info-value">Textura Ativa</span>
                     </div>
                 </div>
 
                 <div>
-                    <div class="section-title">Editor de Poses</div>
+                    <div class="section-title">Animações & Poses</div>
                     
                     <div class="pose-presets">
-                        <button class="btn-preset active" data-pose="default">Padrão</button>
+                        <button class="btn-preset active" data-pose="idle">Parado</button>
                         <button class="btn-preset" data-pose="walk">Andando</button>
                         <button class="btn-preset" data-pose="run">Correndo</button>
-                        <button class="btn-preset" data-pose="sit">Sentado</button>
-                        <button class="btn-preset" data-pose="attack">Ataque</button>
-                        <button class="btn-preset" data-pose="custom">Livre</button>
+                        <button class="btn-preset" data-pose="fly">Voando</button>
+                        <button class="btn-preset" data-pose="custom">Custom</button>
                     </div>
 
                     <div class="joint-sliders">
@@ -634,13 +632,7 @@
     </div>
 
     <script>
-        /**
-         * ==========================================================================
-         * 📌 CONFIGURAÇÃO CENTRAL DE SKINS (SEM O CARACTERE #)
-         * ==========================================================================
-         * Todos os arquivos foram renomeados substituindo # por _
-         * para garantir compatibilidade com Netlify e GitHub Pages.
-         */
+        // CONFIGURAÇÃO MANUAL DE ARQUIVOS (SEM #)
         const SKINS_ESPECIAIS = [
             "EletrickZ100_outfit_10.png",
             "EletrickZ100_outfit_11.png",
@@ -655,8 +647,6 @@
             "EletrickZ100_outfit7.2.png",
             "EletrickZ100_outfit7.png",
             "Eletrickz100.png",
-            
-            // Skins especiais e formatos customizados (JPG/JPEG/PNG)
             "T3usHD.jpeg",
             "Davzz29.png"
         ];
@@ -665,9 +655,7 @@
         const state = {
             skins: [],
             filteredSkins: [],
-            activeSkin: null,
-            autoRotate: false,
-            currentPose: 'default'
+            activeSkin: null
         };
 
         const DOM = {
@@ -679,9 +667,6 @@
             skinModal: document.getElementById('skinModal'),
             btnCloseModal: document.getElementById('btnCloseModal'),
             modalSkinName: document.getElementById('modalSkinName'),
-            modalSkinFormat: document.getElementById('modalSkinFormat'),
-            modalModelType: document.getElementById('modalModelType'),
-            modalResolution: document.getElementById('modalResolution'),
             btnDownload: document.getElementById('btnDownload'),
             btnResetPose: document.getElementById('btnResetPose'),
             btnToggleAutoRotate: document.getElementById('btnToggleAutoRotate'),
@@ -689,11 +674,11 @@
             modalCanvas: document.getElementById('modalCanvas')
         };
 
-        let modalScene, modalCamera, modalRenderer, modalControls, characterMeshGroup, characterParts;
+        // Instância principal do SkinViewer (Skinview3D)
+        let mainViewer = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             initBackgroundColor();
-            init3DScene();
             loadSkinsLibrary();
             setupEventListeners();
         });
@@ -708,43 +693,34 @@
             const color = e.target.value;
             document.documentElement.style.setProperty('--bg-color', color);
             localStorage.setItem('mc_vault_bg_color', color);
-            if (modalScene) {
-                modalScene.background = new THREE.Color(color);
+            if (mainViewer) {
+                mainViewer.background = color;
             }
         });
 
         // ==========================================================================
-        // CARREGADOR INTELIGENTE DE SKINS (GERADOR SEM #)
+        // DETECÇÃO E CARREGAMENTO DE SKINS
         // ==========================================================================
         async function loadSkinsLibrary() {
-            DOM.skinGrid.innerHTML = `<div class="empty-state"><h3>Carregando skins...</h3></div>`;
+            DOM.skinGrid.innerHTML = `<div class="empty-state"><h3>Carregando biblioteca com Skinview3D...</h3></div>`;
             state.skins = [];
 
             const candidateFiles = new Set();
-
-            // 1. Adiciona a lista manual de skins especiais
             SKINS_ESPECIAIS.forEach(file => candidateFiles.add(file));
 
-            // 2. Gerador Automático de Numeração (Usa underline _ em vez de #)
             const PREFIXES = ["EletrickZ100_outfit_", "EletrickZ100_outfit"];
-
             for (let i = 1; i <= 30; i++) {
                 PREFIXES.forEach(prefix => {
-                    // Testa número inteiro (ex: EletrickZ100_outfit_7.png ou EletrickZ100_outfit7.png)
                     candidateFiles.add(`${prefix}${i}.png`);
-
-                    // Testa variações decimais (ex: EletrickZ100_outfit_7.1.png, EletrickZ100_outfit7.2.png, etc.)
                     for (let sub = 1; sub <= 5; sub++) {
                         candidateFiles.add(`${prefix}${i}.${sub}.png`);
                     }
                 });
             }
 
-            // 3. Tenta varredura dinâmica via GitHub API
             try {
                 const hostname = window.location.hostname;
                 const pathSegments = window.location.pathname.split('/').filter(Boolean);
-
                 if (hostname.includes('github.io') && pathSegments.length > 0) {
                     const owner = hostname.split('.')[0];
                     const repo = pathSegments[0];
@@ -757,13 +733,10 @@
                 }
             } catch (e) {}
 
-            // Testa e carrega dinamicamente todas as imagens encontradas
             const loadPromises = Array.from(candidateFiles).map(filename => checkAndRegisterSkin(`img/skins/${filename}`, filename));
             await Promise.all(loadPromises);
 
-            // Ordena numericamente para organizar os outfits
             state.skins.sort((a, b) => a.filename.localeCompare(b.filename, undefined, { numeric: true, sensitivity: 'base' }));
-
             state.filteredSkins = [...state.skins];
             renderGrid();
         }
@@ -772,20 +745,16 @@
             return new Promise((resolve) => {
                 const img = new Image();
                 img.crossOrigin = 'Anonymous';
-                img.onload = () => {
-                    const processedData = processSkinTexture(img);
-                    const skinObj = {
+                img.onload = async () => {
+                    // Renderiza um preview rápido utilizando skinview3d offscreen
+                    const previewUrl = await renderThumbnailWithSkinview3D(url);
+                    state.skins.push({
                         id: filename,
                         name: filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
                         filename: filename,
                         url: url,
-                        imgElement: img,
-                        processedCanvas: processedData.canvas,
-                        isAlex: processedData.isAlex,
-                        isLegacy: processedData.isLegacy,
-                        resolution: `${img.width}x${img.height}`
-                    };
-                    state.skins.push(skinObj);
+                        previewUrl: previewUrl
+                    });
                     resolve();
                 };
                 img.onerror = () => resolve();
@@ -793,39 +762,37 @@
             });
         }
 
-        function processSkinTexture(img) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 64;
-            canvas.height = 64;
-            const ctx = canvas.getContext('2d');
+        // ==========================================================================
+        // GERAÇÃO DE THUMBNAIL COM SKINVIEW3D OFFSCREEN
+        // ==========================================================================
+        async function renderThumbnailWithSkinview3D(skinUrl) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 160;
+                canvas.height = 200;
 
-            ctx.drawImage(img, 0, 0);
+                const viewer = new skinview3d.SkinViewer({
+                    canvas: canvas,
+                    width: 160,
+                    height: 200,
+                    skin: skinUrl
+                });
 
-            const isLegacy = (img.height === 32);
+                viewer.camera.position.set(0, 10, 40);
+                viewer.fov = 60;
 
-            if (isLegacy) {
-                copySkinRect(ctx, img, 0, 16, 16, 16, 16, 48, true);
-                copySkinRect(ctx, img, 40, 16, 16, 16, 32, 48, true);
-            }
-
-            const pixelData = ctx.getImageData(54, 20, 1, 1).data;
-            const isAlex = (pixelData[3] === 0);
-
-            return { canvas, isLegacy, isAlex };
+                // Aguarda renderização completa
+                setTimeout(() => {
+                    const dataUrl = canvas.toDataURL('image/png');
+                    viewer.dispose(); // Libera memória WebGL
+                    resolve(dataUrl);
+                }, 100);
+            });
         }
 
-        function copySkinRect(ctx, img, sx, sy, sw, sh, dx, dy, flipHorizontally) {
-            ctx.save();
-            if (flipHorizontally) {
-                ctx.translate(dx + sw, dy);
-                ctx.scale(-1, 1);
-                ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
-            } else {
-                ctx.drawImage(img, sx, sy, sw, sh, dx, dy, sw, sh);
-            }
-            ctx.restore();
-        }
-
+        // ==========================================================================
+        // RENDERIZAÇÃO DA GRADE DE CARDS
+        // ==========================================================================
         function renderGrid() {
             DOM.skinGrid.innerHTML = '';
             DOM.skinCounter.textContent = `${state.filteredSkins.length} Skins Carregadas`;
@@ -834,7 +801,7 @@
                 DOM.skinGrid.innerHTML = `
                     <div class="empty-state">
                         <h3>Nenhuma skin encontrada</h3>
-                        <p>Adicione suas imagens dentro da pasta <strong>img/skins/</strong> e clique em Atualizar.</p>
+                        <p>Adicione arquivos na pasta <strong>img/skins/</strong> e clique em Atualizar.</p>
                     </div>`;
                 return;
             }
@@ -842,19 +809,15 @@
             state.filteredSkins.forEach(skin => {
                 const card = document.createElement('div');
                 card.className = 'skin-card';
-                card.dataset.id = skin.id;
-
-                const thumbnailDataUrl = generateSkinThumbnail(skin);
 
                 card.innerHTML = `
                     <div class="card-preview">
-                        <img src="${thumbnailDataUrl}" alt="${skin.name}" loading="lazy">
+                        <img src="${skin.previewUrl}" alt="${skin.name}" loading="lazy">
                     </div>
                     <div class="card-info">
                         <div class="card-title" title="${skin.filename}">${skin.filename}</div>
                         <div class="card-tags">
-                            <span class="tag">${skin.resolution}</span>
-                            <span class="tag">${skin.isAlex ? 'Alex (3px)' : 'Steve (4px)'}</span>
+                            <span class="tag">3D Skinview3D</span>
                         </div>
                     </div>
                 `;
@@ -864,307 +827,120 @@
             });
         }
 
-        function generateSkinThumbnail(skin) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 160;
-            canvas.height = 200;
-            const ctx = canvas.getContext('2d');
-
-            ctx.imageSmoothingEnabled = false;
-            ctx.drawImage(skin.processedCanvas, 8, 8, 8, 8, 48, 20, 64, 64);
-            ctx.drawImage(skin.processedCanvas, 40, 8, 8, 8, 44, 16, 72, 72);
-            ctx.drawImage(skin.processedCanvas, 20, 20, 8, 12, 48, 84, 64, 96);
-
-            return canvas.toDataURL();
-        }
-
-        function createMinecraftCharacter(textureCanvas, isAlex) {
-            const texture = new THREE.CanvasTexture(textureCanvas);
-            texture.magFilter = THREE.NearestFilter;
-            texture.minFilter = THREE.NearestFilter;
-
-            const baseMat = new THREE.MeshStandardMaterial({
-                map: texture,
-                transparent: true,
-                alphaTest: 0.1,
-                roughness: 0.7,
-                metalness: 0.1
-            });
-
-            const outerMat = new THREE.MeshStandardMaterial({
-                map: texture,
-                transparent: true,
-                alphaTest: 0.1,
-                roughness: 0.7,
-                metalness: 0.1,
-                side: THREE.DoubleSide
-            });
-
-            const characterGroup = new THREE.Group();
-            const armW = isAlex ? 3 : 4;
-            const armOffset = 4 + armW / 2;
-
-            function createBox(w, h, d, u, v, mat, scaleOffset = 0) {
-                const geo = new THREE.BoxGeometry(w + scaleOffset, h + scaleOffset, d + scaleOffset);
-                const uvs = [];
-                const toUV = (x, y) => [x / 64, 1 - (y / 64)];
-
-                function addFace(x1, y1, x2, y2) {
-                    const [u1, v1] = toUV(x1, y1);
-                    const [u2, v2] = toUV(x2, y2);
-                    uvs.push(u1, v1, u2, v1, u1, v2, u2, v2);
-                }
-
-                addFace(u, v + d, u + d, v + d + h);
-                addFace(u + d + w, v + d, u + d + w + d, v + d + h);
-                addFace(u + d, v, u + d + w, v + d);
-                addFace(u + d + w, v, u + d + w + w, v + d);
-                addFace(u + d, v + d, u + d + w, v + d + h);
-                addFace(u + d + w + d, v + d, u + d + w + d + w, v + d + h);
-
-                geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-                const mesh = new THREE.Mesh(geo, mat);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                return mesh;
-            }
-
-            const headGroup = new THREE.Group();
-            headGroup.position.set(0, 24, 0);
-            const headMesh = createBox(8, 8, 8, 0, 0, baseMat);
-            headMesh.position.set(0, 4, 0);
-            const hatMesh = createBox(8, 8, 8, 32, 0, outerMat, 0.6);
-            hatMesh.position.set(0, 4, 0);
-            headGroup.add(headMesh, hatMesh);
-
-            const bodyGroup = new THREE.Group();
-            bodyGroup.position.set(0, 12, 0);
-            const bodyMesh = createBox(8, 12, 4, 16, 16, baseMat);
-            bodyMesh.position.set(0, 6, 0);
-            const jacketMesh = createBox(8, 12, 4, 16, 32, outerMat, 0.5);
-            jacketMesh.position.set(0, 6, 0);
-            bodyGroup.add(bodyMesh, jacketMesh);
-
-            const rightArmGroup = new THREE.Group();
-            rightArmGroup.position.set(-armOffset, 22, 0);
-            const rArmMesh = createBox(armW, 12, 4, 40, 16, baseMat);
-            rArmMesh.position.set(0, -6, 0);
-            const rSleeveMesh = createBox(armW, 12, 4, 40, 32, outerMat, 0.5);
-            rSleeveMesh.position.set(0, -6, 0);
-            rightArmGroup.add(rArmMesh, rSleeveMesh);
-
-            const leftArmGroup = new THREE.Group();
-            leftArmGroup.position.set(armOffset, 22, 0);
-            const lArmMesh = createBox(armW, 12, 4, 32, 48, baseMat);
-            lArmMesh.position.set(0, -6, 0);
-            const lSleeveMesh = createBox(armW, 12, 4, 48, 48, outerMat, 0.5);
-            lSleeveMesh.position.set(0, -6, 0);
-            leftArmGroup.add(lArmMesh, lSleeveMesh);
-
-            const rightLegGroup = new THREE.Group();
-            rightLegGroup.position.set(-2, 12, 0);
-            const rLegMesh = createBox(4, 12, 4, 0, 16, baseMat);
-            rLegMesh.position.set(0, -6, 0);
-            const rPantsMesh = createBox(4, 12, 4, 0, 32, outerMat, 0.5);
-            rPantsMesh.position.set(0, -6, 0);
-            rightLegGroup.add(rLegMesh, rPantsMesh);
-
-            const leftLegGroup = new THREE.Group();
-            leftLegGroup.position.set(2, 12, 0);
-            const lLegMesh = createBox(4, 12, 4, 16, 48, baseMat);
-            lLegMesh.position.set(0, -6, 0);
-            const lPantsMesh = createBox(4, 12, 4, 0, 48, outerMat, 0.5);
-            lPantsMesh.position.set(0, -6, 0);
-            leftLegGroup.add(lLegMesh, lPantsMesh);
-
-            characterGroup.add(headGroup, bodyGroup, rightArmGroup, leftArmGroup, rightLegGroup, leftLegGroup);
-
-            characterGroup.scale.set(0.12, 0.12, 0.12);
-            characterGroup.position.set(0, -1.8, 0);
-
-            return {
-                group: characterGroup,
-                parts: {
-                    head: headGroup,
-                    body: bodyGroup,
-                    rightArm: rightArmGroup,
-                    leftArm: leftArmGroup,
-                    rightLeg: rightLegGroup,
-                    leftLeg: leftLegGroup
-                }
-            };
-        }
-
-        function init3DScene() {
-            modalScene = new THREE.Scene();
-            modalScene.background = new THREE.Color(DOM.bgColorPicker.value);
-
-            modalCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-            modalCamera.position.set(0, 0.5, 7);
-
-            modalRenderer = new THREE.WebGLRenderer({
-                canvas: DOM.modalCanvas,
-                antialias: true,
-                alpha: true
-            });
-            modalRenderer.setPixelRatio(window.devicePixelRatio);
-            modalRenderer.shadowMap.enabled = true;
-            modalRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-            modalScene.add(ambientLight);
-
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.position.set(5, 10, 7);
-            dirLight.castShadow = true;
-            dirLight.shadow.mapSize.width = 1024;
-            dirLight.shadow.mapSize.height = 1024;
-            modalScene.add(dirLight);
-
-            const backLight = new THREE.DirectionalLight(0x38bdf8, 0.4);
-            backLight.position.set(-5, 5, -5);
-            modalScene.add(backLight);
-
-            const shadowPlane = new THREE.Mesh(
-                new THREE.PlaneGeometry(10, 10),
-                new THREE.ShadowMaterial({ opacity: 0.3 })
-            );
-            shadowPlane.rotation.x = -Math.PI / 2;
-            shadowPlane.position.y = -3.2;
-            shadowPlane.receiveShadow = true;
-            modalScene.add(shadowPlane);
-
-            modalControls = new THREE.OrbitControls(modalCamera, DOM.modalCanvas);
-            modalControls.enableDamping = true;
-            modalControls.dampingFactor = 0.05;
-            modalControls.maxPolarAngle = Math.PI / 2 + 0.1;
-            modalControls.minDistance = 2;
-            modalControls.maxDistance = 12;
-
-            function animate() {
-                requestAnimationFrame(animate);
-                if (state.autoRotate && characterMeshGroup) {
-                    characterMeshGroup.rotation.y += 0.01;
-                }
-                modalControls.update();
-                modalRenderer.render(modalScene, modalCamera);
-            }
-            animate();
-
-            window.addEventListener('resize', resizeCanvas);
-        }
-
-        function resizeCanvas() {
-            if (!DOM.viewportContainer) return;
-            const width = DOM.viewportContainer.clientWidth;
-            const height = DOM.viewportContainer.clientHeight;
-            modalCamera.aspect = width / height;
-            modalCamera.updateProjectionMatrix();
-            modalRenderer.setSize(width, height, false);
-        }
-
+        // ==========================================================================
+        // INICIALIZAÇÃO DO VIEWER PRINCIPAL NA MODAL (SKINVIEW3D)
+        // ==========================================================================
         function openModal(skin) {
             state.activeSkin = skin;
-            
             DOM.modalSkinName.textContent = skin.filename;
-            DOM.modalSkinFormat.textContent = skin.resolution;
-            DOM.modalResolution.textContent = skin.resolution;
-            DOM.modalModelType.textContent = skin.isAlex ? 'Alex (Braços 3px)' : 'Steve (Braços 4px)';
 
-            if (characterMeshGroup) {
-                modalScene.remove(characterMeshGroup);
+            const width = DOM.viewportContainer.clientWidth || 500;
+            const height = DOM.viewportContainer.clientHeight || 500;
+
+            if (!mainViewer) {
+                // Criação do SkinViewer oficial
+                mainViewer = new skinview3d.SkinViewer({
+                    canvas: DOM.modalCanvas,
+                    width: width,
+                    height: height,
+                    skin: skin.url
+                });
+
+                mainViewer.camera.position.set(0, 10, 40);
+                mainViewer.fov = 60;
+                mainViewer.autoRotate = false;
+            } else {
+                mainViewer.loadSkin(skin.url);
             }
 
-            const charObj = createMinecraftCharacter(skin.processedCanvas, skin.isAlex);
-            characterMeshGroup = charObj.group;
-            characterParts = charObj.parts;
-            modalScene.add(characterMeshGroup);
+            mainViewer.background = DOM.bgColorPicker.value;
 
-            modalCamera.position.set(0, 0.5, 7);
-            modalControls.target.set(0, 0, 0);
-            applyPose('default');
+            // Define pose inicial
+            applyPose('idle');
 
             DOM.skinModal.classList.add('active');
-            setTimeout(resizeCanvas, 50);
+            setTimeout(() => {
+                mainViewer.width = DOM.viewportContainer.clientWidth;
+                mainViewer.height = DOM.viewportContainer.clientHeight;
+            }, 50);
         }
 
         function closeModal() {
             DOM.skinModal.classList.remove('active');
-            state.autoRotate = false;
-            DOM.btnToggleAutoRotate.classList.remove('btn-secondary');
-            DOM.btnToggleAutoRotate.textContent = 'Ativar Auto-Giro';
+            if (mainViewer) {
+                mainViewer.autoRotate = false;
+                DOM.btnToggleAutoRotate.classList.remove('btn-secondary');
+                DOM.btnToggleAutoRotate.textContent = 'Ativar Auto-Giro';
+            }
         }
 
+        // ==========================================================================
+        // SISTEMA DE ANIMAÇÕES E POSES COM SKINVIEW3D
+        // ==========================================================================
         const degToRad = (deg) => (deg * Math.PI) / 180;
 
         function applyPose(poseName) {
-            if (!characterParts) return;
+            if (!mainViewer) return;
 
-            state.currentPose = poseName;
-            
             document.querySelectorAll('.btn-preset').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.pose === poseName);
             });
 
-            characterParts.body.position.set(0, 12, 0);
-
-            let angles = { headX: 0, headY: 0, armRX: 0, armLX: 0, legRX: 0, legLX: 0 };
+            // Reseta animação ativa
+            mainViewer.animation = null;
 
             switch (poseName) {
                 case 'walk':
-                    angles = { headX: 0, headY: 0, armRX: 30, armLX: -30, legRX: -30, legLX: 30 };
+                    mainViewer.animation = new skinview3d.WalkingAnimation();
+                    mainViewer.animation.speed = 1.0;
                     break;
                 case 'run':
-                    angles = { headX: 10, headY: 0, armRX: 60, armLX: -60, legRX: -50, legLX: 50 };
+                    mainViewer.animation = new skinview3d.RunningAnimation();
+                    mainViewer.animation.speed = 1.2;
                     break;
-                case 'sit':
-                    angles = { headX: 0, headY: 0, armRX: 20, armLX: 20, legRX: -90, legLX: -90 };
-                    characterParts.body.position.y = 8;
+                case 'fly':
+                    mainViewer.animation = new skinview3d.FlyingAnimation();
+                    mainViewer.animation.speed = 0.8;
                     break;
-                case 'attack':
-                    angles = { headX: 0, headY: 15, armRX: -80, armLX: 20, legRX: -20, legLX: 20 };
+                case 'idle':
+                    mainViewer.animation = new skinview3d.IdleAnimation();
                     break;
-                case 'default':
+                case 'custom':
                 default:
-                    angles = { headX: 0, headY: 0, armRX: 0, armLX: 0, legRX: 0, legLX: 0 };
                     break;
             }
 
-            document.getElementById('slideHeadX').value = angles.headX;
-            document.getElementById('slideHeadY').value = angles.headY;
-            document.getElementById('slideArmRX').value = angles.armRX;
-            document.getElementById('slideArmLX').value = angles.armLX;
-            document.getElementById('slideLegRX').value = angles.legRX;
-            document.getElementById('slideLegLX').value = angles.legLX;
-
-            updateJointRotations();
+            updateJointSlidersFromModel();
         }
 
-        function updateJointRotations() {
-            if (!characterParts) return;
+        function updateJointSlidersFromModel() {
+            if (!mainViewer || !mainViewer.playerObject) return;
+            
+            const headX = parseInt(document.getElementById('slideHeadX').value);
+            const headY = parseInt(document.getElementById('slideHeadY').value);
+            const armRX = parseInt(document.getElementById('slideArmRX').value);
+            const armLX = parseInt(document.getElementById('slideArmLX').value);
+            const legRX = parseInt(document.getElementById('slideLegRX').value);
+            const legLX = parseInt(document.getElementById('slideLegLX').value);
 
-            const hX = parseInt(document.getElementById('slideHeadX').value);
-            const hY = parseInt(document.getElementById('slideHeadY').value);
-            const aRX = parseInt(document.getElementById('slideArmRX').value);
-            const aLX = parseInt(document.getElementById('slideArmLX').value);
-            const lRX = parseInt(document.getElementById('slideLegRX').value);
-            const lLX = parseInt(document.getElementById('slideLegLX').value);
+            document.getElementById('valHeadX').textContent = `${headX}°`;
+            document.getElementById('valHeadY').textContent = `${headY}°`;
+            document.getElementById('valArmRX').textContent = `${armRX}°`;
+            document.getElementById('valArmLX').textContent = `${armLX}°`;
+            document.getElementById('valLegRX').textContent = `${legRX}°`;
+            document.getElementById('valLegLX').textContent = `${legLX}°`;
 
-            document.getElementById('valHeadX').textContent = `${hX}°`;
-            document.getElementById('valHeadY').textContent = `${hY}°`;
-            document.getElementById('valArmRX').textContent = `${aRX}°`;
-            document.getElementById('valArmLX').textContent = `${aLX}°`;
-            document.getElementById('valLegRX').textContent = `${lRX}°`;
-            document.getElementById('valLegLX').textContent = `${lLX}°`;
-
-            characterParts.head.rotation.x = degToRad(hX);
-            characterParts.head.rotation.y = degToRad(hY);
-            characterParts.rightArm.rotation.x = degToRad(aRX);
-            characterParts.leftArm.rotation.x = degToRad(aLX);
-            characterParts.rightLeg.rotation.x = degToRad(lRX);
-            characterParts.leftLeg.rotation.x = degToRad(lLX);
+            if (mainViewer.playerObject.skin) {
+                mainViewer.playerObject.skin.head.rotation.x = degToRad(headX);
+                mainViewer.playerObject.skin.head.rotation.y = degToRad(headY);
+                mainViewer.playerObject.skin.rightArm.rotation.x = degToRad(armRX);
+                mainViewer.playerObject.skin.leftArm.rotation.x = degToRad(armLX);
+                mainViewer.playerObject.skin.rightLeg.rotation.x = degToRad(legRX);
+                mainViewer.playerObject.skin.leftLeg.rotation.x = degToRad(legLX);
+            }
         }
 
+        // LISTENERS DE EVENTOS
         function setupEventListeners() {
             DOM.btnCloseModal.addEventListener('click', closeModal);
             DOM.skinModal.addEventListener('click', (e) => {
@@ -1194,27 +970,39 @@
             const sliders = ['slideHeadX', 'slideHeadY', 'slideArmRX', 'slideArmLX', 'slideLegRX', 'slideLegLX'];
             sliders.forEach(id => {
                 document.getElementById(id).addEventListener('input', () => {
-                    updateJointRotations();
+                    if (mainViewer) mainViewer.animation = null; // Pausa animação ao mexer no slider
                     document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+                    updateJointSlidersFromModel();
                 });
             });
 
-            DOM.btnResetPose.addEventListener('click', () => applyPose('default'));
+            DOM.btnResetPose.addEventListener('click', () => {
+                sliders.forEach(id => document.getElementById(id).value = 0);
+                applyPose('idle');
+            });
 
             DOM.btnToggleAutoRotate.addEventListener('click', () => {
-                state.autoRotate = !state.autoRotate;
-                DOM.btnToggleAutoRotate.textContent = state.autoRotate ? 'Parar Auto-Giro' : 'Ativar Auto-Giro';
-                DOM.btnToggleAutoRotate.classList.toggle('btn-secondary', !state.autoRotate);
+                if (!mainViewer) return;
+                mainViewer.autoRotate = !mainViewer.autoRotate;
+                DOM.btnToggleAutoRotate.textContent = mainViewer.autoRotate ? 'Parar Auto-Giro' : 'Ativar Auto-Giro';
+                DOM.btnToggleAutoRotate.classList.toggle('btn-secondary', !mainViewer.autoRotate);
             });
 
             DOM.btnDownload.addEventListener('click', () => {
                 if (!state.activeSkin) return;
                 const link = document.createElement('a');
                 link.download = state.activeSkin.filename;
-                link.href = state.activeSkin.processedCanvas.toDataURL('image/png');
+                link.href = state.activeSkin.url;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+            });
+
+            window.addEventListener('resize', () => {
+                if (mainViewer && DOM.skinModal.classList.contains('active')) {
+                    mainViewer.width = DOM.viewportContainer.clientWidth;
+                    mainViewer.height = DOM.viewportContainer.clientHeight;
+                }
             });
         }
     </script>
