@@ -733,35 +733,7 @@
        CÓDIGO JAVASCRIPT (LÓGICA DO SISTEMA, THREE.JS E DETECÇÃO)
        ========================================================================== -->
     <script>
-        /**
-         * ====================================================================
-         * EXPLICAÇÃO TÉCNICA DA DETECÇÃO AUTOMÁTICA DE ARQUIVOS NO NAVEGADOR
-         * ====================================================================
-         * Navegadores por motivos de segurança (CORS/File System Security) não possuem
-         * acesso direto de leitura para listar pastas locais em servidores estáticos.
-         * 
-         * SOLUÇÃO IMPLEMENTADA NESTE PROJETO:
-         * 1. Detecção automática para GitHub Pages usando a API oficial de conteúdos da GitHub.
-         * 2. Varredura dinâmica de arquivos (probes HTTP) para identificar PNGs na pasta img/skins/.
-         * 3. Fallback inteligente com lista estendida para garantir funcionamento imediato.
-         * 
-         * CASO DESEJE EXECUTAR EM UM SERVIDOR NODE.JS LOCAL:
-         * Você pode criar um servidor simples `server.js` com o seguinte trecho:
-         * --------------------------------------------------------------------
-         * const express = require('express');
-         * const fs = require('fs');
-         * const app = express();
-         * app.use(express.static('.'));
-         * app.get('/api/skins', (req, res) => {
-         *     fs.readdir('./img/skins', (err, files) => {
-         *         res.json(files.filter(f => f.endsWith('.png')));
-         *     });
-         * });
-         * app.listen(3000, () => console.log('Servidor ativo em http://localhost:3000'));
-         * --------------------------------------------------------------------
-         */
-
-        // State Global da Aplicação
+       // State Global da Aplicação
         const state = {
             skins: [],
             filteredSkins: [],
@@ -794,9 +766,7 @@
         // Instâncias 3D da Modal
         let modalScene, modalCamera, modalRenderer, modalControls, characterMeshGroup, characterParts;
 
-        // ==========================================================================
         // INICIALIZAÇÃO DA APLICAÇÃO
-        // ==========================================================================
         window.addEventListener('DOMContentLoaded', () => {
             initBackgroundColor();
             init3DScene();
@@ -821,51 +791,71 @@
         });
 
         // ==========================================================================
-        // MOTOR DE DETECÇÃO AUTOMÁTICA DE SKINS
+        // DETECÇÃO 100% DINÂMICA E AUTOMÁTICA DE SKINS
         // ==========================================================================
         async function loadSkinsLibrary() {
-            DOM.skinGrid.innerHTML = `<div class="empty-state"><h3>Carregando biblioteca de skins...</h3></div>`;
+            DOM.skinGrid.innerHTML = `<div class="empty-state"><h3>Escaneando pasta img/skins/...</h3></div>`;
             state.skins = [];
+            const discoveredFiles = new Set();
 
-            let discoveredFiles = new Set();
-
-            // Método 1: Tentar detectar via GitHub API se hospedado no GitHub Pages
+            // ESTRATÉGIA 1: Tentar ler a listagem do servidor (Auto-Index HTML do Apache/Nginx/LiveServer)
             try {
-                const pathParts = window.location.pathname.split('/').filter(Boolean);
-                const host = window.location.hostname;
-                if (host.includes('github.io') && pathParts.length > 0) {
-                    const owner = host.split('.')[0];
-                    const repo = pathParts[0];
-                    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/img/skins`;
-                    const res = await fetch(apiUrl);
-                    if (res.ok) {
-                        const data = await res.json();
-                        data.filter(item => item.name.endsWith('.png')).forEach(item => discoveredFiles.add(item.name));
-                    }
+                const res = await fetch('img/skins/');
+                if (res.ok) {
+                    const htmlText = await res.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlText, 'text/html');
+                    const links = Array.from(doc.querySelectorAll('a'));
+                    
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (href && href.toLowerCase().endsWith('.png')) {
+                            const filename = href.split('/').pop().split('?')[0];
+                            if (filename) discoveredFiles.add(filename);
+                        }
+                    });
                 }
-            } catch (err) {
-                console.warn('Detecção via GitHub API indisponível, usando método de scanner.');
+            } catch (e) {
+                console.log('Buscando via API do repositório...');
             }
 
-            // Método 2: Scanner dinâmico de nomes comuns + padrão skin1.png, skin2.png ...
-            const candidateNames = [
-                'skin1.png', 'skin2.png', 'skin3.png', 'skin4.png', 'skin5.png',
-                'steve.png', 'alex.png', 'cyberpunk.png', 'knight.png', 'enderman.png',
-                'zombie.png', 'creeper.png', 'hero.png', 'ninja.png', 'robot.png'
-            ];
-            
-            // Adiciona padrões sequenciais
-            for (let i = 1; i <= 30; i++) {
-                candidateNames.push(`skin${i}.png`);
-                candidateNames.push(`skin_${i}.png`);
+            // ESTRATÉGIA 2: GitHub API (Lê dinamicamente todos os .png do diretório no GitHub)
+            if (discoveredFiles.size === 0) {
+                try {
+                    const hostname = window.location.hostname;
+                    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+
+                    let owner = '';
+                    let repo = '';
+
+                    if (hostname.includes('github.io')) {
+                        owner = hostname.split('.')[0];
+                        repo = pathSegments[0] || '';
+                    }
+
+                    if (owner && repo) {
+                        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/img/skins`;
+                        const res = await fetch(apiUrl);
+                        if (res.ok) {
+                            const files = await res.json();
+                            files.forEach(file => {
+                                if (file.name.toLowerCase().endsWith('.png')) {
+                                    discoveredFiles.add(file.name);
+                                }
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.log('GitHub API não retornou dados.');
+                }
             }
 
-            candidateNames.forEach(name => discoveredFiles.add(name));
+            // CARREGAR TODAS AS SKINS DESCOBERTAS SEM NENHUM NOME PRÉ-DEFINIDO
+            const promises = Array.from(discoveredFiles).map(filename => {
+                return checkAndRegisterSkin(`img/skins/${filename}`, filename);
+            });
 
-            // Testar existência de cada imagem em paralelo com Lazy Load
-            const loadPromises = Array.from(discoveredFiles).map(filename => checkAndRegisterSkin(`img/skins/${filename}`, filename));
-            await Promise.all(loadPromises);
-
+            await Promise.all(promises);
             state.filteredSkins = [...state.skins];
             renderGrid();
         }
@@ -875,7 +865,6 @@
                 const img = new Image();
                 img.crossOrigin = 'Anonymous';
                 img.onload = () => {
-                    // Skin válida encontrada! Processar textura e dimensões
                     const processedData = processSkinTexture(img);
                     const skinObj = {
                         id: filename,
@@ -891,14 +880,12 @@
                     state.skins.push(skinObj);
                     resolve();
                 };
-                img.onerror = () => resolve(); // Arquivo não existe na pasta
+                img.onerror = () => resolve();
                 img.src = url;
             });
         }
 
-        // ==========================================================================
         // PROCESSAMENTO DE TEXTURAS (SUPORTE STEVE, ALEX, 64x64 E 64x32 LEGACY)
-        // ==========================================================================
         function processSkinTexture(img) {
             const canvas = document.createElement('canvas');
             canvas.width = 64;
@@ -909,16 +896,11 @@
 
             const isLegacy = (img.height === 32);
 
-            // Converter skins antigas 64x32 para o padrão novo 64x64
             if (isLegacy) {
-                // Copiar Perna Direita para Perna Esquerda (espelhado)
                 copySkinRect(ctx, img, 0, 16, 16, 16, 16, 48, true);
-                // Copiar Braço Direito para Braço Esquerdo (espelhado)
                 copySkinRect(ctx, img, 40, 16, 16, 16, 32, 48, true);
             }
 
-            // Detecção Automática de Modelo Alex (3px) vs Steve (4px)
-            // Checa a transparência de pixels na área do braço
             const pixelData = ctx.getImageData(54, 20, 1, 1).data;
             const isAlex = (pixelData[3] === 0);
 
@@ -937,9 +919,7 @@
             ctx.restore();
         }
 
-        // ==========================================================================
         // RENDERIZAÇÃO DA GRADE DE CARDS E SNAPSHOTS 3D
-        // ==========================================================================
         function renderGrid() {
             DOM.skinGrid.innerHTML = '';
             DOM.skinCounter.textContent = `${state.filteredSkins.length} Skins Carregadas`;
@@ -948,7 +928,7 @@
                 DOM.skinGrid.innerHTML = `
                     <div class="empty-state">
                         <h3>Nenhuma skin encontrada</h3>
-                        <p>Certifique-se de adicionar imagens .png dentro da pasta <strong>img/skins/</strong></p>
+                        <p>Certifique-se de adicionar imagens .png dentro da pasta <strong>img/skins/</strong> e clique em "Atualizar".</p>
                     </div>`;
                 return;
             }
@@ -978,28 +958,21 @@
             });
         }
 
-        // Gerador de Render Snapshot 2D da textura em 3D leve para thumbnail
         function generateSkinThumbnail(skin) {
             const canvas = document.createElement('canvas');
             canvas.width = 160;
             canvas.height = 200;
             const ctx = canvas.getContext('2d');
 
-            // Renderiza um preview estilizado da textura diretamente no canvas 2D
             ctx.imageSmoothingEnabled = false;
-            // Cabeça
             ctx.drawImage(skin.processedCanvas, 8, 8, 8, 8, 48, 20, 64, 64);
-            // Hat layer se houver
             ctx.drawImage(skin.processedCanvas, 40, 8, 8, 8, 44, 16, 72, 72);
-            // Corpo
             ctx.drawImage(skin.processedCanvas, 20, 20, 8, 12, 48, 84, 64, 96);
 
             return canvas.toDataURL();
         }
 
-        // ==========================================================================
-        // CONSTRUTOR DO MODELO 3D DO MINECRAFT (THREE.JS COM CAMADAS E UVs)
-        // ==========================================================================
+        // CONSTRUTOR DO MODELO 3D DO MINECRAFT
         function createMinecraftCharacter(textureCanvas, isAlex) {
             const texture = new THREE.CanvasTexture(textureCanvas);
             texture.magFilter = THREE.NearestFilter;
@@ -1026,10 +999,8 @@
             const armW = isAlex ? 3 : 4;
             const armOffset = 4 + armW / 2;
 
-            // Função para mapear UVs de caixa do Minecraft perfeitamente no Three.js
             function createBox(w, h, d, u, v, mat, scaleOffset = 0) {
                 const geo = new THREE.BoxGeometry(w + scaleOffset, h + scaleOffset, d + scaleOffset);
-                
                 const uvs = [];
                 const toUV = (x, y) => [x / 64, 1 - (y / 64)];
 
@@ -1039,13 +1010,12 @@
                     uvs.push(u1, v1, u2, v1, u1, v2, u2, v2);
                 }
 
-                // Ordem de faces Three.js BoxGeometry: +X, -X, +Y, -Y, +Z, -Z
-                addFace(u, v + d, u + d, v + d + h);            // Direita
-                addFace(u + d + w, v + d, u + d + w + d, v + d + h); // Esquerda
-                addFace(u + d, v, u + d + w, v + d);            // Topo
-                addFace(u + d + w, v, u + d + w + w, v + d);    // Base
-                addFace(u + d, v + d, u + d + w, v + d + h);    // Frente
-                addFace(u + d + w + d, v + d, u + d + w + d + w, v + d + h); // Costas
+                addFace(u, v + d, u + d, v + d + h);
+                addFace(u + d + w, v + d, u + d + w + d, v + d + h);
+                addFace(u + d, v, u + d + w, v + d);
+                addFace(u + d + w, v, u + d + w + w, v + d);
+                addFace(u + d, v + d, u + d + w, v + d + h);
+                addFace(u + d + w + d, v + d, u + d + w + d + w, v + d + h);
 
                 geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
                 const mesh = new THREE.Mesh(geo, mat);
@@ -1054,7 +1024,6 @@
                 return mesh;
             }
 
-            // CABEÇA (Pivot no pescoço)
             const headGroup = new THREE.Group();
             headGroup.position.set(0, 24, 0);
             const headMesh = createBox(8, 8, 8, 0, 0, baseMat);
@@ -1063,7 +1032,6 @@
             hatMesh.position.set(0, 4, 0);
             headGroup.add(headMesh, hatMesh);
 
-            // CORPO (Pivot na cintura)
             const bodyGroup = new THREE.Group();
             bodyGroup.position.set(0, 12, 0);
             const bodyMesh = createBox(8, 12, 4, 16, 16, baseMat);
@@ -1072,7 +1040,6 @@
             jacketMesh.position.set(0, 6, 0);
             bodyGroup.add(bodyMesh, jacketMesh);
 
-            // BRAÇO DIREITO (Pivot no ombro)
             const rightArmGroup = new THREE.Group();
             rightArmGroup.position.set(-armOffset, 22, 0);
             const rArmMesh = createBox(armW, 12, 4, 40, 16, baseMat);
@@ -1081,7 +1048,6 @@
             rSleeveMesh.position.set(0, -6, 0);
             rightArmGroup.add(rArmMesh, rSleeveMesh);
 
-            // BRAÇO ESQUERDO (Pivot no ombro)
             const leftArmGroup = new THREE.Group();
             leftArmGroup.position.set(armOffset, 22, 0);
             const lArmMesh = createBox(armW, 12, 4, 32, 48, baseMat);
@@ -1090,7 +1056,6 @@
             lSleeveMesh.position.set(0, -6, 0);
             leftArmGroup.add(lArmMesh, lSleeveMesh);
 
-            // PERNA DIREITA (Pivot no quadril)
             const rightLegGroup = new THREE.Group();
             rightLegGroup.position.set(-2, 12, 0);
             const rLegMesh = createBox(4, 12, 4, 0, 16, baseMat);
@@ -1099,7 +1064,6 @@
             rPantsMesh.position.set(0, -6, 0);
             rightLegGroup.add(rLegMesh, rPantsMesh);
 
-            // PERNA ESQUERDA (Pivot no quadril)
             const leftLegGroup = new THREE.Group();
             leftLegGroup.position.set(2, 12, 0);
             const lLegMesh = createBox(4, 12, 4, 16, 48, baseMat);
@@ -1110,7 +1074,6 @@
 
             characterGroup.add(headGroup, bodyGroup, rightArmGroup, leftArmGroup, rightLegGroup, leftLegGroup);
 
-            // Ajustar escala global e centralizar
             characterGroup.scale.set(0.12, 0.12, 0.12);
             characterGroup.position.set(0, -1.8, 0);
 
@@ -1127,9 +1090,7 @@
             };
         }
 
-        // ==========================================================================
-        // CONFIGURAÇÃO DO CENÁRIO 3D PRINCIPAL (VIEWPORT MODAL)
-        // ==========================================================================
+        // CONFIGURAÇÃO DO CENÁRIO 3D PRINCIPAL
         function init3DScene() {
             modalScene = new THREE.Scene();
             modalScene.background = new THREE.Color(DOM.bgColorPicker.value);
@@ -1146,7 +1107,6 @@
             modalRenderer.shadowMap.enabled = true;
             modalRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-            // Iluminação Estúdio
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
             modalScene.add(ambientLight);
 
@@ -1161,7 +1121,6 @@
             backLight.position.set(-5, 5, -5);
             modalScene.add(backLight);
 
-            // Sombra no Chão
             const shadowPlane = new THREE.Mesh(
                 new THREE.PlaneGeometry(10, 10),
                 new THREE.ShadowMaterial({ opacity: 0.3 })
@@ -1171,7 +1130,6 @@
             shadowPlane.receiveShadow = true;
             modalScene.add(shadowPlane);
 
-            // Controles de Órbita (Mouse/Touch)
             modalControls = new THREE.OrbitControls(modalCamera, DOM.modalCanvas);
             modalControls.enableDamping = true;
             modalControls.dampingFactor = 0.05;
@@ -1179,7 +1137,6 @@
             modalControls.minDistance = 2;
             modalControls.maxDistance = 12;
 
-            // Loop de Animação Render 60 FPS
             function animate() {
                 requestAnimationFrame(animate);
                 
@@ -1192,7 +1149,6 @@
             }
             animate();
 
-            // Ajustar tamanho quando a janela for redimensionada
             window.addEventListener('resize', resizeCanvas);
         }
 
@@ -1205,35 +1161,28 @@
             modalRenderer.setSize(width, height, false);
         }
 
-        // ==========================================================================
-        // ABERTURA DA MODAL E CARREGAMENTO DA SKIN SELECIONADA
-        // ==========================================================================
+        // ABERTURA DA MODAL
         function openModal(skin) {
             state.activeSkin = skin;
             
-            // Atualizar Informações de Texto
             DOM.modalSkinName.textContent = skin.filename;
             DOM.modalSkinFormat.textContent = skin.resolution;
             DOM.modalResolution.textContent = skin.resolution;
             DOM.modalModelType.textContent = skin.isAlex ? 'Alex (Braços 3px)' : 'Steve (Braços 4px)';
 
-            // Remover personagem anterior do cenário
             if (characterMeshGroup) {
                 modalScene.remove(characterMeshGroup);
             }
 
-            // Criar novo personagem 3D com a textura processada
             const charObj = createMinecraftCharacter(skin.processedCanvas, skin.isAlex);
             characterMeshGroup = charObj.group;
             characterParts = charObj.parts;
             modalScene.add(characterMeshGroup);
 
-            // Resetar Câmera e Pose
             modalCamera.position.set(0, 0.5, 7);
             modalControls.target.set(0, 0, 0);
             applyPose('default');
 
-            // Exibir Modal
             DOM.skinModal.classList.add('active');
             setTimeout(resizeCanvas, 50);
         }
@@ -1245,9 +1194,7 @@
             DOM.btnToggleAutoRotate.textContent = 'Ativar Auto-Giro';
         }
 
-        // ==========================================================================
-        // SISTEMA DO EDITOR DE POSES (PRESETS + SLIDERS)
-        // ==========================================================================
+        // EDITOR DE POSES
         const degToRad = (deg) => (deg * Math.PI) / 180;
 
         function applyPose(poseName) {
@@ -1255,19 +1202,13 @@
 
             state.currentPose = poseName;
             
-            // Destacar botão ativo
             document.querySelectorAll('.btn-preset').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.pose === poseName);
             });
 
-            // Reseta posições das juntas
             characterParts.body.position.set(0, 12, 0);
 
-            let angles = {
-                headX: 0, headY: 0,
-                armRX: 0, armLX: 0,
-                legRX: 0, legLX: 0
-            };
+            let angles = { headX: 0, headY: 0, armRX: 0, armLX: 0, legRX: 0, legLX: 0 };
 
             switch (poseName) {
                 case 'walk':
@@ -1289,7 +1230,6 @@
                     break;
             }
 
-            // Atualiza Sliders na Interface
             document.getElementById('slideHeadX').value = angles.headX;
             document.getElementById('slideHeadY').value = angles.headY;
             document.getElementById('slideArmRX').value = angles.armRX;
@@ -1310,7 +1250,6 @@
             const lRX = parseInt(document.getElementById('slideLegRX').value);
             const lLX = parseInt(document.getElementById('slideLegLX').value);
 
-            // Atualiza textos
             document.getElementById('valHeadX').textContent = `${hX}°`;
             document.getElementById('valHeadY').textContent = `${hY}°`;
             document.getElementById('valArmRX').textContent = `${aRX}°`;
@@ -1318,7 +1257,6 @@
             document.getElementById('valLegRX').textContent = `${lRX}°`;
             document.getElementById('valLegLX').textContent = `${lLX}°`;
 
-            // Aplica rotações 3D
             characterParts.head.rotation.x = degToRad(hX);
             characterParts.head.rotation.y = degToRad(hY);
             characterParts.rightArm.rotation.x = degToRad(aRX);
@@ -1327,11 +1265,8 @@
             characterParts.leftLeg.rotation.x = degToRad(lLX);
         }
 
-        // ==========================================================================
-        // LISTENERS E EVENTOS DA INTERFACE
-        // ==========================================================================
+        // LISTENERS E EVENTOS
         function setupEventListeners() {
-            // Fechar Modal
             DOM.btnCloseModal.addEventListener('click', closeModal);
             DOM.skinModal.addEventListener('click', (e) => {
                 if (e.target === DOM.skinModal) closeModal();
@@ -1340,7 +1275,6 @@
                 if (e.key === 'Escape') closeModal();
             });
 
-            // Pesquisa em tempo real
             DOM.searchInput.addEventListener('input', (e) => {
                 const query = e.target.value.toLowerCase().trim();
                 state.filteredSkins = state.skins.filter(s => 
@@ -1350,37 +1284,30 @@
                 renderGrid();
             });
 
-            // Botão de recarregar biblioteca
             DOM.btnRefresh.addEventListener('click', () => {
                 loadSkinsLibrary();
             });
 
-            // Presets de Pose
             document.querySelectorAll('.btn-preset').forEach(btn => {
                 btn.addEventListener('click', () => applyPose(btn.dataset.pose));
             });
 
-            // Sliders de junta
             const sliders = ['slideHeadX', 'slideHeadY', 'slideArmRX', 'slideArmLX', 'slideLegRX', 'slideLegLX'];
             sliders.forEach(id => {
                 document.getElementById(id).addEventListener('input', () => {
                     updateJointRotations();
-                    // Marca preset como customizado quando alterar slider
                     document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
                 });
             });
 
-            // Resetar Pose
             DOM.btnResetPose.addEventListener('click', () => applyPose('default'));
 
-            // Auto Rotação Toggle
             DOM.btnToggleAutoRotate.addEventListener('click', () => {
                 state.autoRotate = !state.autoRotate;
                 DOM.btnToggleAutoRotate.textContent = state.autoRotate ? 'Parar Auto-Giro' : 'Ativar Auto-Giro';
                 DOM.btnToggleAutoRotate.classList.toggle('btn-secondary', !state.autoRotate);
             });
 
-            // Download da Imagem do Skin PNG
             DOM.btnDownload.addEventListener('click', () => {
                 if (!state.activeSkin) return;
                 const link = document.createElement('a');
