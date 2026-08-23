@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web IDE Pro</title>
     
-    <!-- Bibliotecas Externas (CDNs) -->
+    <!-- FontAwesome & JSZip & Monaco Loader -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
 
     <style>
         /* =========================================================
-           TEMA E VARIÁVEIS (Dracula Inspired)
+           THEME & VARIABLES (Dracula Inspired)
            ========================================================= */
         :root {
             --bg-base: #1e1e1e;
@@ -29,7 +29,7 @@
             --accent-red: #ff5555;
             --border-color: #191a21;
             
-            --font-ui: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             --font-mono: 'Consolas', 'Courier New', monospace;
             --ui-font-size: 13px;
         }
@@ -37,41 +37,45 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg-base); color: var(--fg-main); font-family: var(--font-ui); font-size: var(--ui-font-size); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         button { background: none; border: none; color: inherit; font-family: inherit; font-size: inherit; cursor: pointer; outline: none; }
-        input, select, textarea { font-family: inherit; font-size: inherit; background: var(--bg-base); color: var(--fg-main); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 4px; outline: none; width: 100%; }
+        input, select, textarea { font-family: inherit; font-size: inherit; background: var(--bg-base); color: var(--fg-main); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 4px; outline: none; width: 100%; transition: 0.2s; }
         input:focus, select:focus, textarea:focus { border-color: var(--accent-purple); }
         .hidden { display: none !important; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
         ::-webkit-scrollbar-track { background: var(--bg-base); }
-        ::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 5px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--bg-active); }
 
         /* =========================================================
-           LAYOUT PRINCIPAL
+           LAYOUT
            ========================================================= */
         #ide-container { display: flex; flex-direction: column; height: 100%; }
         
-        /* Activity Bar (Top) */
-        #top-bar { height: 40px; background: var(--bg-panel); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 10px; flex-shrink: 0; }
-        .top-menu { display: flex; gap: 5px; }
-        .top-menu button { padding: 6px 12px; border-radius: 4px; transition: 0.2s; }
+        /* Top Bar */
+        #top-bar { height: 40px; background: var(--bg-panel); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; flex-shrink: 0; user-select: none; }
+        .top-menu { display: flex; gap: 5px; align-items: center; }
+        .top-brand { font-weight: bold; color: var(--accent-pink); margin-right: 20px; font-size: 14px; letter-spacing: 1px; }
+        .top-menu button { padding: 6px 12px; border-radius: 4px; }
         .top-menu button:hover { background: var(--bg-hover); }
-        .top-brand { font-weight: bold; color: var(--accent-pink); margin-right: 15px; font-size: 14px; }
-        .top-actions { display: flex; gap: 8px; }
+        .top-actions { display: flex; gap: 10px; }
         .btn-run { background: var(--accent-green); color: #000; padding: 6px 15px; border-radius: 4px; font-weight: bold; }
         .btn-run:hover { filter: brightness(1.1); }
+        .btn-ai { background: var(--accent-purple); color: #000; padding: 6px 15px; border-radius: 4px; font-weight: bold; }
+        .btn-ai:hover { filter: brightness(1.1); }
 
         /* Main Workspace */
         #workspace { display: flex; flex: 1; min-height: 0; }
 
-        /* Sidebar (Explorer) */
-        #sidebar { width: 250px; background: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.3s; }
-        .sidebar-header { padding: 10px; font-weight: bold; font-size: 11px; text-transform: uppercase; color: var(--fg-muted); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
-        .sidebar-tools button { color: var(--fg-muted); padding: 2px 5px; border-radius: 3px; }
+        /* Sidebar */
+        #sidebar { width: 250px; background: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { padding: 10px 15px; font-weight: bold; font-size: 11px; text-transform: uppercase; color: var(--fg-muted); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); background: var(--bg-surface); }
+        .sidebar-tools button { color: var(--fg-muted); padding: 4px; margin-left: 2px; border-radius: 3px; }
         .sidebar-tools button:hover { color: var(--fg-main); background: var(--bg-hover); }
         #vfs-tree { flex: 1; overflow-y: auto; padding: 5px 0; user-select: none; }
-        .tree-item { display: flex; align-items: center; padding: 4px 10px; cursor: pointer; white-space: nowrap; transition: 0.1s; }
+        .tree-item { display: flex; align-items: center; padding: 4px 15px; cursor: pointer; white-space: nowrap; border: 1px solid transparent; }
         .tree-item:hover { background: var(--bg-hover); }
         .tree-item.active { background: var(--bg-active); color: var(--fg-main); }
+        .tree-item.drag-over { border: 1px dashed var(--accent-green); background: var(--bg-surface); }
         .tree-item i { width: 20px; text-align: center; margin-right: 5px; font-size: 14px; }
         .icon-folder { color: var(--accent-orange); }
         .icon-html { color: #e34c26; }
@@ -83,86 +87,104 @@
         /* Editor Area */
         #editor-area { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--bg-base); }
         #tabs-bar { display: flex; background: var(--bg-panel); height: 35px; border-bottom: 1px solid var(--border-color); overflow-x: auto; overflow-y: hidden; }
-        .tab { display: flex; align-items: center; gap: 8px; padding: 0 15px; min-width: 120px; max-width: 200px; background: var(--bg-panel); border-right: 1px solid var(--border-color); cursor: pointer; border-top: 2px solid transparent; color: #888; }
+        .tab { display: flex; align-items: center; gap: 8px; padding: 0 15px; min-width: 120px; max-width: 200px; background: var(--bg-panel); border-right: 1px solid var(--border-color); cursor: pointer; border-top: 2px solid transparent; color: #888; user-select: none; }
         .tab:hover { background: var(--bg-surface); }
         .tab.active { background: var(--bg-base); color: var(--fg-main); border-top-color: var(--accent-pink); }
         .tab.unsaved .tab-close::before { content: '\f111'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 8px; margin-right: 5px; color: var(--fg-main); }
-        .tab-close { margin-left: auto; border-radius: 3px; padding: 2px; }
+        .tab-close { margin-left: auto; border-radius: 3px; padding: 2px 5px; }
         .tab-close:hover { background: var(--accent-red); color: white; }
         .tab-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        #breadcrumb { padding: 5px 15px; font-size: 11px; color: var(--fg-muted); background: var(--bg-base); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 5px; }
+        #monaco-container { flex: 1; width: 100%; height: 100%; position: relative; }
+
+        /* Panels (Right/Bottom) */
+        .drawer { background: var(--bg-panel); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        #right-panel { width: 40%; border-left: 1px solid var(--border-color); background: #fff; }
         
-        #monaco-container { flex: 1; width: 100%; height: 100%; }
-
-        /* Right Panel (Preview / Tools) */
-        #right-panel { width: 40%; background: #fff; border-left: 1px solid var(--border-color); display: flex; flex-direction: column; }
-        .panel-header { padding: 10px; background: var(--bg-panel); color: var(--fg-main); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-        #preview-frame { flex: 1; border: none; width: 100%; background: #fff; }
-
-        /* Bottom Panel (Console / Terminal) */
         #bottom-panel { height: 250px; background: var(--bg-panel); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; }
+        .panel-header { padding: 10px 15px; background: var(--bg-surface); color: var(--fg-main); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 12px; text-transform: uppercase; }
+        .panel-header button { color: var(--fg-muted); padding: 4px; border-radius: 3px; }
+        .panel-header button:hover { color: var(--fg-main); background: var(--bg-hover); }
+        
         .bottom-tabs { display: flex; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); }
         .bottom-tabs button { padding: 8px 20px; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; color: #888; border-bottom: 2px solid transparent; }
         .bottom-tabs button.active { color: var(--fg-main); border-bottom-color: var(--accent-green); }
-        .bottom-actions { margin-left: auto; display: flex; align-items: center; padding-right: 10px; }
-        .bottom-actions button { padding: 5px; margin-left: 5px; color: var(--fg-muted); }
-        .bottom-actions button:hover { color: var(--fg-main); }
+        .bottom-actions { margin-left: auto; display: flex; align-items: center; padding-right: 10px; gap: 5px; }
+        .bottom-actions button { color: var(--fg-muted); padding: 4px; border-radius: 3px; }
+        .bottom-actions button:hover { color: var(--fg-main); background: var(--bg-hover); }
         
-        .panel-content { flex: 1; overflow-y: auto; padding: 10px; font-family: var(--font-mono); font-size: 13px; }
+        .panel-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        
+        /* Preview */
+        #preview-frame { flex: 1; border: none; width: 100%; height: 100%; background: #fff; }
+
         /* Console */
-        .log-row { padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); word-wrap: break-word; }
+        #view-console { font-family: var(--font-mono); font-size: 13px; padding: 10px; background: var(--bg-base); }
+        .log-row { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); word-wrap: break-word; }
         .log-time { color: #666; margin-right: 10px; font-size: 11px; }
         .log-info { color: var(--accent-purple); }
         .log-warn { color: var(--accent-orange); }
         .log-error { color: var(--accent-red); }
+
         /* Terminal */
-        #terminal-output { margin-bottom: 5px; }
-        .term-input-line { display: flex; align-items: center; }
+        #view-terminal { font-family: var(--font-mono); font-size: 13px; padding: 10px; background: var(--bg-base); }
+        .term-input-line { display: flex; align-items: center; margin-top: 5px; }
         .term-prompt { color: var(--accent-green); margin-right: 8px; font-weight: bold; }
-        #terminal-input { flex: 1; background: transparent; border: none; color: var(--fg-main); font-family: var(--font-mono); padding: 0; outline: none; }
+        #terminal-input { flex: 1; background: transparent; border: none; color: var(--fg-main); padding: 0; outline: none; }
+        .term-out-row { padding: 2px 0; white-space: pre-wrap; }
+
+        /* Tools Panel */
+        #view-tools { flex-direction: row; }
+        .tools-sidebar { width: 200px; border-right: 1px solid var(--border-color); overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .tool-btn { text-align: left; padding: 8px 10px; border-radius: 4px; color: var(--fg-muted); }
+        .tool-btn:hover, .tool-btn.active { background: var(--bg-hover); color: var(--fg-main); }
+        .tools-main { flex: 1; display: flex; flex-direction: column; padding: 10px; gap: 10px; }
+        .tools-main textarea { flex: 1; resize: none; font-family: var(--font-mono); }
+        .tools-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
         /* Status Bar */
         #status-bar { height: 25px; background: var(--accent-purple); color: #1e1e1e; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; font-size: 12px; font-weight: bold; flex-shrink: 0; }
         .status-group { display: flex; gap: 15px; }
 
         /* =========================================================
-           COMPONENTES UI (Modais, Command Palette, Menus, Toasts)
+           UI COMPONENTS (Modals, Overlays, Command Palette)
            ========================================================= */
         #overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; justify-content: center; align-items: center; }
         
-        /* Dialog */
-        .ide-dialog { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 6px; width: 400px; max-width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: hidden; }
+        .ide-dialog { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 6px; width: 450px; max-width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: hidden; animation: popIn 0.2s ease; }
+        @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .dialog-header { padding: 15px; background: var(--bg-surface); font-weight: bold; border-bottom: 1px solid var(--border-color); }
-        .dialog-body { padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+        .dialog-body { padding: 20px; display: flex; flex-direction: column; gap: 15px; max-height: 60vh; overflow-y: auto; }
         .dialog-footer { padding: 15px; display: flex; justify-content: flex-end; gap: 10px; background: var(--bg-surface); border-top: 1px solid var(--border-color); }
         .btn-primary { background: var(--accent-purple); color: #1e1e1e; padding: 8px 15px; border-radius: 4px; font-weight: bold; }
         .btn-primary:hover { filter: brightness(1.1); }
         .btn-secondary { background: var(--bg-hover); color: var(--fg-main); padding: 8px 15px; border-radius: 4px; }
         .btn-secondary:hover { background: var(--bg-active); }
-        
+        .btn-danger { background: var(--accent-red); color: white; padding: 8px 15px; border-radius: 4px; font-weight: bold; }
+
         /* Command Palette */
-        #command-palette { position: fixed; top: 10%; left: 50%; transform: translateX(-50%); width: 500px; max-width: 90%; background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); z-index: 2000; display: flex; flex-direction: column; }
-        #cp-input { margin: 10px; padding: 12px; font-size: 14px; border-radius: 4px; background: var(--bg-surface); border: 1px solid var(--accent-purple); }
+        #command-palette { position: fixed; top: 15%; left: 50%; transform: translateX(-50%); width: 600px; max-width: 95%; background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); z-index: 2000; display: flex; flex-direction: column; }
+        #cp-input { margin: 10px; padding: 12px; font-size: 14px; border-radius: 4px; background: var(--bg-surface); border: 1px solid var(--accent-purple); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
         #cp-list { max-height: 350px; overflow-y: auto; padding-bottom: 10px; }
-        .cp-item { padding: 10px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .cp-item:hover, .cp-item.selected { background: var(--accent-purple); color: #1e1e1e; }
-        .cp-item-category { font-size: 11px; opacity: 0.7; }
+        .cp-item { padding: 10px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid transparent; }
+        .cp-item:hover, .cp-item.selected { background: var(--bg-surface); border-left-color: var(--accent-purple); }
+        .cp-item-category { font-size: 11px; opacity: 0.5; text-transform: uppercase; }
 
         /* Context Menu */
-        #context-menu { position: fixed; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 3000; min-width: 180px; padding: 5px 0; }
+        #context-menu { position: fixed; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 3000; min-width: 200px; padding: 5px 0; }
         .ctx-item { padding: 8px 20px; font-size: 13px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .ctx-item:hover { background: var(--accent-purple); color: #1e1e1e; }
-        .ctx-shortcut { font-size: 11px; opacity: 0.6; }
+        .ctx-divider { height: 1px; background: var(--border-color); margin: 5px 0; }
 
         /* Toasts */
         #toast-container { position: fixed; bottom: 40px; right: 20px; z-index: 4000; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: var(--bg-surface); border-left: 4px solid var(--accent-purple); padding: 12px 20px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 13px; animation: slideIn 0.3s ease forwards; opacity: 0; }
-        .toast.success { border-color: var(--accent-green); }
-        .toast.error { border-color: var(--accent-red); }
-        .toast.warning { border-color: var(--accent-orange); }
+        .ide-toast { background: var(--bg-surface); border-left: 4px solid var(--accent-purple); padding: 12px 20px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 13px; animation: slideIn 0.3s ease forwards; display: flex; align-items: center; gap: 10px; }
+        .ide-toast.success { border-color: var(--accent-green); }
+        .ide-toast.error { border-color: var(--accent-red); }
+        .ide-toast.warning { border-color: var(--accent-orange); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
-        /* Ocultos por padrão */
-        .file-input-hidden { display: none; }
+        .file-hidden { display: none; }
     </style>
 </head>
 <body>
@@ -172,28 +194,29 @@
     <header id="top-bar">
         <div class="top-menu">
             <span class="top-brand"><i class="fa-solid fa-code"></i> IDE Pro</span>
-            <button onclick="IDE.Commands.execute('file.new')">File</button>
-            <button onclick="IDE.Commands.execute('editor.format')">Edit</button>
-            <button onclick="IDE.Commands.execute('ui.palette')">View</button>
-            <button onclick="IDE.Commands.execute('ui.settings')">Settings</button>
-            <button onclick="IDE.Commands.execute('ui.help')">Help</button>
+            <button data-action="menu.file">File</button>
+            <button data-action="menu.edit">Edit</button>
+            <button data-action="menu.view">View</button>
+            <button data-action="menu.project">Project</button>
+            <button data-action="menu.help">Help</button>
         </div>
         <div class="top-actions">
-            <button class="btn-run" onclick="IDE.Commands.execute('preview.toggle')"><i class="fa-solid fa-play"></i> Preview</button>
+            <button class="btn-ai" data-action="ai.openPanel"><i class="fa-solid fa-robot"></i> AI</button>
+            <button class="btn-run" data-action="preview.toggle"><i class="fa-solid fa-play"></i> Run</button>
         </div>
     </header>
 
-    <!-- Main Workspace -->
+    <!-- Workspace -->
     <main id="workspace">
         <!-- Sidebar Explorer -->
         <aside id="sidebar">
             <div class="sidebar-header">
                 <span>Explorer</span>
                 <div class="sidebar-tools">
-                    <button onclick="IDE.Commands.execute('file.new')" title="New File"><i class="fa-solid fa-file-circle-plus"></i></button>
-                    <button onclick="IDE.Commands.execute('file.newFolder')" title="New Folder"><i class="fa-solid fa-folder-plus"></i></button>
-                    <button onclick="IDE.Commands.execute('project.importZip')" title="Import ZIP"><i class="fa-solid fa-file-zipper"></i></button>
-                    <button onclick="IDE.Commands.execute('project.exportZip')" title="Export ZIP"><i class="fa-solid fa-download"></i></button>
+                    <button data-action="fs.newFile" title="New File"><i class="fa-solid fa-file-circle-plus"></i></button>
+                    <button data-action="fs.newFolder" title="New Folder"><i class="fa-solid fa-folder-plus"></i></button>
+                    <button data-action="project.importZip" title="Import ZIP"><i class="fa-solid fa-file-zipper"></i></button>
+                    <button data-action="ui.toggleExplorer" title="Close"><i class="fa-solid fa-chevron-left"></i></button>
                 </div>
             </div>
             <div id="vfs-tree"></div>
@@ -202,19 +225,21 @@
         <!-- Editor Area -->
         <section id="editor-area">
             <div id="tabs-bar"></div>
+            <div id="breadcrumb"><i class="fa-solid fa-folder-tree"></i> <span id="bc-text">Workspace</span></div>
             <div id="monaco-container"></div>
         </section>
 
-        <!-- Right Panel -->
-        <aside id="right-panel" class="hidden">
+        <!-- Right Panel (Preview / AI) -->
+        <aside id="right-panel" class="drawer hidden">
             <div class="panel-header">
                 <span id="right-panel-title"><i class="fa-solid fa-desktop"></i> Live Preview</span>
                 <div>
-                    <button onclick="IDE.Commands.execute('preview.refresh')" title="Refresh"><i class="fa-solid fa-rotate-right"></i></button>
-                    <button onclick="IDE.Commands.execute('preview.toggle')" style="margin-left: 10px;" title="Close"><i class="fa-solid fa-xmark"></i></button>
+                    <button data-action="preview.refresh" title="Refresh"><i class="fa-solid fa-rotate-right"></i></button>
+                    <button data-action="ui.closeRightPanel" style="margin-left: 5px;" title="Close"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
-            <iframe id="preview-frame" sandbox="allow-scripts allow-modals allow-same-origin"></iframe>
+            <!-- sandbox without allow-same-origin for security -->
+            <iframe id="preview-frame" sandbox="allow-scripts allow-forms allow-modals"></iframe>
         </aside>
     </main>
 
@@ -223,18 +248,39 @@
         <div class="bottom-tabs">
             <button class="active" data-target="console">Console</button>
             <button data-target="terminal">Terminal</button>
+            <button data-target="tools">Tools</button>
+            <button data-target="search">Search Results</button>
             <div class="bottom-actions">
-                <button onclick="IDE.Console.clear()" title="Clear Console"><i class="fa-solid fa-ban"></i></button>
-                <button onclick="IDE.Commands.execute('ui.toggleBottom')" title="Close Panel"><i class="fa-solid fa-xmark"></i></button>
+                <button data-action="ui.clearBottom" title="Clear"><i class="fa-solid fa-ban"></i></button>
+                <button data-action="ui.toggleBottom" title="Close"><i class="fa-solid fa-xmark"></i></button>
             </div>
         </div>
-        <div class="panel-content active" id="view-console"></div>
+        
+        <div class="panel-content" id="view-console"></div>
+        
         <div class="panel-content hidden" id="view-terminal">
             <div id="terminal-output"></div>
             <div class="term-input-line">
-                <span class="term-prompt">ide:~$</span>
+                <span class="term-prompt" id="term-prompt-text">ide:~/root$</span>
                 <input type="text" id="terminal-input" autocomplete="off" spellcheck="false">
             </div>
+        </div>
+
+        <div class="panel-content hidden" id="view-tools">
+            <div class="tools-sidebar" id="tools-list"></div>
+            <div class="tools-main">
+                <h3 id="tool-title" style="color:var(--accent-pink);">Tool</h3>
+                <textarea id="tool-input" placeholder="Input here..."></textarea>
+                <div class="tools-actions">
+                    <button class="btn-secondary" data-action="tools.clear">Clear</button>
+                    <button class="btn-primary" data-action="tools.execute">Execute</button>
+                </div>
+                <textarea id="tool-output" placeholder="Output..." readonly></textarea>
+            </div>
+        </div>
+
+        <div class="panel-content hidden" id="view-search">
+            <div id="search-results" style="font-family:var(--font-mono); font-size:13px;"></div>
         </div>
     </footer>
 
@@ -247,15 +293,15 @@
         <div class="status-group">
             <span id="sb-cursor">Ln 1, Col 1</span>
             <span id="sb-lang">Plain Text</span>
+            <span id="sb-storage" title="Storage Mode"><i class="fa-solid fa-database"></i></span>
         </div>
     </div>
 </div>
 
 <!-- =========================================================
-     COMPONENTS HTML (Ocultos)
+     COMPONENTS HTML (Hidden)
      ========================================================= -->
 <div id="overlay" class="hidden">
-    <!-- Dynamic Dialog -->
     <div id="ide-dialog" class="ide-dialog hidden">
         <div class="dialog-header" id="dialog-title">Title</div>
         <div class="dialog-body" id="dialog-body"></div>
@@ -267,48 +313,44 @@
 </div>
 
 <div id="command-palette" class="hidden">
-    <input type="text" id="cp-input" placeholder="Type a command or search (Ctrl+Shift+P)...">
+    <input type="text" id="cp-input" placeholder="Type a command or search files (Ctrl+P / Ctrl+Shift+P)...">
     <div id="cp-list"></div>
 </div>
 
 <div id="context-menu" class="hidden"></div>
 <div id="toast-container"></div>
-<input type="file" id="file-importer" accept=".zip" class="file-input-hidden">
+<input type="file" id="file-importer" accept=".zip" class="file-hidden">
 
 <!-- =========================================================
-     LÓGICA DA IDE (JavaScript Modular)
+     JAVASCRIPT LOGIC
      ========================================================= -->
 <script>
 /**
- * ARQUITETURA WEB IDE PRO
- * - IDE.Events: Event Bus para desacoplamento.
- * - IDE.Storage: Wrapper IndexedDB para persistência.
- * - IDE.VFS: Virtual File System (Arquivos e Pastas em memória).
- * - IDE.Workspace: Gerenciamento de abas e estado ativo.
- * - IDE.Editor: Instância e Modelos do Monaco Editor.
- * - IDE.Preview: Engine de execução HTML/CSS/JS via Blob URLs.
- * - IDE.Terminal / Console: I/O interno.
- * - IDE.Commands / Palette: Registro central de ações.
- * - IDE.UI: Interfaces, Modais, Árvores.
- * - IDE.ZIP / Tools / AI: Módulos de suporte.
+ * WEB IDE PRO - ARCHITECTURE
+ * Using strict modular pattern attached to window.IDE.
+ * No inline HTML handlers used. Event delegation handles interactions.
  */
 
-const IDE = {};
+window.IDE = {
+    MemoryStorage: {}, // Fallback memory store
+    useMemory: false
+};
 
-/* --- 1. CORE & EVENTS --- */
+/* --- 1. UTILS & EVENTS --- */
 IDE.Events = {
-    listeners: {},
+    _listeners: {},
     on(event, callback) {
-        if (!this.listeners[event]) this.listeners[event] = [];
-        this.listeners[event].push(callback);
+        if (!this._listeners[event]) this._listeners[event] = [];
+        this._listeners[event].push(callback);
     },
     emit(event, data) {
-        if (this.listeners[event]) this.listeners[event].forEach(cb => cb(data));
+        if (this._listeners[event]) this._listeners[event].forEach(cb => cb(data));
     }
 };
 
 IDE.Utils = {
-    generateId: () => '_' + Math.random().toString(36).substr(2, 9),
+    uuid: () => 'id_' + Math.random().toString(36).substr(2, 9),
+    escape: (str) => String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag])),
     getExt: (name) => name.split('.').pop().toLowerCase(),
     getLang: (name) => {
         const map = { html:'html', css:'css', js:'javascript', json:'json', md:'markdown', ts:'typescript' };
@@ -325,136 +367,156 @@ IDE.Utils = {
     }
 };
 
-/* --- 2. STORAGE (IndexedDB) --- */
+/* --- 2. STORAGE --- */
 IDE.Storage = {
     db: null,
-    init() {
-        return new Promise((resolve, reject) => {
-            const req = indexedDB.open("WebIDEProDB", 1);
-            req.onupgradeneeded = (e) => {
-                const db = e.target.result;
-                if (!db.objectStoreNames.contains("vfs")) db.createObjectStore("vfs", { keyPath: "id" });
-                if (!db.objectStoreNames.contains("state")) db.createObjectStore("state", { keyPath: "key" });
-            };
-            req.onsuccess = (e) => { this.db = e.target.result; resolve(); };
-            req.onerror = (e) => reject(e.target.error);
-        });
-    },
-    tx(storeName, mode) {
-        const tx = this.db.transaction(storeName, mode);
-        return tx.objectStore(storeName);
+    async init() {
+        try {
+            // Test localStorage availability (might throw in some sandboxes/incognito)
+            const test = '__test__';
+            localStorage.setItem(test, test);
+            localStorage.removeItem(test);
+
+            // Init IndexedDB
+            return await new Promise((resolve, reject) => {
+                const req = indexedDB.open("WebIDEPro", 1);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains("vfs")) db.createObjectStore("vfs", { keyPath: "id" });
+                    if (!db.objectStoreNames.contains("state")) db.createObjectStore("state", { keyPath: "key" });
+                };
+                req.onsuccess = (e) => { this.db = e.target.result; resolve(); };
+                req.onerror = (e) => reject(e.target.error);
+            });
+        } catch (e) {
+            IDE.useMemory = true;
+            console.warn("Storage restricted. Using in-memory fallback.", e);
+            document.getElementById('sb-storage').style.color = "var(--accent-red)";
+            document.getElementById('sb-storage').title = "Memory Mode (Ephemeral)";
+            setTimeout(() => IDE.UI.notify("Persistent storage is unavailable in this context. Changes will remain only for this session.", "warning"), 1000);
+        }
     },
     async set(storeName, obj) {
-        return new Promise(res => { const req = this.tx(storeName, "readwrite").put(obj); req.onsuccess = res; });
+        if (IDE.useMemory) {
+            if (!IDE.MemoryStorage[storeName]) IDE.MemoryStorage[storeName] = {};
+            const key = obj.id || obj.key;
+            IDE.MemoryStorage[storeName][key] = obj;
+            return;
+        }
+        return new Promise(res => { const req = this.db.transaction(storeName, "readwrite").objectStore(storeName).put(obj); req.onsuccess = res; });
     },
     async get(storeName, key) {
-        return new Promise(res => { const req = this.tx(storeName, "readonly").get(key); req.onsuccess = () => res(req.result); });
+        if (IDE.useMemory) return IDE.MemoryStorage[storeName] ? IDE.MemoryStorage[storeName][key] : null;
+        return new Promise(res => { const req = this.db.transaction(storeName, "readonly").objectStore(storeName).get(key); req.onsuccess = () => res(req.result); });
     },
     async getAll(storeName) {
-        return new Promise(res => { const req = this.tx(storeName, "readonly").getAll(); req.onsuccess = () => res(req.result); });
+        if (IDE.useMemory) return IDE.MemoryStorage[storeName] ? Object.values(IDE.MemoryStorage[storeName]) : [];
+        return new Promise(res => { const req = this.db.transaction(storeName, "readonly").objectStore(storeName).getAll(); req.onsuccess = () => res(req.result); });
     },
-    async delete(storeName, key) {
-        return new Promise(res => { const req = this.tx(storeName, "readwrite").delete(key); req.onsuccess = res; });
+    async remove(storeName, key) {
+        if (IDE.useMemory) { if (IDE.MemoryStorage[storeName]) delete IDE.MemoryStorage[storeName][key]; return; }
+        return new Promise(res => { const req = this.db.transaction(storeName, "readwrite").objectStore(storeName).delete(key); req.onsuccess = res; });
     },
     async clear(storeName) {
-        return new Promise(res => { const req = this.tx(storeName, "readwrite").clear(); req.onsuccess = res; });
+        if (IDE.useMemory) { IDE.MemoryStorage[storeName] = {}; return; }
+        return new Promise(res => { const req = this.db.transaction(storeName, "readwrite").objectStore(storeName).clear(); req.onsuccess = res; });
     }
 };
 
-/* --- 3. VFS (Virtual File System) --- */
+/* --- 3. VIRTUAL FILE SYSTEM --- */
 IDE.VFS = {
     files: {}, // { id: { id, name, type, parentId, content, modified } }
     
     async init() {
         const records = await IDE.Storage.getAll("vfs");
-        if (records.length === 0) {
-            await this.seedDefault();
-        } else {
-            records.forEach(r => this.files[r.id] = r);
-        }
+        if (records.length === 0) await this.seedDefault();
+        else records.forEach(r => this.files[r.id] = r);
     },
     async seedDefault() {
         const root = { id: 'root', name: 'Root', type: 'folder', parentId: null };
         this.files['root'] = root; await IDE.Storage.set("vfs", root);
         
-        await this.createFile('index.html', 'root', '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>Hello IDE</title>\n  <link rel="stylesheet" href="css/style.css">\n</head>\n<body>\n  <h1>Welcome to Web IDE Pro</h1>\n  <button id="btn">Click Me!</button>\n  <script src="js/main.js"><\/script>\n</body>\n</html>');
+        await this.createFile('index.html', 'root', '<!DOCTYPE html>\n<html>\n<head>\n  <link rel="stylesheet" href="css/style.css">\n</head>\n<body>\n  <h1>Web IDE Pro</h1>\n  <button id="btn">Click</button>\n  <script src="js/main.js"><\/script>\n</body>\n</html>');
         const cssFolder = await this.createFolder('css', 'root');
-        await this.createFile('style.css', cssFolder, 'body {\n  background: #282a36;\n  color: #f8f8f2;\n  font-family: sans-serif;\n  text-align: center;\n  padding-top: 50px;\n}\nbutton {\n  padding: 10px 20px;\n  background: #ff79c6;\n  border: none;\n  color: white;\n  border-radius: 4px;\n  cursor: pointer;\n}');
+        await this.createFile('style.css', cssFolder, 'body { background: #282a36; color: #fff; font-family: sans-serif; padding: 20px; }');
         const jsFolder = await this.createFolder('js', 'root');
-        await this.createFile('main.js', jsFolder, 'document.getElementById("btn").addEventListener("click", () => {\n  console.log("Button clicked!");\n  alert("Hello from internal preview!");\n});');
+        await this.createFile('main.js', jsFolder, 'document.getElementById("btn").onclick = () => console.log("Clicked!");');
     },
     async createFile(name, parentId = 'root', content = '') {
-        const id = IDE.Utils.generateId();
+        const id = IDE.Utils.uuid();
         const file = { id, name, type: 'file', parentId, content, modified: Date.now() };
-        this.files[id] = file;
-        await IDE.Storage.set("vfs", file);
-        IDE.Events.emit('vfs.changed');
-        return id;
+        this.files[id] = file; await IDE.Storage.set("vfs", file);
+        IDE.Events.emit('vfs.changed'); return id;
     },
     async createFolder(name, parentId = 'root') {
-        const id = IDE.Utils.generateId();
+        const id = IDE.Utils.uuid();
         const folder = { id, name, type: 'folder', parentId, content: null };
-        this.files[id] = folder;
-        await IDE.Storage.set("vfs", folder);
-        IDE.Events.emit('vfs.changed');
-        return id;
+        this.files[id] = folder; await IDE.Storage.set("vfs", folder);
+        IDE.Events.emit('vfs.changed'); return id;
     },
     async updateContent(id, content) {
         if (this.files[id] && this.files[id].content !== content) {
-            this.files[id].content = content;
-            this.files[id].modified = Date.now();
+            this.files[id].content = content; this.files[id].modified = Date.now();
             await IDE.Storage.set("vfs", this.files[id]);
             IDE.Events.emit('file.saved', id);
         }
     },
     async rename(id, newName) {
-        if (this.files[id]) {
-            this.files[id].name = newName;
-            await IDE.Storage.set("vfs", this.files[id]);
-            IDE.Events.emit('vfs.changed');
+        if (this.files[id]) { this.files[id].name = newName; await IDE.Storage.set("vfs", this.files[id]); IDE.Events.emit('vfs.changed'); }
+    },
+    async move(srcId, targetDirId) {
+        if (!this.files[srcId] || !this.files[targetDirId] || this.files[targetDirId].type !== 'folder') return false;
+        // Prevent moving into self or descendants
+        let curr = targetDirId;
+        while(curr && curr !== 'root') {
+            if (curr === srcId) return false;
+            curr = this.files[curr].parentId;
         }
+        this.files[srcId].parentId = targetDirId;
+        await IDE.Storage.set("vfs", this.files[srcId]);
+        IDE.Events.emit('vfs.changed');
+        return true;
     },
     async remove(id) {
         if (id === 'root') return;
-        const idsToDelete = [id];
+        const toDelete = [id];
         const findChildren = (pid) => {
-            Object.values(this.files).forEach(f => {
-                if (f.parentId === pid) { idsToDelete.push(f.id); findChildren(f.id); }
-            });
+            Object.values(this.files).forEach(f => { if (f.parentId === pid) { toDelete.push(f.id); findChildren(f.id); } });
         };
         findChildren(id);
-        for (const cid of idsToDelete) {
-            delete this.files[cid];
-            await IDE.Storage.delete("vfs", cid);
+        for (const cid of toDelete) {
+            delete this.files[cid]; await IDE.Storage.remove("vfs", cid);
             IDE.Events.emit('file.deleted', cid);
         }
         IDE.Events.emit('vfs.changed');
     },
-    resolvePath(startDirId, relativePath) {
-        let currentId = startDirId === 'root' ? 'root' : (this.files[startDirId]?.parentId || 'root');
-        const parts = relativePath.split('/');
-        for (let i = 0; i < parts.length; i++) {
-            const p = parts[i];
-            if (p === '.' || p === '') continue;
-            if (p === '..') {
+    resolvePath(startDirId, pathStr) {
+        if (!pathStr || pathStr === '.') return this.files[startDirId] || this.files['root'];
+        if (pathStr === '/') return this.files['root'];
+        let currentId = pathStr.startsWith('/') ? 'root' : startDirId;
+        const parts = pathStr.split('/').filter(p => p !== '' && p !== '.');
+        for (let part of parts) {
+            if (part === '..') {
                 if (currentId !== 'root') currentId = this.files[currentId]?.parentId || 'root';
-                continue;
+            } else {
+                const child = Object.values(this.files).find(f => f.parentId === currentId && f.name === part);
+                if (!child) return null;
+                currentId = child.id;
             }
-            const child = Object.values(this.files).find(f => f.parentId === currentId && f.name === p);
-            if (!child) return null;
-            if (i === parts.length - 1) return child;
-            currentId = child.id;
         }
-        return null;
+        return this.files[currentId];
+    },
+    getFullPath(id) {
+        if (id === 'root') return '/';
+        let path = []; let curr = this.files[id];
+        while(curr && curr.id !== 'root') { path.unshift(curr.name); curr = this.files[curr.parentId]; }
+        return '/' + path.join('/');
     }
 };
 
-/* --- 4. WORKSPACE --- */
+/* --- 4. WORKSPACE & TABS --- */
 IDE.Workspace = {
-    openTabs: [], // array of file IDs
-    activeTab: null,
-    expandedFolders: { 'root': true },
-    
+    openTabs: [], activeTab: null, expandedFolders: { 'root': true },
     async init() {
         const state = await IDE.Storage.get("state", "workspace");
         if (state) {
@@ -463,7 +525,7 @@ IDE.Workspace = {
             this.expandedFolders = state.expandedFolders || { 'root': true };
         }
         if (this.openTabs.length === 0) {
-            const idx = Object.values(IDE.VFS.files).find(f => f.name === 'index.html');
+            const idx = Object.values(IDE.VFS.files).find(f => f.name === 'index.html' && f.parentId === 'root');
             if (idx) this.openFile(idx.id);
         } else {
             IDE.Events.emit('workspace.changed');
@@ -477,72 +539,70 @@ IDE.Workspace = {
         const file = IDE.VFS.files[id];
         if (!file || file.type === 'folder') return;
         if (!this.openTabs.includes(id)) this.openTabs.push(id);
-        this.activeTab = id;
-        this.saveState();
-        IDE.Events.emit('workspace.changed');
-        IDE.Events.emit('file.opened', id);
+        this.activeTab = id; this.saveState();
+        IDE.Events.emit('workspace.changed'); IDE.Events.emit('file.opened', id);
     },
     closeFile(id) {
         this.openTabs = this.openTabs.filter(t => t !== id);
-        if (this.activeTab === id) {
-            this.activeTab = this.openTabs.length > 0 ? this.openTabs[this.openTabs.length - 1] : null;
-        }
-        this.saveState();
-        IDE.Events.emit('workspace.changed');
+        if (this.activeTab === id) this.activeTab = this.openTabs.length > 0 ? this.openTabs[this.openTabs.length - 1] : null;
+        this.saveState(); IDE.Events.emit('workspace.changed');
         if (this.activeTab) IDE.Events.emit('file.opened', this.activeTab);
         else IDE.Editor.clear();
     },
+    closeOthers(id) {
+        this.openTabs = [id]; this.activeTab = id; this.saveState();
+        IDE.Events.emit('workspace.changed'); IDE.Events.emit('file.opened', id);
+    },
+    closeRight(id) {
+        const idx = this.openTabs.indexOf(id);
+        if(idx !== -1) {
+            this.openTabs = this.openTabs.slice(0, idx + 1);
+            if(!this.openTabs.includes(this.activeTab)) this.activeTab = id;
+            this.saveState(); IDE.Events.emit('workspace.changed');
+            if (this.activeTab) IDE.Events.emit('file.opened', this.activeTab);
+        }
+    },
+    closeAll() {
+        this.openTabs = []; this.activeTab = null; this.saveState();
+        IDE.Events.emit('workspace.changed'); IDE.Editor.clear();
+    },
     toggleFolder(id) {
         this.expandedFolders[id] = !this.expandedFolders[id];
-        this.saveState();
-        IDE.Events.emit('vfs.changed');
+        this.saveState(); IDE.Events.emit('vfs.changed');
     }
 };
 
-/* --- 5. MONACO EDITOR --- */
+/* --- 5. EDITOR (Monaco) --- */
 IDE.Editor = {
-    instance: null,
-    models: {}, // { id: monaco.editor.ITextModel }
-    
+    instance: null, models: {},
     init() {
-        // Configurando o Monaco Loader para rodar cross-origin sem web workers locais nativos
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' } });
-        window.MonacoEnvironment = { getWorkerUrl: () => proxy }; // Fallback
-        
+        window.MonacoEnvironment = { getWorkerUrl: () => proxy }; 
         require(['vs/editor/editor.main'], () => {
             monaco.editor.defineTheme('dracula', {
                 base: 'vs-dark', inherit: true,
                 rules: [
-                    { token: 'comment', foreground: '6272a4' },
-                    { token: 'keyword', foreground: 'ff79c6' },
-                    { token: 'string', foreground: 'f1fa8c' },
-                    { token: 'number', foreground: 'bd93f9' },
+                    { token: 'comment', foreground: '6272a4' }, { token: 'keyword', foreground: 'ff79c6' },
+                    { token: 'string', foreground: 'f1fa8c' }, { token: 'number', foreground: 'bd93f9' },
                     { token: 'type', foreground: '8be9fd' }
                 ],
                 colors: { 'editor.background': '#1e1e1e', 'editor.lineHighlightBackground': '#282a36' }
             });
 
             this.instance = monaco.editor.create(document.getElementById('monaco-container'), {
-                theme: 'dracula',
-                automaticLayout: true,
-                fontSize: 14,
-                fontFamily: "var(--font-mono)",
-                minimap: { enabled: false },
-                wordWrap: 'on',
-                formatOnPaste: true,
-                padding: { top: 10 }
+                theme: 'dracula', automaticLayout: true, fontSize: 14, fontFamily: "var(--font-mono)",
+                minimap: { enabled: false }, wordWrap: 'on', formatOnPaste: true, padding: { top: 10 }
             });
 
-            this.instance.onDidChangeCursorPosition((e) => {
-                document.getElementById('sb-cursor').innerText = `Ln ${e.position.lineNumber}, Col ${e.position.column}`;
-            });
-
+            this.instance.onDidChangeCursorPosition((e) => document.getElementById('sb-cursor').innerText = `Ln ${e.position.lineNumber}, Col ${e.position.column}`);
             this.instance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => IDE.Commands.execute('file.save'));
             this.instance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyP, () => IDE.Commands.execute('ui.palette'));
+            this.instance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyP, () => IDE.Commands.execute('ui.paletteSearch'));
+            this.instance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF, () => IDE.Commands.execute('search.global'));
+            this.instance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyJ, () => IDE.Commands.execute('ui.toggleBottom'));
 
             IDE.Events.on('file.opened', (id) => this.switchModel(id));
             IDE.Events.on('file.deleted', (id) => { if (this.models[id]) { this.models[id].dispose(); delete this.models[id]; } });
-            
             if (IDE.Workspace.activeTab) this.switchModel(IDE.Workspace.activeTab);
         });
     },
@@ -550,76 +610,62 @@ IDE.Editor = {
         if (!this.instance) return;
         const file = IDE.VFS.files[id];
         if (!file) return;
-
         if (!this.models[id]) {
-            const lang = IDE.Utils.getLang(file.name);
-            this.models[id] = monaco.editor.createModel(file.content, lang);
-            this.models[id].onDidChangeContent(() => IDE.UI.renderTabs()); // triggers unsaved dot
+            this.models[id] = monaco.editor.createModel(file.content, IDE.Utils.getLang(file.name));
+            this.models[id].onDidChangeContent(() => IDE.UI.renderTabs()); // unsaved dot
         }
         this.instance.setModel(this.models[id]);
         document.getElementById('sb-lang').innerText = IDE.Utils.getLang(file.name).toUpperCase();
+        document.getElementById('bc-text').innerText = IDE.VFS.getFullPath(id);
     },
     clear() {
         if (this.instance) this.instance.setModel(null);
         document.getElementById('sb-lang').innerText = "Plain Text";
+        document.getElementById('bc-text').innerText = "Workspace";
     }
 };
 
-/* --- 6. PREVIEW ENGINE --- */
+/* --- 6. SECURE PREVIEW --- */
 IDE.Preview = {
     run() {
-        const indexId = Object.keys(IDE.VFS.files).find(id => IDE.VFS.files[id].name === 'index.html');
-        if (!indexId) { IDE.UI.toast("index.html não encontrado no projeto.", "error"); return; }
+        const indexNode = Object.values(IDE.VFS.files).find(f => f.name === 'index.html' && f.parentId === 'root');
+        if (!indexNode) { IDE.UI.notify("index.html not found in root.", "error"); return; }
         
-        const indexFile = IDE.VFS.files[indexId];
-        let html = indexFile.content;
-
-        // Varrer links CSS
-        html = html.replace(/<link[^>]+href=["']([^"']+\.css)["'][^>]*>/gi, (match, url) => {
-            const file = IDE.VFS.resolvePath(indexFile.id, url);
-            if (file) {
-                const blob = new Blob([file.content], {type: 'text/css'});
-                return `<link rel="stylesheet" href="${URL.createObjectURL(blob)}">`;
-            }
-            return match;
+        let html = indexNode.content;
+        
+        // Resolve local assets via Blob URLs
+        html = html.replace(/<link[^>]+href=["']([^"']+)["'][^>]*>/gi, (match, url) => {
+            if(url.startsWith('http')) return match;
+            const f = IDE.VFS.resolvePath(indexNode.id, url);
+            return f ? `<link rel="stylesheet" href="${URL.createObjectURL(new Blob([f.content], {type: 'text/css'}))}">` : match;
+        });
+        html = html.replace(/<script[^>]+src=["']([^"']+)["'][^>]*><\/script>/gi, (match, url) => {
+            if(url.startsWith('http')) return match;
+            const f = IDE.VFS.resolvePath(indexNode.id, url);
+            return f ? `<script src="${URL.createObjectURL(new Blob([f.content], {type: 'application/javascript'}))}"><\/script>` : match;
         });
 
-        // Varrer scripts JS
-        html = html.replace(/<script[^>]+src=["']([^"']+\.js)["'][^>]*><\/script>/gi, (match, url) => {
-            const file = IDE.VFS.resolvePath(indexFile.id, url);
-            if (file) {
-                const blob = new Blob([file.content], {type: 'application/javascript'});
-                return `<script src="${URL.createObjectURL(blob)}"><\/script>`;
-            }
-            return match;
-        });
-
-        // Interceptar Console e Erros
+        // Safe Bridge (no DOM access, only strict postMessage)
         const bridge = `
         <script>
-            ['log','info','warn','error','debug'].forEach(m => {
-                const old = console[m];
-                console[m] = function(...args) {
-                    window.parent.postMessage({ type: 'ide-log', level: m, msg: args.map(a => typeof a === 'object'? JSON.stringify(a):String(a)).join(' ') }, '*');
-                    old.apply(console, args);
-                };
-            });
-            window.onerror = function(msg, url, line) { 
-                window.parent.postMessage({ type: 'ide-log', level: 'error', msg: msg + ' (Line ' + line + ')' }, '*');
-            };
+            (function(){
+                const send = (lvl, args) => window.parent.postMessage({ type: 'ide-log', level: lvl, msg: args.map(a => typeof a==='object'?JSON.stringify(a):String(a)).join(' ') }, '*');
+                ['log','info','warn','error','debug'].forEach(m => { const old = console[m]; console[m] = function(...args) { send(m, args); old.apply(console, args); }; });
+                window.onerror = function(msg, url, line) { send('error', [msg + ' (Line ' + line + ')']); };
+                window.addEventListener('unhandledrejection', e => send('error', ['Unhandled Promise: ' + e.reason]));
+            })();
         <\/script>`;
         
         html = html.replace('<head>', '<head>\n' + bridge);
-
-        document.getElementById('right-panel').classList.remove('hidden');
-        const iframe = document.getElementById('preview-frame');
-        iframe.srcdoc = html;
         
-        IDE.Console.log("Preview iniciado.", "info");
+        document.getElementById('right-panel').classList.remove('hidden');
+        document.getElementById('preview-frame').srcdoc = html;
+        IDE.Console.log("Preview started.", "info");
     }
 };
 
 window.addEventListener('message', e => {
+    // We expect messages from iframe. Origin is 'null' because it's a sandboxed iframe without allow-same-origin (which is secure).
     if (e.data && e.data.type === 'ide-log') IDE.Console.log(e.data.msg, e.data.level);
 });
 
@@ -627,14 +673,9 @@ window.addEventListener('message', e => {
 IDE.Console = {
     log(msg, level='info') {
         const pane = document.getElementById('view-console');
-        const div = document.createElement('div');
-        div.className = `log-row log-${level}`;
-        const time = new Date().toLocaleTimeString();
-        div.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-msg">${IDE.UI.escape(msg)}</span>`;
-        pane.appendChild(div);
-        pane.scrollTop = pane.scrollHeight;
-        
-        // Auto-open panel se oculto e for erro
+        const div = document.createElement('div'); div.className = `log-row log-${level}`;
+        div.innerHTML = `<span class="log-time">[${new Date().toLocaleTimeString()}]</span> <span class="log-msg">${IDE.Utils.escape(msg)}</span>`;
+        pane.appendChild(div); pane.scrollTop = pane.scrollHeight;
         if (level === 'error') {
             document.getElementById('bottom-panel').classList.remove('hidden');
             IDE.UI.switchBottomTab('console');
@@ -644,20 +685,15 @@ IDE.Console = {
 };
 
 IDE.Terminal = {
-    cwd: 'root', // ID do diretório atual
-    history: [],
-    historyIdx: -1,
-    
+    cwd: 'root', history: [], historyIdx: -1,
     init() {
         const input = document.getElementById('terminal-input');
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                const cmd = input.value.trim();
-                input.value = '';
+                const cmd = input.value.trim(); input.value = '';
                 if(cmd) {
-                    this.history.push(cmd);
-                    this.historyIdx = this.history.length;
-                    this.print(`ide:~$ ${cmd}`, 'accent-green');
+                    this.history.push(cmd); this.historyIdx = this.history.length;
+                    this.print(`ide:${IDE.VFS.getFullPath(this.cwd)}$ ${cmd}`, 'accent-green');
                     this.execute(cmd);
                 }
             } else if (e.key === 'ArrowUp') {
@@ -667,37 +703,439 @@ IDE.Terminal = {
                 else { this.historyIdx = this.history.length; input.value = ''; }
             }
         });
+        this.updatePrompt();
     },
-    print(msg, colorClass = 'fg-main') {
+    updatePrompt() { document.getElementById('term-prompt-text').innerText = `ide:${IDE.VFS.getFullPath(this.cwd)}$`; },
+    print(msg, color = 'fg-main') {
         const pane = document.getElementById('terminal-output');
-        const div = document.createElement('div');
-        div.className = `log-row`;
-        div.style.color = `var(--${colorClass})`;
-        div.innerText = msg;
-        pane.appendChild(div);
-        document.getElementById('view-terminal').scrollTop = document.getElementById('view-terminal').scrollHeight;
+        const div = document.createElement('div'); div.className = `term-out-row`; div.style.color = `var(--${color})`; div.innerText = msg;
+        pane.appendChild(div); document.getElementById('view-terminal').scrollTop = document.getElementById('view-terminal').scrollHeight;
     },
-    execute(cmdStr) {
+    async execute(cmdStr) {
         const args = cmdStr.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g).map(s => s.replace(/['"]/g, ''));
         const cmd = args.shift().toLowerCase();
         
-        const getPathId = (pathStr) => {
-            if(!pathStr) return this.cwd;
-            const res = IDE.VFS.resolvePath(this.cwd, pathStr);
-            return res ? res.id : null;
-        };
+        const getPathId = (str) => { if(!str) return this.cwd; const res = IDE.VFS.resolvePath(this.cwd, str); return res ? res.id : null; };
 
         switch(cmd) {
-            case 'help':
-                this.print("Commands: help, clear, ls, cd <dir>, mkdir <name>, touch <name>, rm <name>, cat <name>, run, date, ide settings");
-                break;
-            case 'clear':
-                document.getElementById('terminal-output').innerHTML = '';
-                break;
-            case 'date':
-                this.print(new Date().toString());
-                break;
+            case 'help': this.print("Commands: help, clear, ls, pwd, cd, tree, mkdir, touch, rm, cat, run, date, version"); break;
+            case 'clear': document.getElementById('terminal-output').innerHTML = ''; break;
+            case 'pwd': this.print(IDE.VFS.getFullPath(this.cwd)); break;
+            case 'date': this.print(new Date().toString()); break;
+            case 'version': this.print("Web IDE Pro v2.0"); break;
             case 'ls':
+            case 'dir':
                 const files = Object.values(IDE.VFS.files).filter(f => f.parentId === this.cwd);
                 if(files.length === 0) this.print("(empty)");
-                else this.print(files.map(f => f.type === 'folder' ? f.name+'/' : f.name).join('  '), 'acce
+                else this.print(files.map(f => f.type === 'folder' ? f.name+'/' : f.name).join('  '), 'accent-purple');
+                break;
+            case 'cd':
+                const target = getPathId(args[0]);
+                if (target && IDE.VFS.files[target].type === 'folder') { this.cwd = target; this.updatePrompt(); }
+                else this.print(`cd: ${args[0]||''}: No such directory`, 'accent-red');
+                break;
+            case 'mkdir':
+                if (args[0]) { await IDE.VFS.createFolder(args[0], this.cwd); this.print(`Created folder ${args[0]}`); }
+                break;
+            case 'touch':
+                if (args[0]) { await IDE.VFS.createFile(args[0], this.cwd); this.print(`Created file ${args[0]}`); }
+                break;
+            case 'rm':
+            case 'del':
+                const toRm = getPathId(args[0]);
+                if(toRm) { await IDE.VFS.remove(toRm); this.print(`Removed ${args[0]}`); }
+                else this.print(`rm: cannot remove '${args[0]}': No such file`, 'accent-red');
+                break;
+            case 'cat':
+                const toCat = getPathId(args[0]);
+                if(toCat && IDE.VFS.files[toCat].type === 'file') this.print(IDE.VFS.files[toCat].content);
+                else this.print(`cat: ${args[0]}: No such file`, 'accent-red');
+                break;
+            case 'run':
+            case 'preview': IDE.Commands.execute('preview.toggle'); break;
+            case 'tree':
+                let res = '';
+                const walk = (pid, depth) => {
+                    const c = Object.values(IDE.VFS.files).filter(f=>f.parentId===pid);
+                    c.forEach(f => { res += '  '.repeat(depth) + '|- ' + f.name + '\n'; if(f.type==='folder') walk(f.id, depth+1); });
+                };
+                walk(this.cwd, 0); this.print(res || '(empty)');
+                break;
+            default: this.print(`${cmd}: command not found`, 'accent-red');
+        }
+    }
+};
+
+/* --- 8. TOOLS --- */
+IDE.Tools = {
+    current: null,
+    registry: {
+        'jsonFormat': { name: 'JSON Formatter', run: v => JSON.stringify(JSON.parse(v), null, 2) },
+        'jsonValid': { name: 'JSON Validator', run: v => { JSON.parse(v); return "Valid JSON."; } },
+        'b64Enc': { name: 'Base64 Encode', run: v => btoa(unescape(encodeURIComponent(v))) },
+        'b64Dec': { name: 'Base64 Decode', run: v => decodeURIComponent(escape(atob(v))) },
+        'urlEnc': { name: 'URL Encode', run: v => encodeURIComponent(v) },
+        'urlDec': { name: 'URL Decode', run: v => decodeURIComponent(v) },
+        'uuid': { name: 'UUID Generator', run: () => 'id_' + Math.random().toString(36).substr(2, 9) + Math.random().toString(36).substr(2, 9) },
+        'count': { name: 'Text Counter', run: v => `Characters: ${v.length}\nWords: ${v.trim().split(/\s+/).length}` },
+        'upper': { name: 'To Uppercase', run: v => v.toUpperCase() },
+        'lower': { name: 'To Lowercase', run: v => v.toLowerCase() }
+    },
+    init() {
+        const list = document.getElementById('tools-list');
+        Object.keys(this.registry).forEach(k => {
+            const b = document.createElement('button'); b.className = 'tool-btn'; b.innerText = this.registry[k].name;
+            b.onclick = () => this.select(k); list.appendChild(b);
+        });
+        this.select('jsonFormat');
+    },
+    select(id) {
+        this.current = id;
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+        Array.from(document.querySelectorAll('.tool-btn')).find(b => b.innerText === this.registry[id].name).classList.add('active');
+        document.getElementById('tool-title').innerText = this.registry[id].name;
+    },
+    execute() {
+        const input = document.getElementById('tool-input').value;
+        const out = document.getElementById('tool-output');
+        try { out.value = this.registry[this.current].run(input); } 
+        catch(e) { out.value = "Error: " + e.message; }
+    },
+    clear() { document.getElementById('tool-input').value = ''; document.getElementById('tool-output').value = ''; }
+};
+
+/* --- 9. AI MODULE --- */
+IDE.AI = {
+    async openPanel() {
+        // We use a custom dialog instead of a persistent sidebar to keep it clean.
+        const fileId = IDE.Workspace.activeTab;
+        if (!fileId) { IDE.UI.notify("Please open a file to use AI context.", "warning"); return; }
+        
+        let key = "";
+        try { key = localStorage.getItem('ide_ai_key'); } catch(e){}
+        if (!key) { IDE.UI.notify("Please set your Gemini API key in Settings first.", "error"); IDE.Commands.execute('ui.settings'); return; }
+
+        const prompt = await IDE.UI.prompt("AI Assistant", `File context: ${IDE.VFS.files[fileId].name}<br><br>What should I do?`, "e.g., Refactor this function");
+        if (!prompt) return;
+
+        IDE.UI.notify("AI is thinking...", "info");
+        const code = IDE.Editor.models[fileId].getValue();
+
+        try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ contents: [{ parts: [{ text: "You are a senior dev. Return ONLY raw modified code based on request. No markdown tags like ```html, no explanations." }, { text: `Code:\n${code}\n\nTask: ${prompt}` }]}]})
+            });
+            const data = await res.json();
+            if(data.error) throw new Error(data.error.message);
+            
+            let newCode = data.candidates[0].content.parts[0].text;
+            newCode = newCode.replace(/^```[\w]*\n/, '').replace(/```$/, '');
+
+            const accept = await IDE.UI.confirm("AI Proposal", "The AI generated new code. Apply changes?");
+            if (accept) {
+                IDE.Editor.models[fileId].setValue(newCode);
+                IDE.UI.notify("AI changes applied.", "success");
+            }
+        } catch (err) {
+            IDE.UI.notify(`AI Request failed: ${err.message}`, "error");
+        }
+    }
+};
+
+/* --- 10. COMMANDS --- */
+IDE.Commands = {
+    registry: {
+        'file.new': { label: 'File: New File', action: async () => { const n = await IDE.UI.prompt("New File", "Name:"); if(n) { const id = await IDE.VFS.createFile(n, 'root'); IDE.Workspace.openFile(id); } } },
+        'file.newFolder': { label: 'File: New Folder', action: async () => { const n = await IDE.UI.prompt("New Folder", "Name:"); if(n) IDE.VFS.createFolder(n, 'root'); } },
+        'file.save': { label: 'File: Save Active (Ctrl+S)', action: () => {
+            const id = IDE.Workspace.activeTab; if(id && IDE.Editor.models[id]) { IDE.VFS.updateContent(id, IDE.Editor.models[id].getValue()); IDE.UI.renderTabs(); IDE.UI.notify("Saved.", "success"); }
+        }},
+        'file.closeAll': { label: 'File: Close All Tabs', action: () => IDE.Workspace.closeAll() },
+        
+        'editor.format': { label: 'Editor: Format Document', action: () => { if(IDE.Editor.instance) IDE.Editor.instance.getAction('editor.action.formatDocument').run(); } },
+        
+        'project.exportZip': { label: 'Project: Export ZIP', action: () => {
+            if(!window.JSZip) return IDE.UI.notify("JSZip loading...", "warning");
+            const zip = new JSZip();
+            const buildZip = (pid, folder) => {
+                Object.values(IDE.VFS.files).filter(f=>f.parentId===pid).forEach(f => {
+                    if(f.type==='folder') buildZip(f.id, folder.folder(f.name));
+                    else folder.file(f.name, f.content);
+                });
+            };
+            buildZip('root', zip);
+            zip.generateAsync({type:"blob"}).then(blob => {
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Project.zip'; a.click();
+            });
+        }},
+        'project.importZip': { label: 'Project: Import ZIP', action: () => {
+            const i = document.getElementById('file-importer');
+            i.onchange = async (e) => {
+                if(!e.target.files.length) return;
+                const ok = await IDE.UI.confirm("Import ZIP", "This will add files to your project. Continue?");
+                if(!ok) return;
+                const zip = await JSZip.loadAsync(e.target.files[0]);
+                for (let [path, entry] of Object.entries(zip.files)) {
+                    if (entry.dir) continue;
+                    const parts = path.split('/').filter(p=>p);
+                    const name = parts.pop();
+                    let pid = 'root';
+                    for(let folder of parts) {
+                        let fn = Object.values(IDE.VFS.files).find(f=>f.parentId===pid && f.name===folder && f.type==='folder');
+                        if(!fn) { const nid = IDE.Utils.uuid(); fn = { id:nid, name:folder, type:'folder', parentId:pid }; IDE.VFS.files[nid]=fn; IDE.Storage.set("vfs", fn); }
+                        pid = fn.id;
+                    }
+                    const content = await entry.async("string");
+                    await IDE.VFS.createFile(name, pid, content);
+                }
+                IDE.Events.emit('vfs.changed');
+                IDE.UI.notify("ZIP Imported successfully.", "success"); i.value = '';
+            }; i.click();
+        }},
+
+        'search.global': { label: 'Search: Global Search', action: async () => {
+            const q = await IDE.UI.prompt("Global Search", "Enter text to search across all files:");
+            if(!q) return;
+            const res = Object.values(IDE.VFS.files).filter(f=>f.type==='file' && f.content.includes(q));
+            const c = document.getElementById('search-results'); c.innerHTML = `<h4>Results for "${IDE.Utils.escape(q)}"</h4><br>`;
+            res.forEach(f => {
+                const lines = f.content.split('\n');
+                lines.forEach((l, idx) => {
+                    if(l.includes(q)) {
+                        const d = document.createElement('div'); d.style.padding = '5px'; d.style.cursor = 'pointer'; d.style.borderBottom = '1px solid #333';
+                        d.innerHTML = `<span style="color:var(--accent-purple)">${IDE.VFS.getFullPath(f.id)}</span>:L${idx+1} - ${IDE.Utils.escape(l.trim())}`;
+                        d.onclick = () => { IDE.Workspace.openFile(f.id); IDE.Editor.instance.revealLine(idx+1); IDE.Editor.instance.setPosition({lineNumber:idx+1, column:1}); };
+                        c.appendChild(d);
+                    }
+                });
+            });
+            if(res.length===0) c.innerHTML += "No results found.";
+            document.getElementById('bottom-panel').classList.remove('hidden');
+            IDE.UI.switchBottomTab('search');
+        }},
+
+        'ui.palette': { label: 'View: Command Palette', action: () => IDE.UI.showPalette() },
+        'ui.paletteSearch': { label: 'View: Quick Open File', action: () => IDE.UI.showPalette('file') },
+        'ui.toggleBottom': { label: 'View: Toggle Bottom Panel (Ctrl+J)', action: () => { const b = document.getElementById('bottom-panel'); b.classList.toggle('hidden'); if(!b.classList.contains('hidden')) document.getElementById('terminal-input').focus(); }},
+        'ui.toggleExplorer': { label: 'View: Toggle Explorer', action: () => { const s = document.getElementById('sidebar'); s.style.display = s.style.display === 'none' ? 'flex' : 'none'; }},
+        'ui.clearBottom': { label: 'View: Clear Console/Terminal', action: () => { IDE.Console.clear(); document.getElementById('terminal-output').innerHTML=''; }},
+        'ui.closeRightPanel': { label: 'View: Close Preview', action: () => document.getElementById('right-panel').classList.add('hidden') },
+        
+        'ui.settings': { label: 'Preferences: Settings', action: async () => {
+            let key = ""; try { key = localStorage.getItem('ide_ai_key') || ""; } catch(e){}
+            const res = await IDE.UI.dialog("Settings", "API keys are stored in your browser's local storage and never sent to our servers.", [{ id:'key', label:'Gemini API Key', type:'password', value:key }]);
+            if(res) { try{ localStorage.setItem('ide_ai_key', res.key); IDE.UI.notify("Settings saved.", "success"); }catch(e){ IDE.UI.notify("Cannot save to local storage in this context.", "error"); } }
+        }},
+        'ui.help': { label: 'Help: Documentation', action: () => IDE.UI.dialog("Help", "<b>Terminal Commands:</b><br>ls, cd, mkdir, touch, rm, cat, pwd, run<br><br><b>Shortcuts:</b><br>Ctrl+S: Save<br>Ctrl+P: Quick Open<br>Ctrl+Shift+P: Command Palette<br>Ctrl+Shift+F: Global Search<br>Ctrl+J: Toggle Terminal") },
+        
+        'preview.toggle': { label: 'Preview: Run Project', action: () => { const p = document.getElementById('right-panel'); if(p.classList.contains('hidden')) IDE.Preview.run(); else p.classList.add('hidden'); }},
+        'preview.refresh': { label: 'Preview: Refresh', action: () => IDE.Preview.run() },
+        'ai.openPanel': { label: 'AI: Assistant', action: () => IDE.AI.openPanel() },
+        'tools.execute': { label: 'Tools: Execute', action: () => IDE.Tools.execute() },
+        'tools.clear': { label: 'Tools: Clear', action: () => IDE.Tools.clear() },
+        
+        // Menus triggers
+        'menu.file': { action: () => IDE.UI.showPalette('File:') },
+        'menu.edit': { action: () => IDE.UI.showPalette('Editor:') },
+        'menu.view': { action: () => IDE.UI.showPalette('View:') },
+        'menu.project': { action: () => IDE.UI.showPalette('Project:') },
+        'menu.help': { action: () => IDE.Commands.execute('ui.help') }
+    },
+    execute(cmdId) { if (this.registry[cmdId]) this.registry[cmdId].action(); }
+};
+
+/* --- 11. UI RENDERER & INTERACTION --- */
+IDE.UI = {
+    paletteMode: 'cmd',
+    
+    init() {
+        IDE.Events.on('vfs.changed', () => this.renderExplorer());
+        IDE.Events.on('workspace.changed', () => { this.renderTabs(); this.renderExplorer(); });
+        
+        // Global Click Delegator
+        document.addEventListener('click', e => {
+            const btn = e.target.closest('[data-action]');
+            if (btn) { e.preventDefault(); IDE.Commands.execute(btn.getAttribute('data-action')); }
+            
+            const tabBtn = e.target.closest('[data-target]');
+            if (tabBtn && tabBtn.parentElement.classList.contains('bottom-tabs')) { this.switchBottomTab(tabBtn.getAttribute('data-target')); }
+
+            // Close popups
+            if (!e.target.closest('#command-palette') && !e.target.closest('.top-menu')) document.getElementById('command-palette').classList.add('hidden');
+            if (!e.target.closest('#context-menu')) document.getElementById('context-menu').classList.add('hidden');
+        });
+
+        document.getElementById('cp-input').addEventListener('input', e => this.renderPaletteList(e.target.value));
+        
+        IDE.Tools.init();
+    },
+
+    notify(msg, type = 'info') {
+        const c = document.getElementById('toast-container');
+        const t = document.createElement('div'); t.className = `ide-toast ${type}`; t.innerHTML = `<i class="fa-solid fa-${type==='success'?'check':type==='error'?'xmark':'circle-info'}"></i> ` + msg;
+        c.appendChild(t); setTimeout(() => { t.style.opacity = 0; setTimeout(() => t.remove(), 300); }, 3000);
+    },
+
+    switchBottomTab(target) {
+        document.querySelectorAll('.bottom-tabs button').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.bottom-tabs button[data-target="${target}"]`).classList.add('active');
+        document.querySelectorAll('.panel-content').forEach(p => p.classList.add('hidden'));
+        document.getElementById(`view-${target}`).classList.remove('hidden');
+        document.getElementById('bottom-panel').classList.remove('hidden');
+        if(target === 'terminal') document.getElementById('terminal-input').focus();
+    },
+
+    dialog(title, htmlBody, inputs = []) {
+        return new Promise(resolve => {
+            document.getElementById('overlay').classList.remove('hidden');
+            document.getElementById('ide-dialog').classList.remove('hidden');
+            document.getElementById('dialog-title').innerText = title;
+            const b = document.getElementById('dialog-body'); b.innerHTML = htmlBody;
+            const inputEls = {};
+            inputs.forEach(inp => {
+                const l = document.createElement('label'); l.innerText = inp.label; l.style.fontSize = '12px'; l.style.color = 'var(--fg-muted)';
+                const el = document.createElement('input'); el.type = inp.type || 'text'; el.value = inp.value || '';
+                b.appendChild(l); b.appendChild(el); inputEls[inp.id] = el;
+                if(inp.focus) setTimeout(() => el.focus(), 100);
+            });
+            const close = () => { document.getElementById('overlay').classList.add('hidden'); document.getElementById('ide-dialog').classList.add('hidden'); };
+            document.getElementById('dialog-btn-confirm').onclick = () => { close(); resolve(inputs.length > 0 ? Object.fromEntries(Object.keys(inputEls).map(k => [k, inputEls[k].value])) : true); };
+            document.getElementById('dialog-btn-cancel').onclick = () => { close(); resolve(null); };
+        });
+    },
+    async prompt(title, msg, placeholder='') {
+        const res = await this.dialog(title, msg, [{ id: 'val', label: '', value: '', focus: true }]);
+        return res ? res.val : null;
+    },
+    async confirm(title, msg) { return await this.dialog(title, msg); },
+
+    showContextMenu(e, items) {
+        e.preventDefault(); e.stopPropagation();
+        const menu = document.getElementById('context-menu'); menu.innerHTML = '';
+        items.forEach(item => {
+            if(item.divider) { const d = document.createElement('div'); d.className = 'ctx-divider'; menu.appendChild(d); return; }
+            const div = document.createElement('div'); div.className = 'ctx-item'; div.innerHTML = `<span>${item.label}</span>`;
+            div.onclick = () => { item.action(); menu.classList.add('hidden'); }; menu.appendChild(div);
+        });
+        menu.style.left = Math.min(e.pageX, window.innerWidth - 200) + 'px'; menu.style.top = Math.min(e.pageY, window.innerHeight - 300) + 'px';
+        menu.classList.remove('hidden');
+    },
+
+    showPalette(filter = '') {
+        this.paletteMode = filter === 'file' ? 'file' : 'cmd';
+        document.getElementById('command-palette').classList.remove('hidden');
+        const inp = document.getElementById('cp-input');
+        inp.placeholder = this.paletteMode === 'file' ? "Search files..." : "Type a command...";
+        inp.value = filter === 'file' ? '' : filter; inp.focus();
+        this.renderPaletteList(inp.value);
+    },
+    renderPaletteList(filter) {
+        const list = document.getElementById('cp-list'); list.innerHTML = '';
+        if (this.paletteMode === 'cmd') {
+            const cmds = Object.keys(IDE.Commands.registry).filter(k => IDE.Commands.registry[k].label.toLowerCase().includes(filter.toLowerCase()));
+            cmds.forEach((k, idx) => {
+                const div = document.createElement('div'); div.className = `cp-item ${idx===0?'selected':''}`;
+                div.innerHTML = `<span>${IDE.Commands.registry[k].label}</span>`;
+                div.onclick = () => { document.getElementById('command-palette').classList.add('hidden'); IDE.Commands.execute(k); };
+                list.appendChild(div);
+            });
+        } else {
+            const files = Object.values(IDE.VFS.files).filter(f => f.type === 'file' && f.name.toLowerCase().includes(filter.toLowerCase()));
+            files.forEach((f, idx) => {
+                const div = document.createElement('div'); div.className = `cp-item ${idx===0?'selected':''}`;
+                div.innerHTML = `<span><i class="${IDE.Utils.getIcon(f.name)}"></i> ${f.name}</span> <span class="cp-item-category">${IDE.VFS.getFullPath(f.parentId)}</span>`;
+                div.onclick = () => { document.getElementById('command-palette').classList.add('hidden'); IDE.Workspace.openFile(f.id); };
+                list.appendChild(div);
+            });
+        }
+    },
+
+    renderExplorer() {
+        const c = document.getElementById('vfs-tree'); c.innerHTML = '';
+        const buildNode = (parentId, depth) => {
+            const children = Object.values(IDE.VFS.files).filter(f => f.parentId === parentId);
+            children.sort((a,b) => a.type === b.type ? a.name.localeCompare(b.name) : a.type === 'folder' ? -1 : 1);
+            
+            children.forEach(f => {
+                const isExpanded = IDE.Workspace.expandedFolders[f.id];
+                const div = document.createElement('div');
+                div.className = `tree-item ${IDE.Workspace.activeTab === f.id ? 'active' : ''}`;
+                div.style.paddingLeft = `${10 + (depth * 15)}px`;
+                div.innerHTML = `<i class="${IDE.Utils.getIcon(f.name, f.type==='folder', isExpanded)}"></i> <span class="tree-item-name">${f.name}</span>`;
+                
+                div.draggable = true;
+                div.ondragstart = (e) => { e.stopPropagation(); e.dataTransfer.setData('text/plain', f.id); };
+                div.ondragover = (e) => { e.preventDefault(); e.stopPropagation(); if(f.type==='folder') div.classList.add('drag-over'); };
+                div.ondragleave = (e) => { e.preventDefault(); e.stopPropagation(); div.classList.remove('drag-over'); };
+                div.ondrop = (e) => {
+                    e.preventDefault(); e.stopPropagation(); div.classList.remove('drag-over');
+                    const srcId = e.dataTransfer.getData('text/plain');
+                    if(srcId && f.type === 'folder') IDE.VFS.move(srcId, f.id);
+                };
+
+                div.onclick = () => { if (f.type === 'folder') IDE.Workspace.toggleFolder(f.id); else IDE.Workspace.openFile(f.id); };
+                div.oncontextmenu = (e) => {
+                    let items = [
+                        { label: '<i class="fa-solid fa-pen"></i> Rename', action: async () => { const n = await IDE.UI.prompt("Rename", "New name:", f.name); if(n) IDE.VFS.rename(f.id, n); } },
+                        { label: '<i class="fa-solid fa-trash"></i> Delete', action: async () => { const ok = await IDE.UI.confirm("Delete", `Delete ${f.name}?`); if(ok) IDE.VFS.remove(f.id); } }
+                    ];
+                    if (f.type === 'folder') {
+                        items.unshift({ label: '<i class="fa-solid fa-plus"></i> New File', action: async () => { const n = await IDE.UI.prompt("New File", "Name:"); if(n) IDE.VFS.createFile(n, f.id); } },
+                                      { label: '<i class="fa-solid fa-folder-plus"></i> New Folder', action: async () => { const n = await IDE.UI.prompt("New Folder", "Name:"); if(n) IDE.VFS.createFolder(n, f.id); } },
+                                      { divider: true });
+                    }
+                    this.showContextMenu(e, items);
+                };
+                c.appendChild(div);
+                if (f.type === 'folder' && isExpanded) buildNode(f.id, depth + 1);
+            });
+        };
+        buildNode('root', 0);
+    },
+
+    renderTabs() {
+        const c = document.getElementById('tabs-bar'); c.innerHTML = '';
+        IDE.Workspace.openTabs.forEach(id => {
+            const f = IDE.VFS.files[id]; if(!f) return;
+            const unsaved = IDE.Editor.models[id] && IDE.Editor.models[id].getValue() !== f.content;
+            
+            const div = document.createElement('div');
+            div.className = `tab ${IDE.Workspace.activeTab === id ? 'active' : ''} ${unsaved ? 'unsaved' : ''}`;
+            div.innerHTML = `<i class="${IDE.Utils.getIcon(f.name)}"></i> <span class="tab-title" title="${IDE.VFS.getFullPath(id)}">${f.name}</span> <span class="tab-close"><i class="fa-solid fa-xmark"></i></span>`;
+            
+            div.onclick = () => IDE.Workspace.openFile(id);
+            div.querySelector('.tab-close').onclick = (e) => { e.stopPropagation(); IDE.Workspace.closeFile(id); };
+            
+            div.oncontextmenu = (e) => {
+                this.showContextMenu(e, [
+                    { label: 'Close', action: () => IDE.Workspace.closeFile(id) },
+                    { label: 'Close Others', action: () => IDE.Workspace.closeOthers(id) },
+                    { label: 'Close to the Right', action: () => IDE.Workspace.closeRight(id) },
+                    { divider: true },
+                    { label: 'Close All', action: () => IDE.Workspace.closeAll() }
+                ]);
+            };
+            c.appendChild(div);
+        });
+    }
+};
+
+/* --- 12. BOOTSTRAP --- */
+window.onload = async () => {
+    try {
+        await IDE.Storage.init();
+        await IDE.VFS.init();
+        IDE.UI.init();
+        await IDE.Workspace.init();
+        IDE.Editor.init();
+        IDE.Terminal.init();
+        IDE.Console.log("Web IDE Pro successfully initialized.", "success");
+    } catch(err) {
+        console.error(err);
+        document.body.innerHTML = `<h2 style="color:red; padding:20px;">Fatal Boot Error: ${err.message}</h2>`;
+    }
+};
+</script>
+</body>
+</html>
