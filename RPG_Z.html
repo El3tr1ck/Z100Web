@@ -1,441 +1,395 @@
+```html
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Gerador Hexagonal</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-
-:root{
-    --bg:#eef2f7;
-    --card:#ffffff;
-    --primary:#1976d2;
-    --primary-dark:#125aa0;
-    --secondary:#16a34a;
-    --purple:#7c3aed;
-    --text:#172033;
-    --muted:#64748b;
-    --border:#cbd5e1;
-    --soft:#e8edf3;
+* {
+    box-sizing: border-box;
 }
 
-*{
-    box-sizing:border-box;
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(circle at top, #26334f 0%, #111827 45%, #070b12 100%);
+    color: #f4f7fb;
+    padding: 25px;
 }
 
-body{
-    margin:0;
-    font-family:Segoe UI,Arial,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    padding:30px;
+.container {
+    width: min(1050px, 100%);
+    margin: auto;
 }
 
-.container{
-    width:100%;
-    max-width:1000px;
-    margin:auto;
+h1 {
+    text-align: center;
+    margin: 0 0 8px;
+    font-size: 34px;
 }
 
-.panel{
-    background:white;
-    border-radius:20px;
-    padding:30px;
-    box-shadow:0 12px 35px rgba(0,0,0,.09);
+.subtitle {
+    text-align: center;
+    color: #aeb9c9;
+    margin-bottom: 25px;
 }
 
-h1{
-    text-align:center;
-    margin-top:0;
+.panel {
+    background: rgba(16, 23, 36, 0.94);
+    border: 1px solid #344158;
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,.25);
 }
 
-h2{
-    font-size:18px;
-    margin-top:25px;
+.panel h2 {
+    margin-top: 0;
+    font-size: 20px;
 }
 
-input{
-    width:100%;
-    padding:11px;
-    border:1px solid var(--border);
-    border-radius:9px;
-    margin-bottom:10px;
-    font-size:14px;
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
 }
 
-button{
-    border:0;
-    border-radius:10px;
-    padding:11px 15px;
-    cursor:pointer;
-    font-weight:600;
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
 }
 
-button:disabled{
-    opacity:.5;
-    cursor:not-allowed;
+.field label {
+    font-weight: bold;
+    color: #dce5f2;
 }
 
-.generate{
-    width:100%;
-    background:var(--primary);
-    color:white;
-    margin-top:15px;
+input,
+select,
+button {
+    font: inherit;
 }
 
-.generate:hover{
-    background:var(--primary-dark);
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #3b475d;
+    background: #0d1420;
+    color: white;
+    outline: none;
+}
+
+input:focus,
+select:focus {
+    border-color: #7187ad;
+}
+
+.photo-input {
+    padding: 10px;
 }
 
 .nature-grid,
-.class-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
+.attribute-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
 }
 
-.nature-btn,
-.class-btn{
-    background:var(--soft);
-    border-radius:12px;
-    padding:13px;
-    text-align:center;
-    cursor:pointer;
-    user-select:none;
+.check-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px;
+    border-radius: 10px;
+    background: #111a29;
+    border: 1px solid #29364b;
 }
 
-.nature-btn.selected{
-    background:var(--primary);
-    color:white;
+.check-row input {
+    width: 18px;
+    height: 18px;
 }
 
-.class-btn.selected{
-    background:var(--purple);
-    color:white;
+.attribute-row {
+    display: grid;
+    grid-template-columns: 1fr 90px 45px;
+    align-items: center;
+    gap: 8px;
+    background: #111a29;
+    border: 1px solid #29364b;
+    padding: 9px;
+    border-radius: 10px;
 }
 
-.warning{
-    display:none;
-    background:#fee2e2;
-    color:#991b1b;
-    border-radius:10px;
-    padding:10px;
-    margin-top:10px;
+.attribute-row input[type="number"] {
+    padding: 9px;
 }
 
-.info{
-    background:#e0f2fe;
-    color:#075985;
-    padding:11px;
-    border-radius:10px;
-    margin-top:12px;
-    font-size:14px;
+.attribute-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
 }
 
-.toggle{
-    color:var(--primary);
-    font-weight:600;
-    margin-top:18px;
-    cursor:pointer;
+.advanced {
+    margin-top: 15px;
+    padding: 15px;
+    border: 1px solid #303e54;
+    border-radius: 12px;
+    background: #0c131f;
 }
 
-.optional{
-    display:none;
-    margin-top:12px;
-    padding:15px;
-    border:1px solid var(--border);
-    border-radius:12px;
+.advanced-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 12px;
 }
 
-.attribute-row{
-    display:grid;
-    grid-template-columns:28px 1fr;
-    gap:8px;
-    align-items:center;
-    margin-bottom:8px;
+button {
+    border: 0;
+    border-radius: 11px;
+    padding: 13px 18px;
+    cursor: pointer;
+    background: #dce6f4;
+    color: #0c1119;
+    font-weight: bold;
+    transition: .15s;
 }
 
-.attribute-row input[type="checkbox"]{
-    width:18px;
-    height:18px;
-    margin:0;
+button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
 }
 
-.attribute-row input[type="number"]{
-    margin:0;
+.main-button {
+    width: 100%;
+    margin-top: 20px;
+    font-size: 17px;
 }
 
-.setting{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin:12px 0;
+.export-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
 }
 
-.setting input{
-    width:auto;
-    margin:0;
+.export-buttons button {
+    flex: 1;
 }
 
-.limit-box{
-    display:none;
+.hidden {
+    display: none !important;
 }
 
-.photo-box{
-    border:2px dashed var(--border);
-    padding:20px;
-    border-radius:14px;
-    text-align:center;
-    margin-top:15px;
+.result {
+    margin-top: 30px;
 }
 
-.photo-preview{
-    display:none;
-    width:150px;
-    height:150px;
-    object-fit:cover;
-    border-radius:12px;
-    margin:15px auto 0;
+.card-wrapper {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+    padding: 10px;
 }
 
-.hidden{
-    display:none!important;
-}
-
-/* =========================================================
-   CARTA
-========================================================= */
-
-.card-area{
-    display:flex;
-    justify-content:center;
-    margin-top:25px;
-}
-
-.character-card{
-    width:700px;
-    min-height:980px;
-    padding:18px;
-    border-radius:28px;
-    position:relative;
-    overflow:hidden;
-
+.character-card {
+    width: 680px;
+    min-height: 920px;
+    max-width: 100%;
     background:
-        radial-gradient(
-            circle at 15% 10%,
-            rgba(255,255,255,.9),
-            transparent 28%
-        ),
-        linear-gradient(
-            145deg,
-            #f7fbff,
-            #dbeafe 45%,
-            #f8fafc
-        );
-
-    border:10px solid #1e293b;
-
+        linear-gradient(145deg, #eef2f7 0%, #cbd4df 48%, #8e9aaa 100%);
+    color: #10151d;
+    border-radius: 28px;
+    border: 7px solid #202936;
     box-shadow:
-        0 18px 50px rgba(0,0,0,.25);
+        0 20px 50px rgba(0,0,0,.5),
+        inset 0 0 0 2px rgba(255,255,255,.5);
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
 }
 
-.card-inner{
-    border:3px solid #64748b;
-    border-radius:18px;
-    padding:15px;
-    height:100%;
-    background:rgba(255,255,255,.62);
-}
-
-.card-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:2px solid #475569;
-    padding-bottom:8px;
-}
-
-.card-name{
-    font-size:30px;
-    font-weight:800;
-}
-
-.card-age{
-    font-size:17px;
-    font-weight:600;
-}
-
-.card-class{
-    display:inline-block;
-    margin-top:8px;
-    padding:5px 12px;
-    border-radius:20px;
-    background:#334155;
-    color:white;
-    font-size:13px;
-    font-weight:700;
-}
-
-.photo-frame{
-    margin-top:14px;
-    width:100%;
-    height:270px;
-    border-radius:14px;
-    overflow:hidden;
+.character-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
     background:
         linear-gradient(
-            135deg,
-            #cbd5e1,
-            #f8fafc
+            120deg,
+            transparent 0%,
+            rgba(255,255,255,.25) 45%,
+            transparent 60%
         );
-    border:4px solid #475569;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    pointer-events: none;
 }
 
-.photo-frame img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
+.card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 5px 5px 12px;
 }
 
-.no-photo{
-    color:#64748b;
-    font-weight:600;
+.card-name {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: .5px;
+    overflow-wrap: anywhere;
 }
 
-.section-title{
-    font-size:15px;
-    font-weight:800;
-    margin-top:14px;
-    padding-bottom:5px;
-    border-bottom:2px solid #64748b;
+.card-class {
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #414b59;
+    margin-top: 4px;
 }
 
-.nature-list{
-    display:flex;
-    flex-wrap:wrap;
-    gap:7px;
-    margin-top:8px;
+.card-age {
+    text-align: right;
+    font-weight: bold;
+    white-space: nowrap;
 }
 
-.nature-tag{
-    padding:6px 10px;
-    border-radius:7px;
-    background:#334155;
-    color:white;
-    font-size:12px;
-    font-weight:700;
+.photo-frame {
+    width: 100%;
+    height: 270px;
+    border: 5px solid #27313e;
+    border-radius: 17px;
+    background:
+        radial-gradient(circle, #eef3f8, #aeb9c6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 16px;
 }
 
-.card-chart{
-    width:100%;
-    height:300px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+.photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
 }
 
-.card-chart svg{
-    width:300px;
-    height:300px;
+.no-photo {
+    color: #586574;
+    font-weight: bold;
+    text-align: center;
 }
 
-.card-attributes{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:9px;
-    margin-top:10px;
+.card-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
-.stat{
-    background:rgba(255,255,255,.8);
-    border:1px solid #94a3b8;
-    border-radius:9px;
-    padding:9px;
+.chart-box,
+.attributes-box {
+    background: rgba(247,249,252,.78);
+    border: 2px solid #3b4654;
+    border-radius: 16px;
+    padding: 12px;
 }
 
-.stat-header{
-    display:flex;
-    justify-content:space-between;
-    font-weight:700;
-    font-size:13px;
+.box-title {
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: .8px;
+    margin-bottom: 5px;
 }
 
-.stat-bar{
-    height:8px;
-    background:#cbd5e1;
-    border-radius:5px;
-    overflow:hidden;
-    margin-top:6px;
+canvas {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
-.stat-fill{
-    height:100%;
-    background:#2563eb;
+.attribute-result {
+    padding: 9px 0;
+    border-bottom: 1px solid #b9c1cb;
 }
 
-.card-footer{
-    text-align:center;
-    margin-top:15px;
-    padding-top:10px;
-    border-top:2px solid #64748b;
-    font-size:11px;
-    color:#475569;
-    font-weight:600;
+.attribute-result:last-child {
+    border-bottom: 0;
 }
 
-.download-area{
-    display:flex;
-    gap:10px;
-    margin-top:20px;
+.attribute-name {
+    font-weight: 900;
+    font-size: 14px;
 }
 
-.download-area button{
-    flex:1;
-    background:#1e293b;
-    color:white;
+.attribute-equation {
+    margin-top: 3px;
+    font-size: 12px;
+    color: #4e5967;
 }
 
-@media(max-width:750px){
+.attribute-total {
+    font-size: 20px;
+    font-weight: 900;
+    margin-top: 2px;
+}
 
-    body{
-        padding:10px;
+.card-footer {
+    margin-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    color: #4d5967;
+    font-weight: bold;
+}
+
+@media (max-width: 700px) {
+    body {
+        padding: 10px;
     }
 
-    .panel{
-        padding:18px;
-    }
-
-    .character-card{
-        width:100%;
-    }
-
-}
-
-@media(max-width:550px){
-
+    .grid,
     .nature-grid,
-    .class-grid{
-        grid-template-columns:1fr;
+    .attribute-grid,
+    .advanced-grid,
+    .card-main {
+        grid-template-columns: 1fr;
     }
 
-    .card-name{
-        font-size:22px;
+    .character-card {
+        width: 100%;
+        min-height: auto;
     }
 
-    .card-attributes{
-        grid-template-columns:1fr;
+    .photo-frame {
+        height: 240px;
     }
 
+    .card-header {
+        flex-direction: column;
+    }
+
+    .card-age {
+        text-align: left;
+    }
+
+    .export-buttons {
+        flex-direction: column;
+    }
 }
-
 </style>
 </head>
 
@@ -443,306 +397,282 @@ button:disabled{
 
 <div class="container">
 
-<div id="formPanel" class="panel">
+    <h1>Gerador Hexagonal</h1>
+    <div class="subtitle">
+        Gerador determinístico de personagens
+    </div>
 
-<h1>Gerador de Natureza</h1>
+    <div class="panel">
 
-<input
-    id="nome"
-    type="text"
-    placeholder="Nome">
+        <h2>Identidade</h2>
 
-<input
-    id="idade"
-    type="number"
-    min="0"
-    placeholder="Idade">
+        <div class="grid">
 
+            <div class="field">
+                <label for="name">Nome</label>
+                <input id="name" type="text" placeholder="Digite o nome">
+            </div>
 
-<h2>Naturezas</h2>
+            <div class="field">
+                <label for="age">Idade</label>
+                <input id="age" type="number" min="0" placeholder="Digite a idade">
+            </div>
 
-<div
-    class="nature-grid"
-    id="natureButtons">
-</div>
+            <div class="field">
+                <label for="class">Classe</label>
+                <select id="class">
+                    <option value="Akimovs">Akimovs</option>
+                    <option value="Komons">Komons</option>
+                    <option value="Auzimios">Auzimios</option>
+                    <option value="Elodiers">Elodiers</option>
+                </select>
+            </div>
 
-<div
-    id="natureWarning"
-    class="warning">
-    Máximo de 2 naturezas.
-</div>
+            <div class="field">
+                <label for="photo">Foto opcional</label>
+                <input
+                    id="photo"
+                    class="photo-input"
+                    type="file"
+                    accept="image/*"
+                >
+            </div>
 
+        </div>
 
-<h2>Classe</h2>
+    </div>
 
-<div
-    class="class-grid"
-    id="classButtons">
-</div>
 
-<div
-    id="classWarning"
-    class="warning">
-    Escolha uma classe.
-</div>
+    <div class="panel">
 
-<div
-    id="classInfo"
-    class="info">
-    Escolha uma classe.
-</div>
+        <h2>Naturezas</h2>
 
+        <div class="nature-grid">
 
-<div class="photo-box">
+            <label class="check-row">
+                <input type="checkbox" value="Potencializador">
+                Potencializador
+            </label>
+
+            <label class="check-row">
+                <input type="checkbox" value="Energizador">
+                Energizador
+            </label>
+
+            <label class="check-row">
+                <input type="checkbox" value="Liberador">
+                Liberador
+            </label>
+
+            <label class="check-row">
+                <input type="checkbox" value="Encantador">
+                Encantador
+            </label>
 
-<strong>Foto do personagem</strong>
+            <label class="check-row">
+                <input type="checkbox" value="Espiritualista">
+                Espiritualista
+            </label>
 
-<p>
-Opcional. A foto será incorporada à carta e às exportações.
-</p>
+            <label class="check-row">
+                <input type="checkbox" value="Criador">
+                Criador
+            </label>
 
-<input
-    id="photoInput"
-    type="file"
-    accept="image/*">
+        </div>
 
-<img
-    id="photoPreview"
-    class="photo-preview">
+    </div>
 
-</div>
 
+    <div class="panel">
 
-<div
-    class="toggle"
-    onclick="toggleAdvanced()">
-    Avanços e opções avançadas
-</div>
+        <h2>Atributos adicionais</h2>
 
+        <p>
+            Os valores inseridos aqui permanecem intactos e são somados
+            separadamente à parte gerada.
+        </p>
 
-<div
-    id="advanced"
-    class="optional">
+        <div class="attribute-grid">
 
-<h2>Avanços</h2>
+            <div class="attribute-row">
+                <span>Força</span>
+                <input id="manualForca" type="number" min="0" value="0">
+                <input id="diceForca" type="checkbox" title="Rolar dado">
+            </div>
 
-<p>
-Marque os atributos que receberão uma rolagem.
-O resultado poderá ser alterado manualmente.
-</p>
+            <div class="attribute-row">
+                <span>Agilidade</span>
+                <input id="manualAgilidade" type="number" min="0" value="0">
+                <input id="diceAgilidade" type="checkbox" title="Rolar dado">
+            </div>
 
-<div id="attributeInputs"></div>
+            <div class="attribute-row">
+                <span>Velocidade</span>
+                <input id="manualVelocidade" type="number" min="0" value="0">
+                <input id="diceVelocidade" type="checkbox" title="Rolar dado">
+            </div>
 
-<button
-    onclick="rollSelectedDice()">
-    Rolar dados selecionados
-</button>
+            <div class="attribute-row">
+                <span>Resistência</span>
+                <input id="manualResistencia" type="number" min="0" value="0">
+                <input id="diceResistencia" type="checkbox" title="Rolar dado">
+            </div>
 
+            <div class="attribute-row">
+                <span>Poder Bruto</span>
+                <input id="manualPoder" type="number" min="0" value="0">
+                <input id="dicePoder" type="checkbox" title="Rolar dado">
+            </div>
 
-<h2>Balanceamento</h2>
+        </div>
 
-<div class="setting">
+        <div class="advanced">
 
-<input
-    id="deterministicImpact"
-    type="checkbox">
+            <label class="check-row">
+                <input id="deterministicImpact" type="checkbox">
+                Impacto determinístico
+            </label>
 
-<label for="deterministicImpact">
-Impacto determinístico
-</label>
+            <div class="advanced-grid">
 
-</div>
+                <div class="field">
+                    <label for="customLimit">
+                        Limite de atributo
+                    </label>
 
+                    <label class="check-row">
+                        <input id="useCustomLimit" type="checkbox">
+                        Ativar limite personalizado
+                    </label>
 
-<div class="setting">
+                    <input
+                        id="customLimit"
+                        type="number"
+                        min="1"
+                        value="9"
+                        disabled
+                    >
+                </div>
 
-<input
-    id="customLimit"
-    type="checkbox"
-    onchange="toggleLimit()">
+                <div class="field">
 
-<label for="customLimit">
-Limite de atributo personalizável
-</label>
+                    <label>Escala proporcional</label>
 
-</div>
+                    <label class="check-row">
+                        <input id="proportionalScale" type="checkbox">
+                        Escalar dados e geração para o novo limite
+                    </label>
 
+                </div>
 
-<div
-    id="limitBox"
-    class="limit-box">
+            </div>
 
-<input
-    id="attributeLimit"
-    type="number"
-    min="1"
-    value="9"
-    placeholder="Novo limite">
+        </div>
 
-</div>
+        <button class="main-button" onclick="generateCharacter()">
+            Gerar personagem
+        </button>
 
+    </div>
 
-<div class="setting">
 
-<input
-    id="proportionalScale"
-    type="checkbox">
+    <div id="result" class="result hidden">
 
-<label for="proportionalScale">
-Escala proporcional de limite
-</label>
+        <div class="card-wrapper">
 
-</div>
+            <div id="characterCard" class="character-card">
 
-</div>
+                <div class="card-header">
 
+                    <div>
+                        <div id="resultName" class="card-name"></div>
+                        <div id="resultClass" class="card-class"></div>
+                    </div>
 
-<button
-    id="generateBtn"
-    class="generate"
-    onclick="generate()"
-    disabled>
+                    <div id="resultAge" class="card-age"></div>
 
-Gerar personagem
+                </div>
 
-</button>
 
-</div>
+                <div class="photo-frame">
 
+                    <img
+                        id="resultPhoto"
+                        class="hidden"
+                        alt="Foto do personagem"
+                    >
 
-<!-- RESULTADO -->
+                    <div id="noPhoto" class="no-photo">
+                        SEM FOTO
+                    </div>
 
-<div
-    id="resultPanel"
-    class="panel hidden">
+                </div>
 
-<div class="card-area">
 
-<div
-    id="characterCard"
-    class="character-card">
+                <div class="card-main">
 
-<div class="card-inner">
+                    <div class="chart-box">
 
-<div class="card-top">
+                        <div class="box-title">
+                            Naturezas
+                        </div>
 
-<div>
+                        <canvas
+                            id="radar"
+                            width="500"
+                            height="500"
+                        ></canvas>
 
-<div
-    id="cardName"
-    class="card-name">
-</div>
+                    </div>
 
-<div
-    id="cardClass"
-    class="card-class">
-</div>
 
-</div>
+                    <div class="attributes-box">
 
-<div
-    id="cardAge"
-    class="card-age">
-</div>
+                        <div class="box-title">
+                            Atributos
+                        </div>
 
-</div>
+                        <div id="attributesResult"></div>
 
+                    </div>
 
-<div class="photo-frame">
+                </div>
 
-<img
-    id="cardPhoto"
-    class="hidden">
 
-<div
-    id="noPhoto"
-    class="no-photo">
-    Personagem
-</div>
+                <div class="card-footer">
 
-</div>
+                    <span>GERADOR HEXAGONAL</span>
 
+                    <span id="cardSeedLabel"></span>
 
-<div class="section-title">
-Naturezas
-</div>
+                </div>
 
-<div
-    id="cardNatures"
-    class="nature-list">
-</div>
+            </div>
 
+        </div>
 
-<div class="section-title">
-Perfil
-</div>
 
-<div
-    id="cardChart"
-    class="card-chart">
+        <div class="export-buttons">
 
-<svg
-    id="cardRadar"
-    viewBox="0 0 400 400">
-</svg>
+            <button onclick="downloadPNG()">
+                Baixar PNG
+            </button>
 
-</div>
+            <button onclick="downloadPDF()">
+                Baixar PDF
+            </button>
 
+        </div>
 
-<div class="section-title">
-Atributos
-</div>
-
-<div
-    id="cardAttributes"
-    class="card-attributes">
-</div>
-
-
-<div class="card-footer">
-GERADOR HEXAGONAL — CARTA DE PERSONAGEM
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="download-area">
-
-<button onclick="downloadPNG()">
-Baixar imagem
-</button>
-
-<button onclick="downloadPDF()">
-Baixar PDF
-</button>
-
-</div>
-
-
-<button
-    class="generate"
-    onclick="location.reload()">
-
-Criar outro personagem
-
-</button>
-
-</div>
+    </div>
 
 </div>
 
 
 <script>
 
-/* =========================================================
-   CONFIGURAÇÕES
-========================================================= */
-
-const natureNames=[
+const natureNames = [
     "Potencializador",
     "Energizador",
     "Liberador",
@@ -751,14 +681,7 @@ const natureNames=[
     "Criador"
 ];
 
-const classNames=[
-    "Akimovs",
-    "Komons",
-    "Auzimios",
-    "Elodiers"
-];
-
-const attributeNames=[
+const attributeNames = [
     "Força",
     "Agilidade",
     "Velocidade",
@@ -766,316 +689,1133 @@ const attributeNames=[
     "Poder Bruto"
 ];
 
-let selected=[];
-let selectedClass=null;
-let uploadedPhoto=null;
+const natureBonus = {
+    Potencializador: {
+        "Poder Bruto": 2
+    },
 
-let seed=0n;
+    Energizador: {
+        "Velocidade": 2
+    },
+
+    Liberador: {
+        "Força": 2
+    },
+
+    Encantador: {
+        "Agilidade": 2
+    },
+
+    Espiritualista: {
+        "Resistência": 2
+    },
+
+    Criador: {
+        "Agilidade": 1,
+        "Poder Bruto": 1
+    }
+};
+
+
+/*
+    Impacto das classes.
+
+    A classe influencia principalmente os atributos.
+    O impacto nas naturezas foi propositalmente reduzido.
+*/
+
+const classData = {
+
+    Akimovs: {
+        attributeMultiplier: 0.90,
+        attributeBonus: 1,
+        natureInfluence: 1
+    },
+
+    Komons: {
+        attributeMultiplier: 1.00,
+        attributeBonus: 0,
+        natureInfluence: 1
+    },
+
+    Auzimios: {
+        attributeMultiplier: 0.82,
+        attributeBonus: 0,
+        natureInfluence: 1
+    },
+
+    Elodiers: {
+        attributeMultiplier: 1.12,
+        attributeBonus: 1,
+        natureInfluence: 1
+    }
+
+};
+
+
+let currentCharacter = null;
 
 
 /* =========================================================
-   HASH
+   HASH DETERMINÍSTICO
 ========================================================= */
 
-function fnv1a64(text){
+function hashString(str) {
 
-    let hash=1469598103934665603n;
-    const prime=1099511628211n;
-    const mask=0xFFFFFFFFFFFFFFFFn;
+    let h1 = 0x811c9dc5;
+    let h2 = 0x9e3779b9;
 
-    for(let i=0;i<text.length;i++){
+    for (let i = 0; i < str.length; i++) {
 
-        hash^=BigInt(text.charCodeAt(i));
+        const c = str.charCodeAt(i);
 
-        hash=
-            (hash*prime)&mask;
+        h1 ^= c;
+        h1 = Math.imul(h1, 0x01000193);
+
+        h2 ^= c + i;
+        h2 = Math.imul(h2, 0x85ebca6b);
+
+        h1 ^= h2 >>> 13;
+        h2 ^= h1 >>> 17;
     }
-
-    return hash;
-}
-
-
-function mix64(value){
-
-    value=
-        (value^(value>>30n))*
-        0xbf58476d1ce4e5b9n;
-
-    value&=
-        0xFFFFFFFFFFFFFFFFn;
-
-    value=
-        (value^(value>>27n))*
-        0x94d049bb133111ebn;
-
-    value&=
-        0xFFFFFFFFFFFFFFFFn;
 
     return (
-        value^(value>>31n)
-    )&0xFFFFFFFFFFFFFFFFn;
-}
-
-
-function initializeSeed(){
-
-    const nome=
-        document
-        .getElementById("nome")
-        .value
-        .trim()
-        .toUpperCase();
-
-    const idade=
-        document
-        .getElementById("idade")
-        .value;
-
-    const naturezas=
-        selected
-        .slice()
-        .sort((a,b)=>a-b)
-        .join(",");
-
-    const classe=
-        classNames[selectedClass];
-
-    const source=
-        "HEXAGONAL-Z|"+
-        nome+
-        "|"+
-        idade+
-        "|"+
-        naturezas+
-        "|"+
-        classe;
-
-    seed=
-        mix64(
-            fnv1a64(source)
-        );
-}
-
-
-function randomBig(){
-
-    seed=
-        (
-            seed*
-            6364136223846793005n+
-            1442695040888963407n
-        )&
-        0xFFFFFFFFFFFFFFFFn;
-
-    return seed;
-}
-
-
-function random01(){
-
-    return Number(
-        randomBig()%1000000n
-    )/1000000;
-}
-
-
-function randomInt(min,max){
-
-    return Math.floor(
-        random01()*
-        (max-min+1)
-    )+min;
+        (h1 >>> 0).toString(16).padStart(8, "0") +
+        (h2 >>> 0).toString(16).padStart(8, "0")
+    );
 }
 
 
 /* =========================================================
-   NATUREZAS
+   PRNG DETERMINÍSTICO
 ========================================================= */
 
-function setupNatureButtons(){
+function createRandom(seedText) {
 
-    const container=
-        document.getElementById(
-            "natureButtons"
+    let seed = 0;
+
+    for (let i = 0; i < seedText.length; i++) {
+
+        seed =
+            (Math.imul(
+                seed ^ seedText.charCodeAt(i),
+                1664525
+            ) + 1013904223) >>> 0;
+    }
+
+    return function() {
+
+        seed =
+            (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+
+        return seed / 4294967296;
+    };
+}
+
+
+/* =========================================================
+   CHECKBOXES DE NATUREZA
+========================================================= */
+
+function getSelectedNatures() {
+
+    return [
+        ...document.querySelectorAll(
+            '.nature-grid input[type="checkbox"]:checked'
+        )
+    ].map(input => input.value);
+
+}
+
+
+/* =========================================================
+   LIMITE
+========================================================= */
+
+function getLimit() {
+
+    const enabled =
+        document.getElementById("useCustomLimit").checked;
+
+    if (!enabled) {
+        return 9;
+    }
+
+    const value =
+        Number(document.getElementById("customLimit").value);
+
+    if (!Number.isFinite(value) || value <= 0) {
+        return 9;
+    }
+
+    return Math.floor(value);
+}
+
+
+/* =========================================================
+   GERAÇÃO DAS NATUREZAS
+========================================================= */
+
+function generateNatureValues(
+    selected,
+    random,
+    className
+) {
+
+    const values = {};
+
+    natureNames.forEach(name => {
+
+        values[name] = 10 + Math.floor(random() * 41);
+
+    });
+
+
+    /*
+        Escolhemos no máximo 3 naturezas principais.
+
+        Todas ficam entre 51 e 85.
+        Nenhuma pode chegar a 100.
+    */
+
+    let primary = [...selected];
+
+    if (primary.length === 0) {
+
+        primary = [
+            natureNames[
+                Math.floor(random() * natureNames.length)
+            ]
+        ];
+
+    }
+
+
+    /*
+        Se o usuário selecionou mais de 3,
+        somente três terão papel principal.
+    */
+
+    if (primary.length > 3) {
+
+        primary.sort(() => random() - 0.5);
+        primary = primary.slice(0, 3);
+
+    }
+
+
+    /*
+        Naturezas principais:
+        51–85
+    */
+
+    primary.forEach((name, index) => {
+
+        let value =
+            58 +
+            Math.floor(random() * 28);
+
+        /*
+            Pequeno efeito da classe.
+            A classe não controla diretamente a natureza.
+        */
+
+        if (className === "Elodiers") {
+            value += 2;
+        }
+
+        if (className === "Auzimios") {
+            value -= 2;
+        }
+
+        value = Math.max(51, Math.min(85, value));
+
+        values[name] = value;
+
+    });
+
+
+    /*
+        As naturezas secundárias nunca passam de 50%.
+    */
+
+    natureNames.forEach(name => {
+
+        if (!primary.includes(name)) {
+
+            values[name] =
+                20 +
+                Math.floor(random() * 31);
+
+            values[name] =
+                Math.min(50, values[name]);
+
+        }
+
+    });
+
+
+    /*
+        Evita que duas naturezas principais
+        fiquem exatamente iguais com frequência.
+    */
+
+    const used = new Set();
+
+    primary.forEach(name => {
+
+        let value = values[name];
+
+        let attempts = 0;
+
+        while (used.has(value) && attempts < 10) {
+
+            value =
+                51 +
+                Math.floor(random() * 35);
+
+            value =
+                Math.min(85, value);
+
+            attempts++;
+
+        }
+
+        values[name] = value;
+        used.add(value);
+
+    });
+
+
+    return values;
+
+}
+
+
+/* =========================================================
+   GERAÇÃO DOS ATRIBUTOS
+========================================================= */
+
+function generateAttributes(
+    selectedNatures,
+    random,
+    className,
+    manualValues,
+    diceValues,
+    deterministic,
+    limit,
+    proportional
+) {
+
+    const classInfo = classData[className];
+
+    const generated = {};
+
+    /*
+        Base normal:
+        0–9.
+    */
+
+    attributeNames.forEach(attribute => {
+
+        let value =
+            Math.floor(random() * 10);
+
+        /*
+            Bônus da natureza.
+        */
+
+        selectedNatures.forEach(nature => {
+
+            if (
+                natureBonus[nature] &&
+                natureBonus[nature][attribute]
+            ) {
+
+                value +=
+                    natureBonus[nature][attribute];
+
+            }
+
+        });
+
+
+        /*
+            Impacto da classe somente nos atributos.
+        */
+
+        value =
+            Math.round(
+                value * classInfo.attributeMultiplier
+            );
+
+        value += classInfo.attributeBonus;
+
+
+        generated[attribute] = value;
+
+    });
+
+
+    /*
+        Impacto determinístico.
+
+        Os valores manuais são usados para calcular
+        o equilíbrio da parte aleatória.
+
+        Os valores manuais NÃO são alterados.
+    */
+
+    if (deterministic) {
+
+        let manualTotal = 0;
+
+        attributeNames.forEach(attribute => {
+
+            manualTotal +=
+                Number(manualValues[attribute]) || 0;
+
+        });
+
+
+        const averageManual =
+            manualTotal / attributeNames.length;
+
+
+        /*
+            Quanto maior a carga manual,
+            menor pode ser a parcela aleatória.
+        */
+
+        const pressure =
+            Math.min(
+                0.70,
+                averageManual /
+                Math.max(1, limit)
+            );
+
+
+        attributeNames.forEach(attribute => {
+
+            generated[attribute] =
+                Math.round(
+                    generated[attribute] *
+                    (1 - pressure)
+                );
+
+        });
+
+    }
+
+
+    /*
+        Escala proporcional para limites acima de 9.
+    */
+
+    if (proportional && limit > 9) {
+
+        attributeNames.forEach(attribute => {
+
+            generated[attribute] =
+                Math.round(
+                    generated[attribute] *
+                    (limit / 9)
+                );
+
+        });
+
+    }
+
+
+    /*
+        Dados são incluídos separadamente.
+    */
+
+    const final = {};
+
+    attributeNames.forEach(attribute => {
+
+        const base =
+            generated[attribute];
+
+        const manual =
+            Number(manualValues[attribute]) || 0;
+
+        const dice =
+            Number(diceValues[attribute]) || 0;
+
+        let total =
+            base +
+            manual +
+            dice;
+
+
+        /*
+            O limite afeta a parte gerada,
+            não destrói os valores adicionais.
+        */
+
+        final[attribute] = {
+            base,
+            manual,
+            dice,
+            total
+        };
+
+    });
+
+
+    return final;
+
+}
+
+
+/* =========================================================
+   ROLAGEM DOS DADOS
+========================================================= */
+
+function rollDice(
+    masterSeed
+) {
+
+    const diceValues = {};
+
+    const random =
+        createRandom(
+            masterSeed + "|DADOS"
         );
+
+
+    attributeNames.forEach(attribute => {
+
+        const checkbox =
+            document.getElementById(
+                "dice" +
+                attribute
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+            );
+
+
+        if (checkbox && checkbox.checked) {
+
+            diceValues[attribute] =
+                1 +
+                Math.floor(random() * 6);
+
+        } else {
+
+            diceValues[attribute] = 0;
+
+        }
+
+    });
+
+
+    return diceValues;
+
+}
+
+
+/* =========================================================
+   LEITURA DOS VALORES MANUAIS
+========================================================= */
+
+function getManualValues() {
+
+    return {
+
+        "Força":
+            Number(
+                document.getElementById("manualForca").value
+            ) || 0,
+
+        "Agilidade":
+            Number(
+                document.getElementById("manualAgilidade").value
+            ) || 0,
+
+        "Velocidade":
+            Number(
+                document.getElementById("manualVelocidade").value
+            ) || 0,
+
+        "Resistência":
+            Number(
+                document.getElementById("manualResistencia").value
+            ) || 0,
+
+        "Poder Bruto":
+            Number(
+                document.getElementById("manualPoder").value
+            ) || 0
+
+    };
+
+}
+
+
+/* =========================================================
+   GERAÇÃO PRINCIPAL
+========================================================= */
+
+function generateCharacter() {
+
+    const name =
+        document.getElementById("name").value.trim();
+
+    const age =
+        document.getElementById("age").value;
+
+    const className =
+        document.getElementById("class").value;
+
+    if (!name) {
+
+        alert("Digite um nome.");
+        return;
+
+    }
+
+
+    const selectedNatures =
+        getSelectedNatures();
+
+
+    const manualValues =
+        getManualValues();
+
+
+    const limit =
+        getLimit();
+
+
+    const deterministic =
+        document.getElementById(
+            "deterministicImpact"
+        ).checked;
+
+
+    const proportional =
+        document.getElementById(
+            "proportionalScale"
+        ).checked;
+
+
+    /*
+        Todas as informações relevantes entram
+        no processo determinístico.
+    */
+
+    const source =
+        [
+            name.toUpperCase(),
+            age,
+            className,
+            selectedNatures.join("|"),
+            JSON.stringify(manualValues),
+            limit,
+            deterministic,
+            proportional
+        ].join("::");
+
+
+    const masterSeed =
+        hashString(source);
+
+
+    const natureRandom =
+        createRandom(
+            masterSeed + "|NATUREZAS"
+        );
+
+
+    const attributeRandom =
+        createRandom(
+            masterSeed + "|ATRIBUTOS"
+        );
+
+
+    const natureValues =
+        generateNatureValues(
+            selectedNatures,
+            natureRandom,
+            className
+        );
+
+
+    const diceValues =
+        rollDice(masterSeed);
+
+
+    const attributes =
+        generateAttributes(
+            selectedNatures,
+            attributeRandom,
+            className,
+            manualValues,
+            diceValues,
+            deterministic,
+            limit,
+            proportional
+        );
+
+
+    currentCharacter = {
+
+        name,
+        age,
+        className,
+        natureValues,
+        attributes,
+        masterSeed
+
+    };
+
+
+    document.getElementById(
+        "resultName"
+    ).textContent = name;
+
+
+    document.getElementById(
+        "resultClass"
+    ).textContent = className;
+
+
+    document.getElementById(
+        "resultAge"
+    ).textContent =
+        age !== ""
+            ? "IDADE: " + age
+            : "IDADE: —";
+
+
+    /*
+        Não mostramos hash nem informações
+        matemáticas internas.
+    */
+
+    document.getElementById(
+        "cardSeedLabel"
+    ).textContent = "";
+
+
+    renderAttributes(attributes);
+
+    drawRadar(natureValues);
+
+    document.getElementById(
+        "result"
+    ).classList.remove("hidden");
+
+
+    loadPhoto();
+
+}
+
+
+/* =========================================================
+   ATRIBUTOS NA CARTA
+========================================================= */
+
+function renderAttributes(attributes) {
+
+    const container =
+        document.getElementById(
+            "attributesResult"
+        );
+
+    container.innerHTML = "";
+
+
+    attributeNames.forEach(attribute => {
+
+        const data =
+            attributes[attribute];
+
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "attribute-result";
+
+
+        const name =
+            document.createElement("div");
+
+        name.className =
+            "attribute-name";
+
+        name.textContent =
+            attribute;
+
+
+        /*
+            Mostra a soma como solicitado:
+            Base + Gerado/Adicional + Dado = Total
+
+            O termo "Base" representa a parte gerada
+            pelo sistema.
+        */
+
+        const equation =
+            document.createElement("div");
+
+        equation.className =
+            "attribute-equation";
+
+
+        const parts = [
+            "Base " + data.base,
+            "Adicional " + data.manual
+        ];
+
+
+        if (data.dice > 0) {
+
+            parts.push(
+                "Dado " + data.dice
+            );
+
+        }
+
+
+        equation.textContent =
+            parts.join(" + ") +
+            " = " +
+            data.total;
+
+
+        const total =
+            document.createElement("div");
+
+        total.className =
+            "attribute-total";
+
+        total.textContent =
+            data.total;
+
+
+        row.appendChild(name);
+        row.appendChild(equation);
+        row.appendChild(total);
+
+        container.appendChild(row);
+
+    });
+
+}
+
+
+/* =========================================================
+   RADAR
+========================================================= */
+
+function drawRadar(values) {
+
+    const canvas =
+        document.getElementById("radar");
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    const width =
+        canvas.width;
+
+    const height =
+        canvas.height;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    const centerX =
+        width / 2;
+
+    const centerY =
+        height / 2;
+
+
+    const radius =
+        Math.min(width, height) * 0.34;
+
+
+    const count =
+        natureNames.length;
+
+
+    const angleStep =
+        Math.PI * 2 / count;
+
+
+    /*
+        Fundo.
+    */
+
+    ctx.fillStyle =
+        "#f7f9fc";
+
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    /*
+        Grades.
+    */
+
+    for (let level = 1; level <= 5; level++) {
+
+        const r =
+            radius * level / 5;
+
+        ctx.beginPath();
+
+        for (let i = 0; i < count; i++) {
+
+            const angle =
+                -Math.PI / 2 +
+                i * angleStep;
+
+            const x =
+                centerX +
+                Math.cos(angle) * r;
+
+            const y =
+                centerY +
+                Math.sin(angle) * r;
+
+
+            if (i === 0) {
+
+                ctx.moveTo(x, y);
+
+            } else {
+
+                ctx.lineTo(x, y);
+
+            }
+
+        }
+
+        ctx.closePath();
+
+        ctx.strokeStyle =
+            "#9ca7b5";
+
+        ctx.lineWidth =
+            1;
+
+        ctx.stroke();
+
+    }
+
+
+    /*
+        Eixos e textos.
+    */
 
     natureNames.forEach(
-        (name,index)=>{
+        (name, i) => {
 
-            const button=
-                document.createElement("div");
-
-            button.className=
-                "nature-btn";
-
-            button.innerText=name;
-
-            button.onclick=()=>{
-
-                if(
-                    button.classList.contains(
-                        "selected"
-                    )
-                ){
-
-                    button.classList.remove(
-                        "selected"
-                    );
-
-                    selected=
-                        selected.filter(
-                            v=>v!==index
-                        );
-
-                }else{
-
-                    if(selected.length>=2){
-
-                        document
-                        .getElementById(
-                            "natureWarning"
-                        )
-                        .style.display="block";
-
-                        return;
-                    }
-
-                    button.classList.add(
-                        "selected"
-                    );
-
-                    selected.push(index);
-
-                    document
-                    .getElementById(
-                        "natureWarning"
-                    )
-                    .style.display="none";
-                }
-
-                enforceClassRules();
-                checkReady();
-            };
-
-            container.appendChild(button);
-        }
-    );
-}
+            const angle =
+                -Math.PI / 2 +
+                i * angleStep;
 
 
-/* =========================================================
-   CLASSES
-========================================================= */
+            const x =
+                centerX +
+                Math.cos(angle) * radius;
 
-function setupClassButtons(){
-
-    const container=
-        document.getElementById(
-            "classButtons"
-        );
-
-    classNames.forEach(
-        (name,index)=>{
-
-            const button=
-                document.createElement("div");
-
-            button.className=
-                "class-btn";
-
-            button.innerText=name;
-
-            button.onclick=()=>{
-
-                document
-                .querySelectorAll(
-                    ".class-btn"
-                )
-                .forEach(
-                    b=>b.classList.remove(
-                        "selected"
-                    )
-                );
-
-                button.classList.add(
-                    "selected"
-                );
-
-                selectedClass=index;
-
-                enforceClassRules();
-                checkReady();
-            };
-
-            container.appendChild(button);
-        }
-    );
-}
+            const y =
+                centerY +
+                Math.sin(angle) * radius;
 
 
-function enforceClassRules(){
+            ctx.beginPath();
 
-    const info=
-        document.getElementById(
-            "classInfo"
-        );
-
-    if(selectedClass===null){
-
-        info.innerText=
-            "Escolha uma classe.";
-
-        return;
-    }
-
-
-    if(selectedClass===0){
-
-        info.innerText=
-            "Akimovs: afinidade elevada com a Energia Z, porém com desenvolvimento mais contido.";
-
-    }
-
-
-    if(selectedClass===1){
-
-        info.innerText=
-            "Komons: desenvolvimento equilibrado e dependente da capacidade individual.";
-
-    }
-
-
-    if(selectedClass===2){
-
-        info.innerText=
-            "Auzimios: não utilizam Energia Z. As afinidades de natureza são anuladas.";
-
-    }
-
-
-    if(selectedClass===3){
-
-        info.innerText=
-            "Elodiers: elevado potencial de Energia Z e especialização em uma única natureza.";
-
-        if(selected.length>1){
-
-            const removed=
-                selected.pop();
-
-            const buttons=
-                document
-                .querySelectorAll(
-                    ".nature-btn"
-                );
-
-            buttons[
-                removed
-            ].classList.remove(
-                "selected"
+            ctx.moveTo(
+                centerX,
+                centerY
             );
+
+            ctx.lineTo(
+                x,
+                y
+            );
+
+            ctx.strokeStyle =
+                "#aab4c1";
+
+            ctx.stroke();
+
+
+            const labelX =
+                centerX +
+                Math.cos(angle) *
+                (radius + 40);
+
+            const labelY =
+                centerY +
+                Math.sin(angle) *
+                (radius + 40);
+
+
+            ctx.fillStyle =
+                "#1d2733";
+
+            ctx.font =
+                "bold 15px Arial";
+
+            ctx.textAlign =
+                "center";
+
+            ctx.textBaseline =
+                "middle";
+
+
+            ctx.fillText(
+                name,
+                labelX,
+                labelY
+            );
+
         }
-    }
+    );
+
+
+    /*
+        Polígono.
+
+        IMPORTANTE:
+        usamos o índice diretamente,
+        evitando problemas quando duas naturezas
+        possuem exatamente o mesmo valor.
+    */
+
+    ctx.beginPath();
+
+    natureNames.forEach(
+        (name, i) => {
+
+            const value =
+                values[name];
+
+
+            const r =
+                radius *
+                value /
+                100;
+
+
+            const angle =
+                -Math.PI / 2 +
+                i * angleStep;
+
+
+            const x =
+                centerX +
+                Math.cos(angle) * r;
+
+
+            const y =
+                centerY +
+                Math.sin(angle) * r;
+
+
+            if (i === 0) {
+
+                ctx.moveTo(x, y);
+
+            } else {
+
+                ctx.lineTo(x, y);
+
+            }
+
+        }
+    );
+
+
+    ctx.closePath();
+
+
+    ctx.fillStyle =
+        "rgba(70, 100, 140, 0.25)";
+
+    ctx.fill();
+
+
+    ctx.strokeStyle =
+        "#344b68";
+
+    ctx.lineWidth =
+        4;
+
+    ctx.stroke();
+
+
+    /*
+        Pontos.
+    */
+
+    natureNames.forEach(
+        (name, i) => {
+
+            const value =
+                values[name];
+
+
+            const r =
+                radius *
+                value /
+                100;
+
+
+            const angle =
+                -Math.PI / 2 +
+                i * angleStep;
+
+
+            const x =
+                centerX +
+                Math.cos(angle) * r;
+
+
+            const y =
+                centerY +
+                Math.sin(angle) * r;
+
+
+            ctx.beginPath();
+
+            ctx.arc(
+                x,
+                y,
+                6,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fillStyle =
+                "#24364f";
+
+            ctx.fill();
+
+        }
+    );
+
 }
 
 
@@ -1083,1093 +1823,133 @@ function enforceClassRules(){
    FOTO
 ========================================================= */
 
-document
-.getElementById("photoInput")
-.addEventListener(
-    "change",
-    function(){
+function loadPhoto() {
 
-        const file=this.files[0];
+    const input =
+        document.getElementById("photo");
 
-        if(!file)
-            return;
+    const img =
+        document.getElementById("resultPhoto");
 
-        const reader=
-            new FileReader();
-
-        reader.onload=
-            function(event){
-
-                uploadedPhoto=
-                    event.target.result;
-
-                const preview=
-                    document.getElementById(
-                        "photoPreview"
-                    );
-
-                preview.src=
-                    uploadedPhoto;
-
-                preview.style.display=
-                    "block";
-            };
-
-        reader.readAsDataURL(file);
-    }
-);
+    const placeholder =
+        document.getElementById("noPhoto");
 
 
-/* =========================================================
-   ATRIBUTOS MANUAIS
-========================================================= */
+    if (
+        !input.files ||
+        !input.files[0]
+    ) {
 
-function setupAttributes(){
+        img.classList.add("hidden");
+        placeholder.classList.remove("hidden");
 
-    const container=
-        document.getElementById(
-            "attributeInputs"
-        );
+        return;
 
-    attributeNames.forEach(
-        (name,index)=>{
-
-            const row=
-                document.createElement(
-                    "div"
-                );
-
-            row.className=
-                "attribute-row";
-
-            row.innerHTML=`
-
-                <input
-                    type="checkbox"
-                    id="dice_${index}">
-
-                <input
-                    type="number"
-                    min="0"
-                    id="extra_${index}"
-                    placeholder="${name} adicional">
-
-            `;
-
-            container.appendChild(row);
-        }
-    );
-}
-
-
-/* =========================================================
-   DADOS
-========================================================= */
-
-function rollSelectedDice(){
-
-    attributeNames.forEach(
-        (name,index)=>{
-
-            const checked=
-                document.getElementById(
-                    "dice_"+index
-                ).checked;
-
-            if(checked){
-
-                const value=
-                    Math.floor(
-                        Math.random()*6
-                    )+1;
-
-                document.getElementById(
-                    "extra_"+index
-                ).value=value;
-            }
-        }
-    );
-}
-
-
-/* =========================================================
-   LIMITES
-========================================================= */
-
-function toggleLimit(){
-
-    document.getElementById(
-        "limitBox"
-    ).style.display=
-        document.getElementById(
-            "customLimit"
-        ).checked
-        ? "block"
-        : "none";
-}
-
-
-function getLimit(){
-
-    if(
-        !document.getElementById(
-            "customLimit"
-        ).checked
-    )
-        return 9;
-
-    let limit=
-        parseInt(
-            document.getElementById(
-                "attributeLimit"
-            ).value
-        );
-
-    if(
-        !Number.isFinite(limit)||
-        limit<1
-    )
-        limit=9;
-
-    return limit;
-}
-
-
-/* =========================================================
-   IMPACTO DAS CLASSES
-========================================================= */
-
-function classImpact(){
-
-    switch(selectedClass){
-
-        case 0:
-
-            return {
-                natureMin:90,
-                natureMax:100,
-                multiplier:.75
-            };
-
-        case 1:
-
-            return {
-                natureMin:90,
-                natureMax:100,
-                multiplier:1
-            };
-
-        case 2:
-
-            return {
-                natureMin:0,
-                natureMax:0,
-                multiplier:.45
-            };
-
-        case 3:
-
-            return {
-                natureMin:90,
-                natureMax:100,
-                multiplier:1.65
-            };
-
-        default:
-
-            return {
-                natureMin:90,
-                natureMax:100,
-                multiplier:1
-            };
-    }
-}
-
-
-/* =========================================================
-   NATUREZAS
-========================================================= */
-
-function generateNatureValues(){
-
-    const values=
-        new Array(6).fill(0);
-
-    const impact=
-        classImpact();
-
-
-    if(selectedClass===2){
-
-        return values;
     }
 
 
-    if(selectedClass===3){
-
-        values[
-            selected[0]
-        ]=
-            randomInt(
-                90,
-                100
-            );
-
-        return values;
-    }
+    const file =
+        input.files[0];
 
 
-    selected.forEach(
-        index=>{
-
-            values[index]=
-                randomInt(
-                    impact.natureMin,
-                    impact.natureMax
-                );
-        }
-    );
+    const reader =
+        new FileReader();
 
 
-    for(let i=0;i<6;i++){
+    reader.onload = function(event) {
 
-        if(values[i]===0){
+        img.src =
+            event.target.result;
 
-            const chance=
-                randomInt(1,100);
+        img.classList.remove("hidden");
 
-            if(chance<=8){
+        placeholder.classList.add("hidden");
 
-                values[i]=
-                    randomInt(
-                        35,
-                        75
-                    );
-
-            }else{
-
-                values[i]=
-                    randomInt(
-                        10,
-                        34
-                    );
-            }
-        }
-    }
-
-    return values;
-}
-
-
-/* =========================================================
-   IMPACTO DE NATUREZA
-========================================================= */
-
-function natureImpact(
-    values,
-    attribute
-){
-
-    const table={
-
-        "Potencializador":{
-            "Poder Bruto":2
-        },
-
-        "Energizador":{
-            "Velocidade":2
-        },
-
-        "Liberador":{
-            "Força":2
-        },
-
-        "Encantador":{
-            "Agilidade":2
-        },
-
-        "Espiritualista":{
-            "Resistência":2
-        },
-
-        "Criador":{
-            "Agilidade":1,
-            "Poder Bruto":1
-        }
     };
 
-    let result=0;
 
-    natureNames.forEach(
-        (nature,index)=>{
+    reader.readAsDataURL(file);
 
-            if(
-                table[nature] &&
-                table[nature][attribute]
-            ){
-
-                result+=
-                    Math.round(
-                        table[nature][attribute]*
-                        (
-                            values[index]/100
-                        )
-                    );
-            }
-        }
-    );
-
-    return result;
 }
 
 
 /* =========================================================
-   ATRIBUTOS
+   EXPORTAÇÃO PNG
 ========================================================= */
 
-function generateAttributes(
-    natureValues
-){
+async function createCardCanvas() {
 
-    const base={};
-
-    const impact=
-        classImpact();
-
-    const limit=
-        getLimit();
-
-    attributeNames.forEach(
-        attribute=>{
-
-            let value=
-                randomInt(
-                    0,
-                    9
-                );
-
-
-            value+=
-                natureImpact(
-                    natureValues,
-                    attribute
-                );
-
-
-            value=
-                Math.round(
-                    value*
-                    impact.multiplier
-                );
-
-
-            if(
-                document
-                .getElementById(
-                    "proportionalScale"
-                ).checked &&
-                limit>9
-            ){
-
-                value=
-                    Math.round(
-                        value*
-                        (limit/9)
-                    );
-            }
-
-
-            value=
-                Math.min(
-                    value,
-                    limit
-                );
-
-
-            base[attribute]=value;
-        }
-    );
-
-
-    /*
-    Balanceamento somente da parte gerada.
-    */
-
-    if(
-        document
-        .getElementById(
-            "deterministicImpact"
-        ).checked
-    ){
-
-        const average=
-            Object
-            .values(base)
-            .reduce(
-                (a,b)=>a+b,
-                0
-            )/
-            attributeNames.length;
-
-
-        const affinity=
-            natureValues
-            .reduce(
-                (a,b)=>a+b,
-                0
-            )/6;
-
-
-        attributeNames.forEach(
-            attribute=>{
-
-                const difference=
-                    base[attribute]-
-                    average;
-
-                const correction=
-                    Math.round(
-                        difference*
-                        (affinity/100)*
-                        .35
-                    );
-
-                base[attribute]=
-                    Math.max(
-                        0,
-                        Math.min(
-                            limit,
-                            base[attribute]-
-                            correction
-                        )
-                    );
-            }
-        );
-    }
-
-    return base;
-}
-
-
-/* =========================================================
-   GRÁFICO
-========================================================= */
-
-function drawRadar(
-    svg,
-    values
-){
-
-    svg.innerHTML="";
-
-    const center=200;
-    const radius=150;
-
-
-    for(let level=1;level<=5;level++){
-
-        const r=
-            radius*
-            (level/5);
-
-        let points="";
-
-        for(let i=0;i<6;i++){
-
-            const angle=
-                (Math.PI*2/6)*i-
-                Math.PI/2;
-
-            const x=
-                center+
-                r*
-                Math.cos(angle);
-
-            const y=
-                center+
-                r*
-                Math.sin(angle);
-
-            points+=
-                `${x},${y} `;
-        }
-
-
-        const polygon=
-            document
-            .createElementNS(
-                "http://www.w3.org/2000/svg",
-                "polygon"
-            );
-
-        polygon.setAttribute(
-            "points",
-            points
-        );
-
-        polygon.setAttribute(
-            "fill",
-            "none"
-        );
-
-        polygon.setAttribute(
-            "stroke",
-            "#94a3b8"
-        );
-
-        polygon.setAttribute(
-            "stroke-width",
-            "1"
-        );
-
-        svg.appendChild(
-            polygon
-        );
-    }
-
-
-    let points="";
-
-    values.forEach(
-        value=>{
-
-            const i=
-                values.indexOf(
-                    value
-                );
-
-            const angle=
-                (Math.PI*2/6)*i-
-                Math.PI/2;
-
-            const r=
-                radius*
-                (value/100);
-
-            const x=
-                center+
-                r*
-                Math.cos(angle);
-
-            const y=
-                center+
-                r*
-                Math.sin(angle);
-
-            points+=
-                `${x},${y} `;
-        }
-    );
-
-
-    const polygon=
-        document
-        .createElementNS(
-            "http://www.w3.org/2000/svg",
-            "polygon"
-        );
-
-    polygon.setAttribute(
-        "points",
-        points
-    );
-
-    polygon.setAttribute(
-        "fill",
-        "rgba(37,99,235,.30)"
-    );
-
-    polygon.setAttribute(
-        "stroke",
-        "#2563eb"
-    );
-
-    polygon.setAttribute(
-        "stroke-width",
-        "3"
-    );
-
-    svg.appendChild(
-        polygon
-    );
-
-
-    for(let i=0;i<6;i++){
-
-        const angle=
-            (Math.PI*2/6)*i-
-            Math.PI/2;
-
-        const x=
-            center+
-            178*
-            Math.cos(angle);
-
-        const y=
-            center+
-            178*
-            Math.sin(angle);
-
-        const text=
-            document
-            .createElementNS(
-                "http://www.w3.org/2000/svg",
-                "text"
-            );
-
-        text.setAttribute(
-            "x",
-            x
-        );
-
-        text.setAttribute(
-            "y",
-            y
-        );
-
-        text.setAttribute(
-            "text-anchor",
-            "middle"
-        );
-
-        text.setAttribute(
-            "font-size",
-            "12"
-        );
-
-        text.setAttribute(
-            "font-weight",
-            "700"
-        );
-
-        text.textContent=
-            natureNames[i]+
-            " "+
-            values[i]+"%";
-
-        svg.appendChild(
-            text
-        );
-    }
-}
-
-
-/* =========================================================
-   CARTA
-========================================================= */
-
-function buildCard(
-    natureValues,
-    attributes,
-    extras,
-    totals
-){
-
-    document.getElementById(
-        "cardName"
-    ).innerText=
-        document.getElementById(
-            "nome"
-        ).value;
-
-
-    document.getElementById(
-        "cardAge"
-    ).innerText=
-        document.getElementById(
-            "idade"
-        ).value+
-        " anos";
-
-
-    document.getElementById(
-        "cardClass"
-    ).innerText=
-        classNames[
-            selectedClass
-        ];
-
-
-    const natureContainer=
-        document.getElementById(
-            "cardNatures"
-        );
-
-    natureContainer.innerHTML="";
-
-
-    selected.forEach(
-        index=>{
-
-            const tag=
-                document.createElement(
-                    "div"
-                );
-
-            tag.className=
-                "nature-tag";
-
-            tag.innerText=
-                natureNames[index]+
-                " "+
-                natureValues[index]+
-                "%";
-
-            natureContainer.appendChild(
-                tag
-            );
-        }
-    );
-
-
-    if(selectedClass===2){
-
-        const tag=
-            document.createElement(
-                "div"
-            );
-
-        tag.className=
-            "nature-tag";
-
-        tag.innerText=
-            "Sem afinidade Z";
-
-        natureContainer.appendChild(
-            tag
-        );
-    }
-
-
-    const cardPhoto=
-        document.getElementById(
-            "cardPhoto"
-        );
-
-    const noPhoto=
-        document.getElementById(
-            "noPhoto"
-        );
-
-
-    if(uploadedPhoto){
-
-        cardPhoto.src=
-            uploadedPhoto;
-
-        cardPhoto.classList.remove(
-            "hidden"
-        );
-
-        noPhoto.style.display=
-            "none";
-
-    }else{
-
-        cardPhoto.classList.add(
-            "hidden"
-        );
-
-        noPhoto.style.display=
-            "block";
-    }
-
-
-    drawRadar(
-        document.getElementById(
-            "cardRadar"
-        ),
-        natureValues
-    );
-
-
-    const container=
-        document.getElementById(
-            "cardAttributes"
-        );
-
-    container.innerHTML="";
-
-
-    const limit=
-        getLimit();
-
-
-    attributeNames.forEach(
-        attribute=>{
-
-            const stat=
-                document.createElement(
-                    "div"
-                );
-
-            stat.className="stat";
-
-
-            const percentage=
-                Math.min(
-                    100,
-                    (totals[attribute]/
-                    Math.max(
-                        limit,
-                        totals[attribute]
-                    ))*
-                    100
-                );
-
-
-            stat.innerHTML=`
-
-                <div class="stat-header">
-
-                    <span>
-                        ${attribute}
-                    </span>
-
-                    <span>
-                        ${totals[attribute]}
-                    </span>
-
-                </div>
-
-                <div class="stat-bar">
-
-                    <div
-                        class="stat-fill"
-                        style="
-                        width:${percentage}%">
-                    </div>
-
-                </div>
-
-            `;
-
-            container.appendChild(
-                stat
-            );
-        }
-    );
-}
-
-
-/* =========================================================
-   GERAÇÃO
-========================================================= */
-
-function generate(){
-
-    if(selectedClass===null){
-
-        document
-        .getElementById(
-            "classWarning"
-        ).style.display="block";
-
-        return;
-    }
-
-
-    if(selected.length===0){
-
-        document
-        .getElementById(
-            "natureWarning"
-        ).style.display="block";
-
-        return;
-    }
-
-
-    initializeSeed();
-
-
-    const natureValues=
-        generateNatureValues();
-
-
-    const base=
-        generateAttributes(
-            natureValues
-        );
-
-
-    const manual={};
-    const totals={};
-
-
-    const limit=
-        getLimit();
-
-
-    attributeNames.forEach(
-        (attribute,index)=>{
-
-            let extra=
-                parseInt(
-                    document
-                    .getElementById(
-                        "extra_"+index
-                    )
-                    .value
-                );
-
-
-            if(
-                !Number.isFinite(extra)
-            )
-                extra=0;
-
-
-            /*
-            A escala proporcional só
-            converte valores de dado
-            entre 1 e 6.
-            */
-
-            if(
-                document
-                .getElementById(
-                    "proportionalScale"
-                ).checked &&
-                limit>9 &&
-                extra>=1 &&
-                extra<=6
-            ){
-
-                extra=
-                    Math.round(
-                        extra*
-                        (limit/9)
-                    );
-            }
-
-
-            manual[attribute]=
-                Math.max(
-                    0,
-                    extra
-                );
-
-
-            /*
-            Importante:
-            o limite não destrói o valor
-            manual inserido.
-            */
-
-            totals[attribute]=
-                base[attribute]+
-                manual[attribute];
-        }
-    );
-
-
-    buildCard(
-        natureValues,
-        base,
-        manual,
-        totals
-    );
-
-
-    document
-    .getElementById(
-        "formPanel"
-    )
-    .classList.add(
-        "hidden"
-    );
-
-
-    document
-    .getElementById(
-        "resultPanel"
-    )
-    .classList.remove(
-        "hidden"
-    );
-}
-
-
-/* =========================================================
-   EXPORTAR PNG
-========================================================= */
-
-async function downloadPNG(){
-
-    const card=
+    const card =
         document.getElementById(
             "characterCard"
         );
 
 
-    const canvas=
-        await html2canvas(
-            card,
-            {
-                scale:3,
-                useCORS:true,
-                backgroundColor:null
-            }
-        );
+    return await html2canvas(
+        card,
+        {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: null,
+            logging: false
+        }
+    );
+
+}
 
 
-    const link=
-        document.createElement(
-            "a"
-        );
+async function downloadPNG() {
 
-    const name=
-        document
-        .getElementById(
-            "nome"
-        )
-        .value
-        .trim()
-        .replace(
-            /[^a-z0-9áéíóúãõç_-]/gi,
-            "_"
-        );
+    if (!currentCharacter) {
+        return;
+    }
 
 
-    link.download=
-        "carta_"+name+".png";
+    const canvas =
+        await createCardCanvas();
 
 
-    link.href=
+    const link =
+        document.createElement("a");
+
+
+    const safeName =
+        currentCharacter.name
+            .replace(/[^\w\-]+/g, "_");
+
+
+    link.download =
+        safeName +
+        "_carta.png";
+
+
+    link.href =
         canvas.toDataURL(
             "image/png"
         );
 
 
     link.click();
+
 }
 
 
 /* =========================================================
-   EXPORTAR PDF
+   EXPORTAÇÃO PDF
 ========================================================= */
 
-async function downloadPDF(){
+async function downloadPDF() {
 
-    const card=
-        document.getElementById(
-            "characterCard"
-        );
-
-
-    const canvas=
-        await html2canvas(
-            card,
-            {
-                scale:3,
-                useCORS:true,
-                backgroundColor:"#ffffff"
-            }
-        );
+    if (!currentCharacter) {
+        return;
+    }
 
 
-    const image=
+    const canvas =
+        await createCardCanvas();
+
+
+    const image =
         canvas.toDataURL(
             "image/png"
         );
@@ -2177,158 +1957,99 @@ async function downloadPDF(){
 
     const {
         jsPDF
-    }=
-        window.jspdf;
+    } = window.jspdf;
 
 
-    const pdf=
-        new jsPDF({
-            orientation:"portrait",
-            unit:"mm",
-            format:"a4"
-        });
+    /*
+        A carta é vertical.
+        O PDF recebe exatamente a proporção
+        da imagem para não deformá-la.
+    */
+
+    const width =
+        680;
+
+    const height =
+        canvas.height /
+        canvas.width *
+        width;
 
 
-    const pageWidth=
-        pdf.internal.pageSize.getWidth();
+    const pdf =
+        new jsPDF(
+            {
+                orientation:
+                    height > width
+                        ? "portrait"
+                        : "landscape",
 
-    const pageHeight=
-        pdf.internal.pageSize.getHeight();
+                unit: "px",
 
-
-    const ratio=
-        canvas.height/
-        canvas.width;
-
-
-    let width=
-        pageWidth-20;
-
-    let height=
-        width*ratio;
-
-
-    if(height>pageHeight-20){
-
-        height=
-            pageHeight-20;
-
-        width=
-            height/ratio;
-    }
-
-
-    const x=
-        (pageWidth-width)/2;
-
-    const y=
-        (pageHeight-height)/2;
+                format: [
+                    width,
+                    height
+                ]
+            }
+        );
 
 
     pdf.addImage(
         image,
         "PNG",
-        x,
-        y,
+        0,
+        0,
         width,
-        height
+        height,
+        undefined,
+        "FAST"
     );
 
 
-    const name=
-        document
-        .getElementById(
-            "nome"
-        )
-        .value
-        .trim()
-        .replace(
-            /[^a-z0-9áéíóúãõç_-]/gi,
-            "_"
-        );
+    const safeName =
+        currentCharacter.name
+            .replace(/[^\w\-]+/g, "_");
 
 
     pdf.save(
-        "carta_"+name+".pdf"
+        safeName +
+        "_carta.pdf"
     );
+
 }
 
 
 /* =========================================================
-   INTERFACE
+   LIMITE PERSONALIZADO
 ========================================================= */
 
-function toggleAdvanced(){
+document
+    .getElementById("useCustomLimit")
+    .addEventListener(
+        "change",
+        function() {
 
-    const box=
-        document.getElementById(
-            "advanced"
-        );
+            document
+                .getElementById("customLimit")
+                .disabled =
+                    !this.checked;
 
-    box.style.display=
-        box.style.display==="block"
-        ? "none"
-        : "block";
-}
-
-
-function checkReady(){
-
-    const nome=
-        document
-        .getElementById(
-            "nome"
-        )
-        .value
-        .trim();
-
-    const idade=
-        document
-        .getElementById(
-            "idade"
-        )
-        .value;
+        }
+    );
 
 
-    document
-    .getElementById(
-        "generateBtn"
-    )
-    .disabled=
-        !(
-            nome &&
-            idade &&
-            selected.length>0 &&
-            selectedClass!==null
-        );
-}
-
+/* =========================================================
+   FOTO
+========================================================= */
 
 document
-.getElementById(
-    "nome"
-)
-.addEventListener(
-    "input",
-    checkReady
-);
-
-
-document
-.getElementById(
-    "idade"
-)
-.addEventListener(
-    "input",
-    checkReady
-);
-
-
-setupNatureButtons();
-setupClassButtons();
-setupAttributes();
+    .getElementById("photo")
+    .addEventListener(
+        "change",
+        loadPhoto
+    );
 
 </script>
 
 </body>
 </html>
+```
