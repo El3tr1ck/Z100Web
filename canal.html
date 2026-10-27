@@ -1,327 +1,243 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini YouTube - Últimos Vídeos</title>
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        h1 {
-            font-size: 24px;
-            color: #444;
-            text-align: center;
-            margin: 40px 0;
-            font-weight: 600;
-        }
-
-        #video-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .card {
-            background: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-        }
-
-        .card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .info {
-            padding: 15px;
-        }
-
-        .title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .description {
-            font-size: 14px;
-            color: #777;
-            margin-bottom: 15px;
-        }
-
-        .card a {
-            display: block;
-            padding: 10px;
-            background-color: #007BFF;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-
-        .card a:hover {
-            background-color: #0056b3;
-        }
-
-        .broadcast-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #FF5733;
-            color: white;
-            font-size: 20px;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            z-index: 1000;
-        }
-
-        .broadcast-btn:hover {
-            background-color: #C0392B;
-        }
-
-        #mode-toggle {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background-color: #fff;
-            border: none;
-            padding: 10px;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
-            z-index: 1000;
-        }
-
-        #mode-toggle:hover {
-            background-color: #f0f0f0;
-        }
-
-        #mode-toggle .fa {
-            font-size: 24px;
-            color: #333;
-        }
-
-        body.dark-mode {
-            background-color: #1a1a1a;
-            color: #fff;
-        }
-
-        body.dark-mode .card {
-            background-color: #2d2d2d;
-        }
-
-        body.dark-mode .title {
-            color: #fff;
-        }
-
-        body.dark-mode .description {
-            color: #ccc;
-        }
-
-        body.dark-mode .card a {
-            background-color: #1a73e8;
-        }
-
-        body.dark-mode .card a:hover {
-            background-color: #1557b0;
-        }
-
-        body.dark-mode #mode-toggle {
-            background-color: #444;
-        }
-
-        body.dark-mode #mode-toggle:hover {
-            background-color: #555;
-        }
-
-        body.dark-mode #mode-toggle .fa {
-            color: #fff;
-        }
-
-        #loading {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .spinner {
-            border: 5px solid #fff;
-            border-top: 5px solid #007BFF;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        #loading p {
-            font-size: 20px;
-            color: #fff;
-            font-weight: 500;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mini YouTube - Melhores Vídeos</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--tx:#0f0f0f;--tx2:#606060;--chip:#f2f2f2;--chiph:#e3e3e3;--line:#d3d3d3}
+:root[data-theme=dark]{--bg:#0f0f0f;--tx:#f1f1f1;--tx2:#aaa;--chip:#272727;--chiph:#3f3f3f;--line:#303030}
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid #3ea6ff;outline-offset:2px}
+header{position:sticky;top:0;z-index:20;height:56px;display:flex;align-items:center;gap:16px;padding:0 16px;background:var(--bg)}
+.logo{display:flex;align-items:center;gap:4px;font-weight:700;font-size:20px;letter-spacing:-.5px;color:var(--tx);text-decoration:none}
+.logo svg{width:30px;height:21px}
+.search{flex:1;max-width:640px;margin:0 auto;display:flex;min-width:0}
+.search input{flex:1;min-width:0;height:40px;padding:0 16px;border:1px solid var(--line);border-radius:40px 0 0 40px;background:var(--bg);color:var(--tx);font:400 16px Roboto,Arial,sans-serif}
+.search button{width:64px;height:40px;border:1px solid var(--line);border-left:0;border-radius:0 40px 40px 0;background:var(--chip);color:var(--tx);cursor:pointer}
+.search svg{width:24px;height:24px;fill:currentColor}
+.pill{display:flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:18px;background:var(--chip);color:var(--tx);font:500 14px Roboto,Arial,sans-serif;text-decoration:none;white-space:nowrap}
+.pill:hover,.chip:hover,.ic:hover{background:var(--chiph)}
+.dot{width:8px;height:8px;border-radius:50%;background:#f00}
+.ic{display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:50%;background:transparent;color:var(--tx);cursor:pointer}
+.ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+:root[data-theme=dark] .moon,:root:not([data-theme=dark]) .sun{display:none}
+.chan{display:flex;align-items:center;gap:16px;padding:16px 24px 0}
+#cav{width:56px;height:56px;border-radius:50%;background:var(--chip)}
+.chan h1{margin:0;font-size:20px;line-height:26px}
+.chan p{margin:2px 0 0;font-size:14px;color:var(--tx2)}
+.upd{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2);text-align:right}
+.pulse{flex:none;width:8px;height:8px;border-radius:50%;background:#2ba640;animation:pu 1.6s infinite}
+@keyframes pu{50%{opacity:.25}}
+.chips{position:sticky;top:56px;z-index:10;display:flex;gap:12px;padding:12px 24px;background:var(--bg);overflow-x:auto}
+.chip{flex:none;height:32px;padding:0 12px;border:0;border-radius:8px;background:var(--chip);color:var(--tx);font:500 14px Roboto,Arial,sans-serif;cursor:pointer}
+.chip.on{background:var(--tx);color:var(--bg)}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:36px 16px;padding:8px 24px 0}
+.card{display:block;color:var(--tx);text-decoration:none}
+.th{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:var(--chip);transition:border-radius .2s}
+.card:hover .th{border-radius:0}
+.th img{display:block;width:100%;height:100%;object-fit:cover}
+.rank,.dur{position:absolute;padding:2px 5px;border-radius:4px;background:rgba(0,0,0,.8);color:#fff;font-size:12px;font-weight:500}
+.rank{left:8px;top:8px;font-weight:700}
+.dur{right:8px;bottom:8px}
+.row{display:flex;gap:12px;margin-top:12px}
+.av{display:block;flex:none;width:36px;height:36px;border-radius:50%;background:var(--chip)}
+h3{margin:0 0 4px;font-size:16px;line-height:22px;font-weight:500;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.row p{margin:0;font-size:14px;line-height:20px;color:var(--tx2)}
+.flash{animation:fl 1.6s}
+@keyframes fl{from{color:#2ba640}}
+.sk .th,.sk i{background:linear-gradient(90deg,var(--chip) 25%,var(--chiph) 50%,var(--chip) 75%);background-size:200% 100%;animation:sh 1.2s linear infinite}
+.sk .ln{display:block;height:14px;border-radius:7px;margin:6px 0}
+.sk .ln.s{width:60%}
+@keyframes sh{to{background-position:-200% 0}}
+.msg{grid-column:1/-1;padding:48px 0;text-align:center;color:var(--tx2)}
+#more{display:block;height:36px;margin:28px auto 40px;padding:0 24px;border-radius:18px}
+#more[hidden]{display:none}
+@media(max-width:640px){.logo span,.pill b{display:none}.chan,.chips{padding-left:16px;padding-right:16px}#grid{padding:8px 0 0;gap:24px}.th{border-radius:0}.row{padding:0 12px}.upd{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
 </head>
 <body>
-    <div class="broadcast-btn" onclick="window.location.href='https://z100web.netlify.app/live.html';">
-        <i class="fa fa-video-camera"></i>
-    </div>
+<header>
+  <a class="logo" href="./" aria-label="Início">
+    <svg viewBox="0 0 28 20"><rect width="28" height="20" rx="5" fill="#f00"/><path d="M11 5.5v9l8-4.5z" fill="#fff"/></svg><span>Mini YouTube</span>
+  </a>
+  <form class="search" onsubmit="return false">
+    <input id="q" type="search" placeholder="Pesquisar nos vídeos" aria-label="Pesquisar nos vídeos">
+    <button type="submit" aria-label="Pesquisar"><svg viewBox="0 0 24 24"><path d="M20.87 20.17l-5.59-5.59A6.96 6.96 0 0017 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.66 0 3.18-.58 4.38-1.54l5.59 5.59.9-.88zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg></button>
+  </form>
+  <a class="pill" href="https://z100web.netlify.app/live.html"><i class="dot"></i><b>Ao vivo</b></a>
+  <button class="ic" id="theme" aria-label="Alternar tema"><svg class="moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
+</header>
 
-    <button id="mode-toggle">
-        <i id="mode-icon" class="fa fa-sun-o"></i>
-    </button>
+<section class="chan">
+  <img id="cav" alt="">
+  <div><h1 id="cname">Carregando…</h1><p id="cmeta"></p></div>
+  <div class="upd"><i class="pulse"></i><span id="upd">Conectando…</span></div>
+</section>
 
-    <h1>Últimos Vídeos</h1>
+<nav class="chips" aria-label="Ordenar vídeos">
+  <button class="chip on" data-s="views">Mais vistos</button>
+  <button class="chip" data-s="likes">Mais curtidos</button>
+  <button class="chip" data-s="recent">Mais recentes</button>
+</nav>
 
-    <div id="loading">
-        <div class="spinner"></div>
-        <p>Carregando vídeos...</p>
-    </div>
+<main>
+  <div id="grid"></div>
+  <button class="chip" id="more" hidden>Mostrar mais</button>
+</main>
 
-    <div id="video-list"></div>
+<script>
+const API_KEY = 'AIzaSyAYUBNxqcp6s2f_Hq3_5K1B4eJX1ynwuaw';
+const CHANNEL_ID = 'UCaUpZWdX_v3j2w4UJX0f7TA';
+const MAX_PAGES = 6;          // 6 x 50 = até 300 uploads analisados
+const PAGE = 24;              // vídeos exibidos por vez
+const REFRESH_MS = 60000;     // atualização das visualizações
+const TTL = 30 * 60 * 1000;   // cache da lista (30 min)
 
-    <script src="https://apis.google.com/js/api.js"></script>
-    <script>
-        const API_KEY = 'AIzaSyAYUBNxqcp6s2f_Hq3_5K1B4eJX1ynwuaw';
-        const CHANNEL_ID = 'UCaUpZWdX_v3j2w4UJX0f7TA';
+const $ = s => document.querySelector(s);
+const st = { ch: null, videos: [], sort: 'views', q: '', shown: PAGE };
+const nf = new Intl.NumberFormat('pt-BR', { notation: 'compact', maximumFractionDigits: 1 });
+const rtf = new Intl.RelativeTimeFormat('pt-BR', { numeric: 'always' });
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const views = n => nf.format(n) + (n >= 1e6 ? ' de' : '') + ' visualizações';
 
-        let nextPageToken = '';
+function ago(d) {
+  const s = (Date.now() - new Date(d)) / 1000;
+  for (const [u, v] of [['year', 31536000], ['month', 2592000], ['week', 604800], ['day', 86400], ['hour', 3600], ['minute', 60]])
+    if (s >= v) return rtf.format(-Math.floor(s / v), u);
+  return 'agora mesmo';
+}
+function dur(iso) {
+  const m = /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(iso || '');
+  if (!m) return '';
+  const h = +m[1] || 0, mi = +m[2] || 0, s = String(+m[3] || 0).padStart(2, '0');
+  return (h ? h + ':' + String(mi).padStart(2, '0') : mi) + ':' + s;
+}
 
-        function loadYouTubeAPI() {
-            gapi.client.init({
-                'apiKey': API_KEY,
-            }).then(() => {
-                gapi.client.load('youtube', 'v3').then(() => {
-                    fetchVideos();
-                });
-            }).catch(err => {
-                console.error("Erro ao carregar a API do YouTube:", err);
-            });
-        }
+async function api(path, params) {
+  const u = new URL('https://www.googleapis.com/youtube/v3/' + path);
+  Object.entries({ ...params, key: API_KEY }).forEach(([k, v]) => v && u.searchParams.set(k, v));
+  const r = await fetch(u), j = await r.json();
+  if (!r.ok) throw new Error(j.error?.message || r.status);
+  return j;
+}
+async function fetchVideos(ids, part, fields) {
+  const out = [];
+  for (let i = 0; i < ids.length; i += 50)
+    out.push(...(await api('videos', { part, fields, id: ids.slice(i, i + 50).join(',') })).items);
+  return out;
+}
 
-        function fetchVideos() {
-            document.getElementById('loading').style.display = 'flex';
-            gapi.client.youtube.channels.list({
-                part: 'contentDetails',
-                id: CHANNEL_ID,
-            }).then(response => {
-                const playlistId = response.result.items[0].contentDetails.relatedPlaylists.uploads;
-                fetchPlaylistVideos(playlistId);
-            }).catch(err => {
-                console.error("Erro ao buscar playlist:", err);
-                document.getElementById('loading').style.display = 'none';
-            });
-        }
+async function loadAll() {
+  const c = (await api('channels', { part: 'snippet,contentDetails,statistics', id: CHANNEL_ID })).items[0];
+  const ch = {
+    name: c.snippet.title, avatar: c.snippet.thumbnails.default.url,
+    subs: c.statistics.hiddenSubscriberCount ? null : +c.statistics.subscriberCount, total: +c.statistics.videoCount
+  };
+  const ids = []; let tok = '';
+  for (let i = 0; i < MAX_PAGES; i++) {
+    const j = await api('playlistItems', {
+      part: 'contentDetails', playlistId: c.contentDetails.relatedPlaylists.uploads, maxResults: 50,
+      pageToken: tok, fields: 'nextPageToken,items/contentDetails/videoId'
+    });
+    ids.push(...j.items.map(x => x.contentDetails.videoId));
+    if (!(tok = j.nextPageToken)) break;
+  }
+  const items = await fetchVideos(ids, 'snippet,contentDetails,statistics',
+    'items(id,snippet(title,publishedAt),contentDetails/duration,statistics(viewCount,likeCount))');
+  return {
+    ch, videos: items.map(v => ({
+      id: v.id, title: v.snippet.title, date: v.snippet.publishedAt, dur: dur(v.contentDetails.duration),
+      views: +v.statistics.viewCount || 0, likes: +v.statistics.likeCount || 0
+    }))
+  };
+}
 
-        function fetchPlaylistVideos(playlistId) {
-            const request = gapi.client.youtube.playlistItems.list({
-                part: 'snippet',
-                playlistId: playlistId,
-                maxResults: 70,
-                pageToken: nextPageToken,
-            });
+const card = (v, r) => `<a class="card" href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener" data-id="${v.id}">
+  <div class="th"><img loading="lazy" src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg" alt="">${r ? `<span class="rank">#${r}</span>` : ''}${v.dur ? `<span class="dur">${v.dur}</span>` : ''}</div>
+  <div class="row"><img class="av" src="${esc(st.ch.avatar)}" alt="">
+    <div><h3>${esc(v.title)}</h3><p>${esc(st.ch.name)}</p><p><span class="vw">${views(v.views)}</span> • ${ago(v.date)}</p></div></div></a>`;
 
-            request.execute(function(response) {
-                if (response.error) {
-                    console.error("Erro na execução da requisição:", response.error);
-                    document.getElementById('loading').style.display = 'none';
-                } else {
-                    const videos = response.items;
-                    nextPageToken = response.nextPageToken;
-                    displayVideos(videos);
-                }
-            });
-        }
+function render() {
+  const by = { views: (a, b) => b.views - a.views, likes: (a, b) => b.likes - a.likes, recent: (a, b) => new Date(b.date) - new Date(a.date) }[st.sort];
+  const all = [...st.videos].sort(by), q = st.q.toLowerCase();
+  const list = q ? all.filter(v => v.title.toLowerCase().includes(q)) : all;
+  $('#grid').innerHTML = list.length
+    ? list.slice(0, st.shown).map(v => card(v, st.sort === 'recent' ? 0 : all.indexOf(v) + 1)).join('')
+    : '<p class="msg">Nenhum vídeo encontrado.</p>';
+  $('#more').hidden = list.length <= st.shown;
+}
 
-        function displayVideos(videos) {
-            const videoList = document.getElementById('video-list');
-            videoList.innerHTML = '';
+function header() {
+  const c = st.ch;
+  $('#cav').src = c.avatar; $('#cname').textContent = c.name;
+  $('#cmeta').textContent = (c.subs != null ? nf.format(c.subs) + ' inscritos • ' : '') + c.total + ' vídeos';
+  document.title = c.name + ' - Melhores vídeos';
+}
 
-            if (videos && videos.length > 0) {
-                videos.forEach(video => {
-                    const videoId = video.snippet.resourceId.videoId;
-                    const title = video.snippet.title;
-                    const description = video.snippet.description;
-                    const thumbnail = video.snippet.thumbnails.high.url;
+function save() {
+  try { localStorage.setItem('ytbest', JSON.stringify({ t: Date.now(), ch: st.ch, videos: st.videos })); } catch (e) {}
+}
 
-                    const card = document.createElement('div');
-                    card.classList.add('card');
+async function refresh() {
+  const ids = [...document.querySelectorAll('.card')].map(c => c.dataset.id);
+  if (document.hidden || !ids.length) return;
+  try {
+    const items = await fetchVideos(ids, 'statistics', 'items(id,statistics(viewCount,likeCount))');
+    items.forEach(it => {
+      const v = st.videos.find(x => x.id === it.id); if (!v) return;
+      const n = +it.statistics.viewCount || 0;
+      v.likes = +it.statistics.likeCount || 0;
+      if (n === v.views) return;
+      v.views = n;
+      const el = document.querySelector(`.card[data-id="${v.id}"] .vw`);
+      if (el) { el.textContent = views(n); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+    });
+    $('#upd').textContent = 'Visualizações atualizadas às ' + new Date().toLocaleTimeString('pt-BR');
+    save();
+  } catch (e) { console.error(e); }
+}
 
-                    card.innerHTML = `
-                        <img src="${thumbnail}" alt="${title}">
-                        <div class="info">
-                            <div class="title">${title}</div>
-                            <div class="description">${description.substring(0, 100)}...</div>
-                            <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">Assistir</a>
-                        </div>
-                    `;
+// Controles
+document.querySelectorAll('.chip[data-s]').forEach(b => b.onclick = () => {
+  st.sort = b.dataset.s; st.shown = PAGE;
+  document.querySelectorAll('.chip[data-s]').forEach(x => x.classList.toggle('on', x === b));
+  render();
+});
+$('#q').oninput = e => { st.q = e.target.value.trim(); st.shown = PAGE; render(); };
+$('#more').onclick = () => { st.shown += PAGE; render(); };
 
-                    videoList.appendChild(card);
-                });
-            } else {
-                videoList.innerHTML = "<p>Não há vídeos disponíveis.</p>";
-            }
+const root = document.documentElement;
+function setTheme(dark) { root.dataset.theme = dark ? 'dark' : 'light'; }
+let saved = null; try { saved = localStorage.getItem('theme'); } catch (e) {}
+setTheme(saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches);
+$('#theme').onclick = () => {
+  const dark = root.dataset.theme !== 'dark'; setTheme(dark);
+  try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+};
 
-            document.getElementById('loading').style.display = 'none';
-        }
-
-        const modeToggle = document.getElementById('mode-toggle');
-        const modeIcon = document.getElementById('mode-icon');
-
-        modeToggle.addEventListener('click', function() {
-            document.body.classList.toggle('dark-mode');
-            
-            if (document.body.classList.contains('dark-mode')) {
-                modeIcon.classList.remove('fa-sun-o');
-                modeIcon.classList.add('fa-moon-o');
-            } else {
-                modeIcon.classList.remove('fa-moon-o');
-                modeIcon.classList.add('fa-sun-o');
-            }
-        });
-
-        gapi.load('client', loadYouTubeAPI);
-    </script>
+// Início
+(async () => {
+  $('#grid').innerHTML = '<div class="sk"><div class="th"></div><div class="row"><i class="av"></i><div style="flex:1"><i class="ln"></i><i class="ln s"></i></div></div></div>'.repeat(8);
+  let cache = null; try { cache = JSON.parse(localStorage.getItem('ytbest')); } catch (e) {}
+  const fresh = cache && Date.now() - cache.t < TTL;
+  try {
+    const d = fresh ? cache : await loadAll();
+    st.ch = d.ch; st.videos = d.videos;
+    if (!fresh) save();
+  } catch (e) {
+    console.error(e);
+    if (!cache) { $('#grid').innerHTML = '<p class="msg">Não foi possível carregar os vídeos. Verifique a chave da API e a cota do YouTube Data API.</p>'; $('#cname').textContent = 'Erro ao carregar'; $('#upd').textContent = 'Sem conexão com o YouTube'; return; }
+    st.ch = cache.ch; st.videos = cache.videos;
+  }
+  header(); render();
+  $('#upd').textContent = 'Atualizando a cada ' + REFRESH_MS / 1000 + ' s';
+  if (fresh) refresh();
+  setInterval(refresh, REFRESH_MS);
+})();
+</script>
 </body>
 </html>
