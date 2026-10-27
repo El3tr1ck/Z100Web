@@ -1,953 +1,583 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  <meta name="theme-color" content="#f5f6f8">
+  <meta name="description" content="Jogos, aplicativos e arquivos reunidos por Eletrickz100.">
   <title>Jogos e arquivos | Eletrickz100</title>
-
-  <!-- Mantém o tema escolhido ao recarregar a página. -->
   <script>
-    try {
-      document.documentElement.dataset.theme =
-        localStorage.getItem('z100-theme') || 'light';
-    } catch (_) {}
+    try { document.documentElement.dataset.theme = localStorage.getItem('z100-theme') === 'dark' ? 'dark' : 'light'; } catch (_) {}
   </script>
-
   <style>
-    /* =====================================================
-       1. CORES
-       Altere estas variáveis para mudar a aparência.
-       ===================================================== */
-
+    /* 1. PALETA. Uma cor de destaque, superfícies neutras e dois temas. */
     :root {
       color-scheme: light;
-      --background: #f6f6f6;
-      --surface: #ffffff;
-      --text: #242424;
-      --muted: #686868;
-      --border: #dedede;
-      --soft: #eeeeee;
-      --button: #292929;
-      --button-text: #ffffff;
+      --bg: #f5f6f8; --surface: #ffffff; --soft: #f0f2f5;
+      --text: #20252d; --muted: #727985; --line: #e4e7ec;
+      --accent: #405b78; --accent-soft: #eaf0f6; --on-accent: #ffffff;
+      --shadow: 0 12px 30px #1c29300b; --radius: 18px;
     }
-
     :root[data-theme="dark"] {
       color-scheme: dark;
-      --background: #171717;
-      --surface: #222222;
-      --text: #eeeeee;
-      --muted: #b4b4b4;
-      --border: #3c3c3c;
-      --soft: #303030;
-      --button: #eeeeee;
-      --button-text: #222222;
+      --bg: #12151b; --surface: #1c2028; --soft: #262c36;
+      --text: #edf1f7; --muted: #a8b1bf; --line: #333b48;
+      --accent: #b4cce8; --accent-soft: #2b3b50; --on-accent: #17283d;
+      --shadow: 0 12px 30px #00000020;
     }
-
-    /* =====================================================
-       2. BASE E CABEÇALHO
-       ===================================================== */
-
-    * {
-      box-sizing: border-box;
-    }
-
-    [hidden] {
-      display: none !important;
-    }
-
-    body {
-      margin: 0;
-      background: var(--background);
-      color: var(--text);
-      font: 15px/1.5 system-ui, "Segoe UI", Arial, sans-serif;
-    }
-
-    body.modal-open {
-      overflow: hidden;
-    }
-
-    button,
-    input,
-    select {
-      font: inherit;
-      color: inherit;
-    }
-
-    button,
-    select {
-      cursor: pointer;
-    }
-
-    a {
-      color: inherit;
-      text-underline-offset: 3px;
-    }
-
-    button:focus-visible,
-    a:focus-visible,
-    .game-button:focus-visible {
-      outline: 2px solid var(--text);
-      outline-offset: 4px;
-    }
-
-    .container {
-      width: min(1180px, calc(100% - 48px));
-      margin: auto;
-    }
-
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      min-height: 96px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 25px;
-      letter-spacing: -.7px;
-    }
-
-    .author {
-      display: inline-block;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .plain-button {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 13px;
-      background: var(--surface);
-      font-size: 12px;
-    }
-
-    /* =====================================================
-       3. PESQUISA, FORMATO E GÊNEROS
-       ===================================================== */
-
-    main {
-      padding-block: 28px 20px;
-    }
-
-    .toolbar {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 155px;
-      gap: 12px;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      min-width: 0;
-    }
-
-    .field label {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    input,
-    select {
-      width: 100%;
-      min-width: 0;
-      min-height: 45px;
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: 10px 12px;
-      background: var(--surface);
-      font-size: 13px;
-    }
-
-    input:focus,
-    select:focus {
-      outline: 2px solid var(--text);
-      outline-offset: 2px;
-    }
-
-    .genres {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 20px 2px 10px;
-      scrollbar-width: none;
-    }
-
-    .genres::-webkit-scrollbar {
-      display: none;
-    }
-
-    .genre-button {
-      flex-shrink: 0;
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 7px 14px;
-      background: var(--surface);
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .genre-button[aria-pressed="true"] {
-      background: var(--button);
-      color: var(--button-text);
-      border-color: var(--button);
-    }
-
-    .results-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-      min-height: 45px;
-      margin-bottom: 10px;
-    }
-
-    #resultCount {
-      margin: 0;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .reset-button {
-      border: 0;
-      padding: 5px 0;
-      background: none;
-      font-size: 12px;
-      text-decoration: underline;
-    }
-
-    /* =====================================================
-       4. CARDS
-       O JavaScript monta o visual a partir de cada div.
-       ===================================================== */
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .game-button {
-      min-width: 0;
-      border: 1px solid var(--border);
-      border-radius: 15px;
-      overflow: hidden;
-      background: var(--surface);
-      cursor: pointer;
-      transition: transform .18s, box-shadow .18s;
-    }
-
-    .game-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 7px 20px #0000000d;
-    }
-
-    .cover {
-      position: relative;
-      display: grid;
-      place-items: center;
-      height: 155px;
-      background: var(--soft);
-    }
-
-    .cover img {
-      position: relative;
-      width: 94px;
-      height: 94px;
-      border-radius: 20px;
-      object-fit: cover;
-    }
-
-    .cover-fallback {
-      position: absolute;
-      font-size: 30px;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .card-content {
-      padding: 15px;
-    }
-
-    .game-name {
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-
-      min-height: 40px;
-      margin: 0;
-      overflow: hidden;
-      overflow-wrap: anywhere;
-
-      font-size: 15px;
-      font-weight: 650;
-      line-height: 1.35;
-    }
-
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-    }
-
-    .card-content > .tags {
-      margin-top: 10px;
-    }
-
-    .tag {
-      border-radius: 5px;
-      padding: 3px 6px;
-      background: var(--soft);
-      font-size: 10px;
-    }
-
-    .card-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 5px;
-      margin-top: 17px;
-      color: var(--muted);
-      font-size: 10px;
-    }
-
-    .card-bottom b {
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .empty {
-      padding: 55px 15px;
-      color: var(--muted);
-      text-align: center;
-    }
-
-    footer {
-      padding-block: 20px 28px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    /* =====================================================
-       5. JANELA DE DETALHES
-       ===================================================== */
-
-    dialog {
-      width: min(630px, calc(100% - 32px));
-      max-height: calc(100dvh - 40px);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 0;
-      overflow: auto;
-      background: var(--surface);
-      color: var(--text);
-      overscroll-behavior: contain;
-    }
-
-    dialog::backdrop {
-      background: #00000099;
-    }
-
-    .dialog-toolbar {
-      display: flex;
-      justify-content: flex-end;
-      padding: 14px 18px 0;
-    }
-
-    .detail-content {
-      padding: 8px 28px 28px;
-    }
-
-    .detail-heading {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      margin-bottom: 22px;
-    }
-
-    .detail-heading .cover {
-      flex-shrink: 0;
-      width: 80px;
-      height: 80px;
-      border-radius: 17px;
-      overflow: hidden;
-    }
-
-    .detail-heading img {
-      width: 80px;
-      height: 80px;
-      border-radius: 17px;
-    }
-
-    #detailTitle {
-      margin: 0;
-      overflow-wrap: anywhere;
-      font-size: 26px;
-      line-height: 1.2;
-      letter-spacing: -.6px;
-    }
-
-    #detailDescription {
-      margin: 18px 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
-      white-space: pre-line;
-    }
-
-    #detailStatus {
-      margin: 18px 0;
-      border-left: 3px solid var(--muted);
-      padding: 10px 12px;
-      background: var(--soft);
-      font-size: 12px;
-    }
-
-    .facts {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px 22px;
-      margin-block: 24px;
-    }
-
-    .facts div {
-      min-width: 0;
-    }
-
-    .facts dt {
-      margin-bottom: 4px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .facts dd {
-      margin: 0;
-      overflow-wrap: anywhere;
-      font-size: 13px;
-    }
-
-    .download-button {
-      display: block;
-      border-radius: 10px;
-      padding: 13px 18px;
-      background: var(--button);
-      color: var(--button-text);
-      text-align: center;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    /* =====================================================
-       6. RESPONSIVIDADE
-       ===================================================== */
-
-    @media (max-width: 950px) {
-      .grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
-
+    /* 2. BASE E ACESSIBILIDADE. Ícones SVG locais, sem bibliotecas externas. */
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { scroll-behavior: smooth; scroll-padding-top: 160px; }
+    body { margin: 0; color: var(--text); background: var(--bg); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+    body.modal-open { overflow: hidden; }
+    button, input, select { font: inherit; color: inherit; }
+    button, select { cursor: pointer; }
+    button { border: 0; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    h1, h2, h3, p { margin: 0; }
+    svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+    .container { width: min(1280px, calc(100% - 64px)); margin-inline: auto; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+    .skip-link { position: fixed; left: 20px; top: -80px; z-index: 50; padding: 12px 18px; background: var(--text); color: var(--surface); border-radius: 10px; }
+    .skip-link:focus { top: 12px; }
+    .icon-button { width: 40px; height: 40px; display: inline-grid; place-items: center; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); }
+    .icon-button:hover, .secondary-button:hover { background: var(--accent-soft); }
+    .text-button { padding: 5px 0; background: none; color: var(--accent); font-size: 12px; font-weight: 600; }
+    .secondary-button, .primary-button { min-height: 44px; padding: 11px 16px; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; font-size: 12px; font-weight: 650; }
+    .secondary-button { border: 1px solid var(--line); background: var(--surface); }
+    .primary-button { background: var(--accent); color: var(--on-accent); }
+    .primary-button:hover { filter: brightness(1.08); }
+    .primary-button svg, .secondary-button svg { width: 17px; height: 17px; }
+    /* 3. CABEÇALHO, PESQUISA E NAVEGAÇÃO. O nome continua sendo o link do canal. */
+    .site-header { position: sticky; top: 0; z-index: 10; background: var(--surface); border-bottom: 1px solid var(--line); }
+    .header-top { min-height: 90px; display: grid; grid-template-columns: 285px minmax(0, 1fr) 40px; align-items: center; gap: 28px; }
+    h1 { font-size: 24px; letter-spacing: -.85px; line-height: 1.25; font-weight: 750; }
+    .author { display: inline-block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .author:hover, .site-footer a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+    .search-box { display: flex; align-items: center; gap: 11px; width: min(100%, 540px); margin-left: auto; padding: 0 16px; border: 1px solid var(--line); background: var(--soft); border-radius: 14px; min-height: 48px; }
+    .search-box > svg { width: 19px; color: var(--muted); }
+    .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); background: var(--surface); }
+    .search-box input { width: 100%; min-width: 0; height: 46px; background: none; border: 0; outline: none; font-size: 13px; }
+    .search-box input::placeholder { color: var(--muted); }
+    .search-box input::-webkit-search-cancel-button { appearance: none; }
+    .search-key { color: var(--muted); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; font-size: 9px; white-space: nowrap; }
+    .search-clear { display: grid; place-items: center; background: none; width: 25px; height: 25px; padding: 0; color: var(--muted); }
+    .search-clear svg { width: 16px; }
+    .sun-icon { display: none; }
+    [data-theme="dark"] .moon-icon { display: none; }
+    [data-theme="dark"] .sun-icon { display: block; }
+    .desktop-nav { display: flex; gap: 30px; height: 49px; }
+    .nav-button { position: relative; background: none; color: var(--muted); display: flex; align-items: center; gap: 8px; padding: 0 3px; font-size: 13px; font-weight: 600; }
+    .nav-button svg { width: 17px; height: 17px; }
+    .nav-button.active { color: var(--accent); }
+    .desktop-nav .nav-button.active::after { content: ""; position: absolute; left: 0; right: 0; height: 3px; bottom: -1px; background: var(--accent); border-radius: 3px 3px 0 0; }
+    .nav-count { min-width: 19px; height: 18px; display: grid; place-items: center; background: var(--soft); color: var(--muted); border-radius: 5px; font-size: 9px; }
+    .mobile-nav { display: none; }
+    /* 4. SEÇÕES E FILTROS. Sem banners promocionais ou anúncios. */
+    main { padding-block: 30px 26px; min-height: 65vh; }
+    .section-heading, .catalog-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+    .catalog-heading { margin-bottom: 19px; }
+    .page-title { font-size: 25px; font-weight: 720; letter-spacing: -.8px; line-height: 1.25; }
+    .result-count { color: var(--muted); font-size: 11px; margin-top: 6px; }
+    .filter-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: flex-end; }
+    .select-wrap { position: relative; }
+    .select-wrap::after { content: ""; position: absolute; right: 13px; top: 15px; width: 5px; height: 5px; border-bottom: 1.5px solid var(--muted); border-right: 1.5px solid var(--muted); transform: rotate(45deg); pointer-events: none; }
+    .filter-select { appearance: none; padding: 9px 31px 9px 12px; border: 1px solid var(--line); background: var(--surface); border-radius: 9px; min-height: 38px; font-size: 11px; max-width: 200px; }
+    /* Os gêneros passam para a próxima linha, sem cortar etiquetas nas bordas. */
+    .genre-filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 2px 2px 13px; margin-bottom: 12px; }
+    .genre-button { flex: 0 1 auto; max-width: 100%; white-space: normal; overflow-wrap: anywhere; min-height: 36px; padding: 8px 14px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 24px; font-size: 11px; font-weight: 550; }
+    .genre-button[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--surface); }
+    .active-filters { display: flex; align-items: center; gap: 15px; padding: 9px 13px; margin-bottom: 18px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); }
+    .active-filters span { color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
+    .active-filters button { margin-left: auto; white-space: nowrap; }
+    .recent-section { padding-bottom: 27px; margin-bottom: 27px; border-bottom: 1px solid var(--line); }
+    .section-heading { margin-bottom: 14px; }
+    .section-heading h2 { font-size: 17px; letter-spacing: -.45px; }
+    .recent-rail { display: flex; gap: 12px; overflow-x: auto; padding: 2px 2px 5px; scrollbar-width: none; }
+    .recent-rail::-webkit-scrollbar { display: none; }
+    .recent-card { display: flex; align-items: center; gap: 12px; width: 240px; flex: none; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 13px; padding: 12px; }
+    .recent-card:hover, .related-card:hover { background: var(--accent-soft); }
+    .mini-copy { min-width: 0; }
+    .mini-name { display: block; font-size: 12px; font-weight: 650; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+    .mini-meta { display: block; margin-top: 3px; font-size: 10px; color: var(--muted); }
+    /* 5. CARDS. A div de cadastro continua sendo a fonte dos dados. */
+    .game-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+    .game-button { position: relative; display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); transition: transform .18s, box-shadow .18s, border-color .18s; }
+    #gameGrid > .game-button > img { width: 102px; height: 102px; object-fit: cover; border-radius: 23px; margin: 30px auto; }
+    #gameGrid > .game-button > span { display: block; padding: 0 17px 18px; font-weight: 650; }
+    .game-button:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); box-shadow: var(--shadow); }
+    .game-button:has(.card-open:focus-visible) { outline: 3px solid var(--accent); outline-offset: 4px; }
+    .card-art { position: relative; flex: none; height: 166px; display: grid; place-items: center; overflow: hidden; background: var(--soft); }
+    .art-backdrop { position: absolute; inset: -15%; width: 130%; height: 130%; max-width: none; object-fit: cover; filter: blur(26px) saturate(.65); opacity: 0; pointer-events: none; }
+    .has-image .art-backdrop { opacity: .16; }
+    .app-icon { position: relative; z-index: 1; width: 102px; height: 102px; object-fit: cover; border-radius: 23px; box-shadow: 0 8px 18px #182b3b1a; }
+    .image-fallback { display: grid; place-items: center; color: var(--accent); font-size: 29px; font-weight: 750; letter-spacing: -1px; }
+    .card-art .image-fallback { position: absolute; width: 102px; height: 102px; background: var(--surface); border-radius: 23px; border: 1px solid var(--line); }
+    .card-info { display: flex; flex-direction: column; flex: 1; padding: 17px 17px 15px; }
+    .game-name { font-size: 15px; line-height: 1.35; letter-spacing: -.35px; font-weight: 700; min-height: 40px; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .tag-list { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 9px; }
+    .tag { font-size: 9px; line-height: 1.35; color: var(--muted); background: var(--soft); padding: 4px 6px; border-radius: 5px; }
+    .tag-more { font-size: 9px; color: var(--muted); padding-left: 2px; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 18px; }
+    .format-label { color: var(--muted); font-size: 9px; letter-spacing: .25px; }
+    .detail-hint { display: flex; align-items: center; gap: 5px; color: var(--accent); font-size: 10px; font-weight: 650; }
+    .detail-hint svg { width: 13px; height: 13px; }
+    .card-open { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; background: transparent; border-radius: var(--radius); }
+    .card-open:focus-visible { outline: none; }
+    .favorite-button { position: absolute; z-index: 3; right: 11px; top: 11px; height: 32px; width: 32px; border: 1px solid #ffffff70; border-radius: 50%; background: color-mix(in srgb, var(--surface) 90%, transparent); color: var(--muted); display: grid; place-items: center; box-shadow: 0 2px 7px #00000008; }
+    .favorite-button svg { width: 16px; height: 16px; }
+    [data-favorite][aria-pressed="true"] { color: var(--accent); }
+    [data-favorite][aria-pressed="true"] svg { fill: currentColor; }
+    .thumb { position: relative; flex: none; width: 48px; height: 48px; overflow: hidden; border-radius: 12px; background: var(--soft); display: grid; place-items: center; }
+    .thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .thumb .image-fallback { font-size: 17px; }
+    /* 6. HISTÓRICO. Cada linha corresponde a uma abertura de download. */
+    .history-list { display: grid; gap: 12px; }
+    .history-row { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto 34px; align-items: center; gap: 16px; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 15px; }
+    .history-row .thumb { width: 56px; height: 56px; border-radius: 14px; }
+    .history-title { display: block; background: none; text-align: left; padding: 0; font-size: 14px; font-weight: 650; letter-spacing: -.25px; overflow-wrap: anywhere; }
+    .history-title:hover { color: var(--accent); }
+    .history-meta { color: var(--muted); font-size: 11px; margin-top: 4px; }
+    .history-date { color: var(--muted); font-size: 10px; margin-top: 4px; }
+    .history-row .icon-button { width: 34px; height: 34px; border: 0; background: transparent; }
+    .history-row .icon-button svg { width: 16px; }
+    .empty-state { text-align: center; padding: 64px 20px; border: 1px dashed var(--line); border-radius: 20px; background: var(--surface); }
+    .empty-symbol { margin: 0 auto 18px; width: 58px; height: 58px; display: grid; place-items: center; border-radius: 18px; background: var(--accent-soft); color: var(--accent); }
+    .empty-symbol svg { width: 26px; height: 26px; }
+    .empty-state h3 { font-size: 22px; letter-spacing: -.7px; }
+    .empty-state p { max-width: 350px; margin: 9px auto 22px; color: var(--muted); font-size: 12px; line-height: 1.8; }
+    .site-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-block: 22px 27px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+    /* 7. DETALHES, AÇÕES E INFORMAÇÕES DO ARQUIVO. */
+    .detail-dialog { width: min(760px, calc(100% - 40px)); max-height: calc(100dvh - 50px); margin: auto; border: 1px solid var(--line); border-radius: 23px; padding: 0; background: var(--surface); color: var(--text); overflow: auto; overscroll-behavior: contain; box-shadow: 0 30px 90px #00000038; }
+    .detail-dialog::backdrop { background: #101923c4; backdrop-filter: blur(6px); }
+    .dialog-chrome { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 14px 22px; background: var(--surface); border-bottom: 1px solid var(--line); }
+    .dialog-chrome > span { color: var(--muted); font-size: 11px; font-weight: 600; }
+    .dialog-chrome .icon-button { width: 32px; height: 32px; background: var(--soft); border: 0; border-radius: 50%; }
+    .dialog-content { padding: 27px 30px 31px; }
+    .detail-identity { display: flex; align-items: center; gap: 22px; }
+    .detail-identity .thumb { width: 105px; height: 105px; border-radius: 24px; }
+    .detail-identity .image-fallback { font-size: 29px; }
+    .detail-kicker { color: var(--accent); font-size: 10px; font-weight: 650; margin-bottom: 6px; }
+    .detail-title { font-size: 30px; line-height: 1.16; letter-spacing: -1px; overflow-wrap: anywhere; }
+    .detail-identity .tag-list { margin-top: 12px; }
+    .detail-actions { display: flex; gap: 9px; margin-top: 25px; align-items: stretch; }
+    .detail-actions .primary-button { flex: 1; min-height: 47px; font-size: 13px; }
+    .detail-actions .icon-button { min-height: 47px; height: auto; width: 45px; }
+    .description { color: var(--muted); font-size: 13px; white-space: pre-line; line-height: 1.85; margin-top: 24px; overflow-wrap: anywhere; }
+    .status-note { color: var(--muted); background: var(--soft); border-left: 3px solid var(--accent); border-radius: 7px; padding: 11px 14px; font-size: 11px; margin-top: 22px; }
+    .detail-section { margin-top: 27px; }
+    .detail-section h3 { font-size: 15px; letter-spacing: -.35px; margin-bottom: 13px; }
+    .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; gap: 0; border: 1px solid var(--line); border-radius: 13px; overflow: hidden; }
+    .facts > div { min-width: 0; padding: 15px 16px; border-bottom: 1px solid var(--line); }
+    .facts > div:nth-child(n+3) { border-bottom: 0; }
+    .facts dt { color: var(--muted); font-size: 10px; margin-bottom: 5px; }
+    .facts dd { margin: 0; font-size: 12px; font-weight: 550; overflow-wrap: anywhere; }
+    .facts a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+    .item-activity { font-size: 10px; color: var(--muted); margin-top: 14px; }
+    .related-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+    .related-card { min-width: 0; display: flex; gap: 10px; align-items: center; background: var(--soft); padding: 11px; border-radius: 11px; text-align: left; }
+    .related-card .thumb { width: 36px; height: 36px; border-radius: 9px; }
+    .related-card .mini-name { font-size: 10px; }
+    .related-card .mini-meta { font-size: 9px; }
+    .share-fallback { margin-top: 15px; }
+    .share-fallback label { display: block; color: var(--muted); font-size: 11px; margin-bottom: 6px; }
+    .share-fallback input { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--soft); font-size: 11px; }
+    .toast { position: fixed; z-index: 40; left: 50%; bottom: 24px; transform: translate(-50%, 15px); display: flex; align-items: center; gap: 22px; padding: 13px 19px; max-width: calc(100% - 32px); border-radius: 12px; background: var(--text); color: var(--surface); box-shadow: 0 7px 30px #00000020; font-size: 12px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+    .toast.visible { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+    .toast button { color: inherit; background: none; font-size: 11px; font-weight: 750; padding: 3px; }
+    /* 8. RESPONSIVIDADE. A navegação vira uma barra inferior no celular. */
+    @media (min-width: 1450px) { .container { width: min(1360px, calc(100% - 80px)); } .game-grid { grid-template-columns: repeat(5, minmax(0,1fr)); } }
+    @media (max-width: 1040px) { .header-top { grid-template-columns: 240px minmax(0,1fr) 40px; gap: 20px; } h1 { font-size: 22px; } .game-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; } .card-art { height: 154px; } }
+    @media (max-width: 760px) { .container { width: calc(100% - 40px); } .header-top { grid-template-columns: 220px minmax(0,1fr) 38px; gap: 14px; } h1 { font-size: 20px; } .search-key { display: none; } .search-box { padding-inline: 12px; } .game-grid { gap: 15px; } .card-info { padding: 14px; } .game-name { font-size: 14px; min-height: 38px; } .card-art { height: 139px; } .app-icon, .card-art .image-fallback { width: 85px; height: 85px; border-radius: 20px; } .catalog-heading { align-items: flex-start; } .filter-select { max-width: 165px; font-size: 10px; } }
     @media (max-width: 650px) {
-      .container {
-        width: calc(100% - 32px);
-      }
-
-      .header-content {
-        min-height: 85px;
-        gap: 12px;
-      }
-
-      h1 {
-        font-size: 22px;
-      }
-
-      main {
-        padding-top: 22px;
-      }
-
-      .toolbar {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 12px;
-      }
-
-      .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-      }
-
-      .cover {
-        height: 130px;
-      }
-
-      .cover img {
-        width: 78px;
-        height: 78px;
-        border-radius: 17px;
-      }
-
-      .card-content {
-        padding: 12px;
-      }
-
-      .game-name {
-        min-height: 36px;
-        font-size: 13px;
-      }
-
-      .tag {
-        font-size: 9px;
-      }
-
-      .card-bottom {
-        font-size: 9px;
-      }
-
-      .detail-content {
-        padding: 10px 20px 24px;
-      }
-
-      .detail-heading {
-        gap: 14px;
-      }
-
-      #detailTitle {
-        font-size: 23px;
-      }
+      html { scroll-padding-top: 145px; }
+      .container { width: calc(100% - 32px); }
+      .header-top { grid-template-columns: minmax(0,1fr) 38px; min-height: 0; gap: 13px 16px; padding-block: 17px 14px; }
+      .heading-brand { align-self: center; }
+      h1 { font-size: 22px; letter-spacing: -.8px; }
+      .author { font-size: 10px; margin-top: 3px; }
+      .header-top .icon-button { width: 36px; height: 36px; border-radius: 11px; }
+      .search-box { grid-row: 2; grid-column: 1/-1; width: 100%; min-height: 44px; margin: 0; border-radius: 11px; }
+      .search-box input { height: 43px; font-size: 12px; }
+      .desktop-nav { display: none; }
+      .mobile-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 12; height: calc(66px + env(safe-area-inset-bottom)); padding: 7px 12px calc(7px + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(3,1fr); border-top: 1px solid var(--line); background: var(--surface); }
+      .mobile-nav .nav-button { flex-direction: column; justify-content: center; gap: 2px; font-size: 9px; padding: 0; }
+      .mobile-nav .nav-button > svg { width: 19px; height: 19px; }
+      .mobile-nav .nav-count { position: absolute; left: calc(50% + 8px); top: 0; height: 14px; min-width: 15px; font-size: 8px; border-radius: 5px; }
+      .mobile-nav .active > svg { background: var(--accent-soft); box-sizing: content-box; padding: 4px 16px; border-radius: 22px; margin: -4px 0 0; }
+      main { padding-block: 24px 20px; }
+      .catalog-heading { flex-wrap: wrap; gap: 15px; margin-bottom: 16px; }
+      .page-title { font-size: 23px; }
+      .result-count { font-size: 10px; margin-top: 4px; }
+      .filter-controls { width: 100%; justify-content: flex-start; }
+      .select-wrap { flex: 1; min-width: 0; }
+      .filter-select { width: 100%; max-width: none; min-height: 36px; font-size: 10px; }
+      #clearHistory { margin-left: auto; font-size: 10px; }
+      .genre-filters { margin-bottom: 9px; gap: 7px; }
+      .genre-button { min-height: 34px; padding: 7px 12px; font-size: 10px; }
+      .game-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 13px 12px; }
+      .card-art { height: 133px; }
+      .app-icon, .card-art .image-fallback { width: 79px; height: 79px; border-radius: 18px; }
+      .favorite-button { width: 28px; height: 28px; right: 8px; top: 8px; }
+      .favorite-button svg { width: 14px; height: 14px; }
+      .card-info { padding: 12px 11px; }
+      .game-name { min-height: 35px; font-size: 13px; letter-spacing: -.2px; }
+      .tag-list { gap: 4px; margin-top: 8px; }
+      .tag { font-size: 8px; padding: 3px 5px; }
+      .tag-more { font-size: 8px; }
+      .card-footer { margin-top: auto; padding-top: 15px; gap: 5px; }
+      .format-label { font-size: 8px; }
+      .detail-hint { font-size: 9px; gap: 3px; }
+      .detail-hint svg { width: 11px; height: 11px; }
+      .active-filters { margin-bottom: 14px; padding: 8px 10px; }
+      .active-filters span, .active-filters button { font-size: 10px; }
+      .recent-section { padding-bottom: 20px; margin-bottom: 23px; }
+      .section-heading h2 { font-size: 16px; }
+      .recent-card { width: 216px; padding: 10px; gap: 10px; }
+      .recent-card .thumb { width: 42px; height: 42px; }
+      .recent-card .mini-name { font-size: 11px; }
+      .recent-card .mini-meta { font-size: 9px; }
+      .history-row { grid-template-columns: 46px minmax(0,1fr) 28px; gap: 11px; padding: 14px; }
+      .history-row .thumb { width: 46px; height: 46px; border-radius: 12px; }
+      .history-title { font-size: 12px; }
+      .history-meta { font-size: 10px; }
+      .history-date { font-size: 9px; }
+      .history-redownload { grid-row: 2; grid-column: 2/4; justify-self: start; padding: 7px 10px; min-height: 34px; font-size: 10px; }
+      .history-remove { grid-row: 1; grid-column: 3; }
+      .history-row .icon-button { width: 28px; height: 30px; }
+      .empty-state { padding: 45px 18px; }
+      .empty-state h3 { font-size: 20px; }
+      .empty-state p { font-size: 11px; }
+      .site-footer { padding-block: 20px calc(86px + env(safe-area-inset-bottom)); font-size: 10px; }
+      .site-footer .text-button { font-size: 10px; }
+      .detail-dialog { width: 100%; max-width: none; max-height: calc(100dvh - 12px); margin: auto 0 0; border-radius: 24px 24px 0 0; border-bottom: 0; }
+      .dialog-chrome { padding: 12px 18px; }
+      .dialog-content { padding: 23px 20px 27px; }
+      .detail-identity { gap: 15px; align-items: flex-start; }
+      .detail-identity .thumb { width: 77px; height: 77px; border-radius: 18px; }
+      .detail-title { font-size: 24px; letter-spacing: -.7px; }
+      .detail-kicker { font-size: 9px; margin-bottom: 5px; }
+      .detail-identity .tag-list { margin-top: 9px; }
+      .detail-actions { gap: 7px; flex-wrap: wrap; margin-top: 23px; }
+      .detail-actions .primary-button { flex-basis: calc(100% - 51px); font-size: 12px; }
+      .detail-actions .secondary-button { flex: 1; font-size: 11px; min-height: 39px; }
+      .detail-actions #copyItemLink { width: 42px; height: 46px; order: -1; }
+      .detail-actions .primary-button { order: -2; }
+      .facts > div { padding: 13px; }
+      .facts dd { font-size: 11px; }
+      .related-grid { grid-template-columns: 1fr; }
+      .related-card { padding: 10px 12px; }
+      .related-card .mini-name { font-size: 12px; }
+      .related-card .mini-meta { font-size: 10px; }
+      .toast { bottom: calc(80px + env(safe-area-inset-bottom)); font-size: 11px; padding: 12px 16px; }
+      body.modal-open .toast { bottom: 18px; }
     }
-
-    @media (prefers-reduced-motion: reduce) {
-      .game-button {
-        transition: none;
-      }
-    }
+    @media (max-width: 360px) { h1 { font-size: 20px; } .game-grid { gap: 11px 10px; } .card-info { padding-inline: 9px; } .game-name { font-size: 12px; } .card-art { height: 123px; } .tag { font-size: 7.5px; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
   </style>
 </head>
-
 <body>
-  <!-- O próprio nome abre o canal. -->
-  <header>
-    <div class="container header-content">
-      <div>
-        <h1>Repositorio de aplicativos e arquivos do canal!!</h1>
+  <a class="skip-link" href="#mainContent">Pular para o catálogo</a>
+  <!-- Ícones vetoriais. Não são emojis nem um logotipo da loja. -->
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 4.5 4.5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.2 5.2a5.4 5.4 0 0 0-7.6 0L12 6l-.6-.8a5.4 5.4 0 0 0-7.6 7.6L12 21l8.2-8.2a5.4 5.4 0 0 0 0-7.6Z"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 1 7M3 4v6h6m3-4v6l4 2"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6m-9 3 9-9M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="m9 15 6-6m-5-3 2-2a5 5 0 0 1 7 7l-3 3a5 5 0 0 1-7 0m5 4-2 2a5 5 0 0 1-7-7l3-3a5 5 0 0 1 7 0"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14A9 9 0 0 1 10 3.5 9 9 0 1 0 20.5 14Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+  </svg>
 
-        <a class="author"
-           href="https://www.youtube.com/@Z-100/videos"
-           target="_blank"
-           rel="noopener noreferrer">
-          Eletrickz100
-        </a>
-      </div>
-
-      <button class="plain-button"
-              id="themeToggle"
-              type="button">
-        Escuro
-      </button>
+  <header class="site-header">
+    <div class="container header-top">
+      <div class="heading-brand"><h1>Jogos e arquivos</h1><a class="author" href="https://www.youtube.com/@Z-100/videos" target="_blank" rel="noopener noreferrer">Eletrickz100</a></div>
+      <form class="search-box" id="searchForm" role="search">
+        <svg aria-hidden="true"><use href="#i-search"/></svg>
+        <label for="searchInput" class="sr-only">Pesquisar no catálogo</label>
+        <input id="searchInput" type="search" placeholder="Pesquisar jogos e aplicativos" autocomplete="off">
+        <button class="search-clear" id="clearSearch" type="button" aria-label="Limpar pesquisa" hidden><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+        <span class="search-key" id="searchKey" aria-hidden="true">Ctrl K</span>
+      </form>
+      <button class="icon-button" id="themeToggle" type="button" aria-label="Ativar tema escuro"><svg class="moon-icon" aria-hidden="true"><use href="#i-moon"/></svg><svg class="sun-icon" aria-hidden="true"><use href="#i-sun"/></svg></button>
     </div>
+    <nav class="container desktop-nav" aria-label="Navegação principal">
+      <button class="nav-button active" data-view="catalog" type="button" aria-current="page"><svg aria-hidden="true"><use href="#i-grid"/></svg>Catálogo</button>
+      <button class="nav-button" data-view="favorites" type="button"><svg aria-hidden="true"><use href="#i-heart"/></svg>Favoritos<span class="nav-count" data-count="favorites" hidden></span></button>
+      <button class="nav-button" data-view="history" type="button"><svg aria-hidden="true"><use href="#i-history"/></svg>Histórico<span class="nav-count" data-count="history" hidden></span></button>
+    </nav>
   </header>
 
-  <main class="container">
-    <section class="toolbar" aria-label="Pesquisa e filtros">
-      <div class="field">
-        <label for="searchInput">Pesquisar</label>
-
-        <input id="searchInput"
-               type="search"
-               placeholder="Nome do jogo ou aplicativo"
-               autocomplete="off">
-      </div>
-
-      <div class="field">
-        <label for="typeFilter">Formato</label>
-
-        <select id="typeFilter">
-          <option value="">Todos</option>
-        </select>
-      </div>
+  <main class="container" id="mainContent" tabindex="-1">
+    <section class="recent-section" id="recentSection" aria-labelledby="recentTitle" hidden>
+      <div class="section-heading"><h2 id="recentTitle">Vistos recentemente</h2><button class="text-button" id="clearViewed" type="button">Limpar</button></div>
+      <div class="recent-rail" id="recentRail"></div>
     </section>
+    <section aria-labelledby="pageTitle">
+      <div class="catalog-heading">
+        <div><h2 class="page-title" id="pageTitle">Catálogo</h2><p class="result-count" id="resultCount" role="status" aria-live="polite"></p></div>
+        <div class="filter-controls">
+          <button class="text-button" id="clearHistory" type="button" hidden>Limpar histórico</button>
+          <div class="select-wrap"><label class="sr-only" for="typeFilter">Formato</label><select class="filter-select" id="typeFilter"><option value="">Todos os formatos</option></select></div>
+          <div class="select-wrap" id="sortWrap"><label class="sr-only" for="sortSelect">Ordenar</label><select class="filter-select" id="sortSelect"><option value="source">Ordem do catálogo</option><option value="az">Nome: A–Z</option><option value="recent">Últimos acessados</option></select></div>
+        </div>
+      </div>
+      <div class="genre-filters" id="genreFilters" role="group" aria-label="Filtrar por gênero"></div>
+      <div class="active-filters" id="activeFilters" hidden><span id="filterSummary"></span><button class="text-button" id="resetFilters" type="button">Limpar filtros</button></div>
+      <!--
+      CADASTRAR UM ITEM: copie UMA div .game-button dentro de #gameGrid.
+      Edite o título em span, a imagem em src e o endereço em data-download.
+      data-game: palavras extras para pesquisa; data-type: formato do arquivo.
+      data-genres: etiquetas separadas por vírgula. A lista GENEROS, no script,
+      é uma referência; qualquer nome novo também é aceito automaticamente.
+      data-version, data-credits, data-credit-url, data-description e data-status
+      são opcionais e ficam nos detalhes. Aplicativos usam categorias funcionais.
+      data-id é opcional: use um identificador único e estável ao renomear um item.
+      Se copiar um card com data-id, troque esse identificador ou remova o atributo.
+      Sem data-id, o identificador é gerado pelo título e formato; atualizar somente
+      a versão ou o link mantém os favoritos. Não crie funções ou botões à mão.
 
-    <div class="genres"
-         id="genreFilters"
-         role="group"
-         aria-label="Filtrar por gênero">
-    </div>
-
-    <div class="results-row">
-      <p id="resultCount" role="status" aria-live="polite"></p>
-
-      <button class="reset-button"
-              id="clearFilters"
-              type="button"
-              hidden>
-        Limpar filtros
-      </button>
-    </div>
-
-    <!-- =====================================================
-         CADASTRO DOS ITENS
-
-         Para adicionar um item:
-         1. Copie uma div .game-button.
-         2. Cole dentro de #gameGrid.
-         3. Altere o título em span.
-         4. Altere a imagem em src.
-         5. Altere o endereço em data-download.
-
-         ATRIBUTOS DISPONÍVEIS
-
-         data-game:
-           Palavras extras para a pesquisa.
-           O título também é pesquisado automaticamente.
-
-         data-type:
-           Formato: APK, EXE, ZIP, RAR, Arquivo, Lojas oficiais
-           ou outro nome que você quiser cadastrar.
-
-         data-genres:
-           Gêneros separados por vírgula.
-           Exemplo: "Aventura, RPG, Mundo aberto".
-
-         data-version:
-           Versão exibida nos detalhes. Opcional.
-
-         data-credits:
-           Nome de quem recebe os créditos. Opcional.
-
-         data-credit-url:
-           Endereço dos créditos. Opcional.
-
-         data-description:
-           Descrição exibida somente nos detalhes. Opcional.
-
-         data-status:
-           Aviso exibido somente nos detalhes. Opcional.
-
-         COMO ESCOLHER OS GÊNEROS
-
-         Procure const GENEROS no JavaScript.
-         A lista está organizada por grupos.
-
-         Copie os nomes desejados para data-genres.
-         Separe os gêneros por vírgula.
-
-         Você também pode escrever qualquer gênero novo
-         diretamente no card, mesmo que não esteja na lista.
-
-         Somente os gêneros utilizados nos itens aparecem
-         como filtros na página.
-
-         MODELO PARA COPIAR:
-
-         <div class="game-button"
-              data-game="nome palavras de pesquisa"
-              data-type="APK"
-              data-genres="Aventura, RPG, Mundo aberto"
-              data-version="1.0"
-              data-download="https://drive.google.com/file/d/SEU_ID/view">
-           <img src="https://seu-site.com/imagem.jpg" alt="Nome do jogo">
-           <span>Nome do jogo</span>
-         </div>
-
-         Retire o modelo de dentro deste comentário
-         quando for cadastrar um novo item.
-
-         Em src, use um link direto de imagem.
-         Não use o endereço da página que contém a imagem.
-         ===================================================== -->
-
-    <div class="grid" id="gameGrid">
-
-      <div class="game-button"
+      MODELO (copie a div para fora deste comentário):
+      <div class="game-button" data-game="palavras pesquisáveis" data-type="APK"
+           data-genres="RPG, Aventura" data-version="1.0"
+           data-download="https://drive.google.com/file/d/SEU_ID/view">
+        <img src="https://seu-site.com/imagem.jpg" alt="Nome do jogo">
+        <span>Nome do jogo</span>
+      </div>
+      -->
+      <div class="game-grid" id="gameGrid">
+        <div class="game-button"
            data-game="myboy"
            data-type="APK"
            data-genres="Emuladores"
            data-version="1.8.0.1"
            data-download="https://drive.google.com/file/d/137Vb0CXvUJrMQW4-ZjNBcBdwIEPf5FZh/view?usp=sharing">
-        <img src="https://play-lh.googleusercontent.com/GmMy8HhuZPLeCep5Op5SOo7hn2S_n9520IZU0G6YStm4qIzzn7AlX1BD9S2jyQ8AOlOWX5hEuHHAM-VGaa8CrTo%3Dw240-h480" alt="My Boy!">
-        <span>My Boy!</span>
-      </div>
+          <img src="https://play-lh.googleusercontent.com/GmMy8HhuZPLeCep5Op5SOo7hn2S_n9520IZU0G6YStm4qIzzn7AlX1BD9S2jyQ8AOlOWX5hEuHHAM-VGaa8CrTo%3Dw240-h480" alt="My Boy!">
+          <span>My Boy!</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="aurora modpack"
            data-type="EXE"
-           data-genres="Ferramentas"
+           data-genres="Ferramentas, Gerenciador de modpacks"
            data-version="1.1.0"
            data-credits="Eletrickz100"
            data-credit-url="https://www.youtube.com/@Z-100/videos"
            data-download="https://drive.google.com/file/d/10c2byqf1rLcZ2x5vJm2f2s2kZo0Mn__y/view?usp=sharing">
-        <img src="https://i.ibb.co/vCV8TPSk/aurora.png" alt="Aurora Modpack Studio">
-        <span>Aurora Modpack Studio</span>
-      </div>
+          <img src="https://i.ibb.co/vCV8TPSk/aurora.png" alt="Aurora Modpack Studio">
+          <span>Aurora Modpack Studio</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="pokemon"
            data-type="Arquivo"
-           data-genres="Aventura, RPG"
+           data-genres="RPG por turnos, Captura de monstros, RPG, Aventura"
            data-download="https://drive.google.com/file/d/1vjGyqWU3_zYIW3nXJhS69_bE7LICh58-/view?usp=sharing">
-        <img src="https://www.vgdb.com.br/gf/fotos/games/media_46628/pok-mon-leafgreen-version---46628.jpg" alt="Pokémon Fire Red">
-        <span>Pokémon Fire Red</span>
-      </div>
+          <img src="https://www.vgdb.com.br/gf/fotos/games/media_46628/pok-mon-leafgreen-version---46628.jpg" alt="Pokémon Fire Red">
+          <span>Pokémon Fire Red</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="pokemon leaf green"
            data-type="Arquivo"
-           data-genres="Aventura, RPG"
+           data-genres="RPG por turnos, Captura de monstros, RPG, Aventura"
            data-download="https://drive.google.com/file/d/1MryHL1oJeQyToBGWjEUyhKPzm7YMgHgP/view?usp=sharing">
-        <img src="https://cdn.thegamesdb.net/images/original/boxart/front/2314-1.jpg" alt="Pokémon Leaf Green">
-        <span>Pokémon Leaf Green</span>
-      </div>
+          <img src="https://cdn.thegamesdb.net/images/original/boxart/front/2314-1.jpg" alt="Pokémon Leaf Green">
+          <span>Pokémon Leaf Green</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="minecraft dungeons feito por paradox"
            data-type="APK"
-           data-genres="Ação, RPG"
+           data-genres="RPG de ação, Dungeon crawler, RPG, Ação"
            data-version="3.2b"
            data-credits="ParadoxBH"
            data-credit-url="https://www.youtube.com/@ParadoxBH"
            data-status="Projeto descontinuado e incompleto."
            data-download="https://drive.google.com/file/d/1RprnbYV6HMnBUV1S9tDe3VfU1H1AkX_n/view?usp=sharing">
-        <img src="https://images.dwncdn.net/images/t_app-icon-l/p/da790bef-37c6-4f8f-ae10-0b6acb5580ce/734797589/minecraft-dungeons-logo" alt="Minecraft Dungeons">
-        <span>Minecraft Dungeons</span>
-      </div>
+          <img src="https://images.dwncdn.net/images/t_app-icon-l/p/da790bef-37c6-4f8f-ae10-0b6acb5580ce/734797589/minecraft-dungeons-logo" alt="Minecraft Dungeons">
+          <span>Minecraft Dungeons</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="minecraft dungeons rar feito por paradox"
            data-type="RAR"
-           data-genres="Ação, RPG"
+           data-genres="RPG de ação, Dungeon crawler, RPG, Ação"
            data-version="2.1b"
            data-credits="ParadoxBH"
            data-credit-url="https://www.youtube.com/@ParadoxBH"
            data-status="Projeto descontinuado e incompleto."
            data-download="https://drive.google.com/file/d/1P-pVbqgHZW_kXxn5kQbijMWxJaBCqzA2/view?usp=sharing">
-        <img src="https://images.dwncdn.net/images/t_app-icon-l/p/da790bef-37c6-4f8f-ae10-0b6acb5580ce/734797589/minecraft-dungeons-logo" alt="Minecraft Dungeons">
-        <span>Minecraft Dungeons</span>
-      </div>
+          <img src="https://images.dwncdn.net/images/t_app-icon-l/p/da790bef-37c6-4f8f-ae10-0b6acb5580ce/734797589/minecraft-dungeons-logo" alt="Minecraft Dungeons">
+          <span>Minecraft Dungeons</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="pokemon quetzal version emerald"
            data-type="Arquivo"
-           data-genres="Aventura, RPG"
+           data-genres="RPG por turnos, Captura de monstros, RPG, Aventura"
            data-version="Edição Emerald"
            data-download="https://drive.google.com/file/d/142HqtV8hFlK7mkBuOU8vv9MnajbO3JIs/view?usp=sharing">
-        <img src="https://cdn2.steamgriddb.com/grid/4f9391d130076f4446a2654b34fdc507.png" alt="Pokémon Quetzal">
-        <span>Pokémon Quetzal</span>
-      </div>
+          <img src="https://cdn2.steamgriddb.com/grid/4f9391d130076f4446a2654b34fdc507.png" alt="Pokémon Quetzal">
+          <span>Pokémon Quetzal</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="stardew valley apk"
            data-type="APK"
-           data-genres="Simulação, RPG"
+           data-genres="Fazenda, Simulação de vida, RPG, Simulação"
            data-version="1.6.15.3"
            data-download="https://drive.google.com/file/d/16ohUKXgfJFky6WooxRpUuEYig-Djshzg/view?usp=sharing">
-        <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/0d55ae41-e76d-4375-b2d9-5b40b36a2f82/dehzxxr-72b13630-0a09-4aa5-b442-1d752c6f6971.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzBkNTVhZTQxLWU3NmQtNDM3NS1iMmQ5LTViNDBiMzZhMmY4MlwvZGVoenh4ci03MmIxMzYzMC0wYTA5LTRhYTUtYjQ0Mi0xZDc1MmM2ZjY5NzEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.gQRDyl3DhBW2uywDMwt8CD4hYRqI5JG2GWHBBGNphJY" alt="Stardew Valley">
-        <span>Stardew Valley</span>
-      </div>
+          <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/0d55ae41-e76d-4375-b2d9-5b40b36a2f82/dehzxxr-72b13630-0a09-4aa5-b442-1d752c6f6971.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzBkNTVhZTQxLWU3NmQtNDM3NS1iMmQ5LTViNDBiMzZhMmY4MlwvZGVoenh4ci03MmIxMzYzMC0wYTA5LTRhYTUtYjQ0Mi0xZDc1MmM2ZjY5NzEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.gQRDyl3DhBW2uywDMwt8CD4hYRqI5JG2GWHBBGNphJY" alt="Stardew Valley">
+          <span>Stardew Valley</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="terraria apk"
            data-type="APK"
-           data-genres="Sandbox, Aventura"
+           data-genres="Sandbox, Aventura, Sobrevivência, Construção"
            data-version="1.4.5.6.4"
            data-download="https://drive.google.com/file/d/19wia05FcTi_9kBC8pZHW6Q4xgV8nrZll/view?usp=sharing">
-        <img src="https://pt.quizur.com/_image?href=https%3A%2F%2Fimg.quizur.com%2Ff%2Fimg5dd9deecc98853.91042522.jpg%3FlastEdited%3D1574559475%3Fo%3Dfeed&amp;w=250&amp;h=300&amp;f=webp" alt="Terraria">
-        <span>Terraria</span>
-      </div>
+          <img src="https://pt.quizur.com/_image?href=https%3A%2F%2Fimg.quizur.com%2Ff%2Fimg5dd9deecc98853.91042522.jpg%3FlastEdited%3D1574559475%3Fo%3Dfeed&amp;w=250&amp;h=300&amp;f=webp" alt="Terraria">
+          <span>Terraria</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="terraria arquivo"
            data-type="Arquivo"
-           data-genres="Sandbox, Aventura"
+           data-genres="Sandbox, Aventura, Sobrevivência, Construção"
            data-version="1.4.5.6"
            data-download="https://drive.google.com/file/d/1rSt3HOvcA1MLhuNFUwF7CRfI0ap-xIOc/view?usp=sharing">
-        <img src="https://pt.quizur.com/_image?href=https%3A%2F%2Fimg.quizur.com%2Ff%2Fimg5dd9deecc98853.91042522.jpg%3FlastEdited%3D1574559475%3Fo%3Dfeed&amp;w=250&amp;h=300&amp;f=webp" alt="Terraria">
-        <span>Terraria</span>
-      </div>
+          <img src="https://pt.quizur.com/_image?href=https%3A%2F%2Fimg.quizur.com%2Ff%2Fimg5dd9deecc98853.91042522.jpg%3FlastEdited%3D1574559475%3Fo%3Dfeed&amp;w=250&amp;h=300&amp;f=webp" alt="Terraria">
+          <span>Terraria</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="pixel dungeons br playstore portugues"
            data-type="Lojas oficiais"
-           data-genres="RPG"
+           data-genres="Roguelike tradicional, Dungeon crawler, RPG por turnos, RPG"
            data-version="Consulte a loja"
            data-download="https://play.google.com/store/apps/details?id=br.com.rodriformiga.pixeldungeon">
-        <img src="https://play-lh.googleusercontent.com/mitfjESw9ISs_NcriECeVQn8LqpVrR2zGv3fTNoChpR6t7_gNDK-a-EpT96aZSG8gg=w480-h960-rw" alt="Pixel Dungeon BR">
-        <span>Pixel Dungeon BR</span>
-      </div>
+          <img src="https://play-lh.googleusercontent.com/mitfjESw9ISs_NcriECeVQn8LqpVrR2zGv3fTNoChpR6t7_gNDK-a-EpT96aZSG8gg=w480-h960-rw" alt="Pixel Dungeon BR">
+          <span>Pixel Dungeon BR</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="pixel dungeon microsoft store"
            data-type="Lojas oficiais"
-           data-genres="RPG"
+           data-genres="Roguelike tradicional, Dungeon crawler, RPG por turnos, RPG"
            data-version="Consulte a loja"
            data-download="https://apps.microsoft.com/detail/9p94wzvrlnw0?hl=pt-br&amp;gl=BR">
-        <img src="https://play-lh.googleusercontent.com/mitfjESw9ISs_NcriECeVQn8LqpVrR2zGv3fTNoChpR6t7_gNDK-a-EpT96aZSG8gg=w480-h960-rw" alt="Pixel Dungeon">
-        <span>Pixel Dungeon</span>
-      </div>
+          <img src="https://play-lh.googleusercontent.com/mitfjESw9ISs_NcriECeVQn8LqpVrR2zGv3fTNoChpR6t7_gNDK-a-EpT96aZSG8gg=w480-h960-rw" alt="Pixel Dungeon">
+          <span>Pixel Dungeon</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="aplicativo do site z100"
            data-type="APK"
-           data-genres="Ferramentas"
+           data-genres="Catálogo, Utilitários"
            data-credits="Eletrickz100"
            data-credit-url="https://www.youtube.com/@Z-100/videos"
            data-download="https://drive.google.com/file/d/1CrRLOYUC8NuEPo13MIHY-kr-B8SY_P-g/view?usp=sharing">
-        <img src="https://i.ibb.co/nNc5StbR/Z100.png" alt="Z100web">
-        <span>Z100web</span>
-      </div>
+          <img src="https://i.ibb.co/nNc5StbR/Z100.png" alt="Z100web">
+          <span>Z100web</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="ppsspp gold psp"
            data-type="APK"
            data-genres="Emuladores"
            data-version="1.20.4"
            data-download="https://drive.google.com/file/d/1rdFCini1RY0vht2G5uzQHegQl1AtB-tS/view?usp=sharing">
-        <img src="https://pic.clubic.com/v1/images/2358814/raw" alt="PPSSPP Gold">
-        <span>PPSSPP Gold</span>
-      </div>
+          <img src="https://pic.clubic.com/v1/images/2358814/raw" alt="PPSSPP Gold">
+          <span>PPSSPP Gold</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="pokemon black portugues"
            data-type="Arquivo"
-           data-genres="Aventura, RPG"
+           data-genres="RPG por turnos, Captura de monstros, RPG, Aventura"
            data-download="https://drive.google.com/file/d/16bfLiEimvfZc5E0iEs4_rng0Kp78yxD3/view?usp=sharing">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRk-wyer_Vk26nTQvPmIavfLBuLyU5xeDYSsqjUF1k__7QnEN_C5tZeTEfMV8U_suZC426F2ky_giGJbTVO1mkXwffo81vEKX8O8qmmag" alt="Pokémon Black">
-        <span>Pokémon Black</span>
-      </div>
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRk-wyer_Vk26nTQvPmIavfLBuLyU5xeDYSsqjUF1k__7QnEN_C5tZeTEfMV8U_suZC426F2ky_giGJbTVO1mkXwffo81vEKX8O8qmmag" alt="Pokémon Black">
+          <span>Pokémon Black</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="minecraft bedrock"
            data-type="APK"
-           data-genres="Sandbox, Sobrevivência"
+           data-genres="Sandbox, Sobrevivência, Construção"
            data-version="26.33.1"
            data-download="https://drive.google.com/file/d/1rNVrNsH2-Bu40dcXs3JVW4SM8RRMAgyl/view?usp=sharing">
-        <img src="https://minecraft.wiki/images/Bedrock_Edition_App_Store_icon_2.png?ec415" alt="Minecraft Bedrock">
-        <span>Minecraft Bedrock</span>
-      </div>
+          <img src="https://minecraft.wiki/images/Bedrock_Edition_App_Store_icon_2.png?ec415" alt="Minecraft Bedrock">
+          <span>Minecraft Bedrock</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="stardew valley rar"
            data-type="RAR"
-           data-genres="Simulação, RPG"
+           data-genres="Fazenda, Simulação de vida, RPG, Simulação"
            data-version="1.6.15"
            data-download="https://drive.google.com/file/d/1aTLNX2q1a11hsrbtFFgv2p60TgyBJcGd/view?usp=sharing">
-        <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/0d55ae41-e76d-4375-b2d9-5b40b36a2f82/dehzxxr-72b13630-0a09-4aa5-b442-1d752c6f6971.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzBkNTVhZTQxLWU3NmQtNDM3NS1iMmQ5LTViNDBiMzZhMmY4MlwvZGVoenh4ci03MmIxMzYzMC0wYTA5LTRhYTUtYjQ0Mi0xZDc1MmM2ZjY5NzEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.gQRDyl3DhBW2uywDMwt8CD4hYRqI5JG2GWHBBGNphJY" alt="Stardew Valley">
-        <span>Stardew Valley</span>
-      </div>
+          <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/0d55ae41-e76d-4375-b2d9-5b40b36a2f82/dehzxxr-72b13630-0a09-4aa5-b442-1d752c6f6971.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzBkNTVhZTQxLWU3NmQtNDM3NS1iMmQ5LTViNDBiMzZhMmY4MlwvZGVoenh4ci03MmIxMzYzMC0wYTA5LTRhYTUtYjQ0Mi0xZDc1MmM2ZjY5NzEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.gQRDyl3DhBW2uywDMwt8CD4hYRqI5JG2GWHBBGNphJY" alt="Stardew Valley">
+          <span>Stardew Valley</span>
+        </div>
 
-      <div class="game-button"
+        <div class="game-button"
            data-game="cuphead mobile"
            data-type="APK"
-           data-genres="Ação, Plataforma 2D"
+           data-genres="Run and gun, Plataforma 2D, Ação"
            data-credits="Gabe Developer"
            data-credit-url="https://www.youtube.com/@GabeDeveloper"
            data-download="https://drive.google.com/file/d/13mp2mncHss7qaRv0qiFX_61HAnT-sWV_/view?usp=sharing">
-        <img src="https://image.api.playstation.com/vulcan/img/cfn/11307fllh6D-IvbpCa18N0vRggVeRYWA06paTNCj3DENJMScAzW2f3ry4IwFcXBAt9kWXdZGpGoOGjxJ_e9MdordMVAosNhZ.png?w=440" alt="Cuphead Mobile">
-        <span>Cuphead Mobile</span>
+          <img src="https://image.api.playstation.com/vulcan/img/cfn/11307fllh6D-IvbpCa18N0vRggVeRYWA06paTNCj3DENJMScAzW2f3ry4IwFcXBAt9kWXdZGpGoOGjxJ_e9MdordMVAosNhZ.png?w=440" alt="Cuphead Mobile">
+          <span>Cuphead Mobile</span>
+        </div>
       </div>
-
-    </div>
-
-    <p class="empty" id="emptyState" hidden>
-      Nenhum item encontrado.
-    </p>
+      <div class="history-list" id="historyList" hidden></div>
+      <div class="empty-state" id="emptyState" hidden>
+        <div class="empty-symbol"><svg aria-hidden="true"><use id="emptyIcon" href="#i-search"/></svg></div>
+        <h3 id="emptyTitle">Nenhum item encontrado</h3><p id="emptyText"></p>
+        <button class="secondary-button" id="emptyAction" type="button">Ver catálogo<svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      </div>
+    </section>
   </main>
 
-  <footer class="container">
-    <a>
-      © 2025 Z-100. Toda e qualquer disponibilização é reservado por acessos publicos na internet.
-    </a>
-  </footer>
+  <footer class="container site-footer"><a href="https://www.youtube.com/@Z-100/videos" target="_blank" rel="noopener noreferrer">Eletrickz100</a><button class="text-button" id="backToTop" type="button">Voltar ao topo</button></footer>
+  <nav class="mobile-nav" aria-label="Navegação do celular">
+    <button class="nav-button active" data-view="catalog" type="button" aria-current="page"><svg aria-hidden="true"><use href="#i-grid"/></svg>Catálogo</button>
+    <button class="nav-button" data-view="favorites" type="button"><svg aria-hidden="true"><use href="#i-heart"/></svg>Favoritos<span class="nav-count" data-count="favorites" hidden></span></button>
+    <button class="nav-button" data-view="history" type="button"><svg aria-hidden="true"><use href="#i-history"/></svg>Histórico<span class="nav-count" data-count="history" hidden></span></button>
+  </nav>
 
-  <!-- Janela compartilhada pelos cards. Não copie para cada item. -->
-  <dialog id="detailsDialog" aria-labelledby="detailTitle">
-    <div class="dialog-toolbar">
-      <button class="plain-button"
-              id="closeDetails"
-              type="button"
-              autofocus>
-        Fechar
-      </button>
-    </div>
-
-    <div class="detail-content">
-      <div class="detail-heading">
-        <div class="cover">
-          <span class="cover-fallback"
-                id="detailFallback"
-                aria-hidden="true">
-          </span>
-
-          <img id="detailImage" alt="">
-        </div>
-
-        <div>
-          <h2 id="detailTitle"></h2>
-        </div>
+  <!-- Uma única janela de detalhes atende a todos os cards. -->
+  <dialog class="detail-dialog" id="detailsDialog" aria-labelledby="detailTitle">
+    <div class="dialog-chrome"><span>Detalhes</span><button class="icon-button" id="closeDialog" type="button" aria-label="Fechar detalhes" autofocus><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+    <div class="dialog-content">
+      <div class="detail-identity"><div id="detailArtwork"></div><div><p class="detail-kicker" id="detailKicker"></p><h2 class="detail-title" id="detailTitle"></h2><div class="tag-list" id="detailGenres"></div></div></div>
+      <div class="detail-actions">
+        <a class="primary-button" id="downloadLink" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true"><use href="#i-download"/></svg><span id="downloadText">Baixar</span><svg aria-hidden="true"><use href="#i-external"/></svg></a>
+        <button class="secondary-button" id="detailFavorite" type="button" data-favorite aria-pressed="false"><svg aria-hidden="true"><use href="#i-heart"/></svg><span id="detailFavoriteText">Favoritar</span></button>
+        <button class="icon-button" id="copyItemLink" type="button" aria-label="Copiar link deste item"><svg aria-hidden="true"><use href="#i-link"/></svg></button>
       </div>
-
-      <div class="tags" id="detailGenres"></div>
-
-      <p id="detailDescription" hidden></p>
-      <p id="detailStatus" hidden></p>
-
-      <dl class="facts">
-        <div>
-          <dt>Versão</dt>
-          <dd id="detailVersion"></dd>
-        </div>
-
-        <div>
-          <dt>Formato</dt>
-          <dd id="detailType"></dd>
-        </div>
-
-        <div>
-          <dt>Créditos</dt>
-          <dd id="detailCredits"></dd>
-        </div>
-
-        <div>
-          <dt>Origem</dt>
-          <dd id="detailSource"></dd>
-        </div>
-      </dl>
-
-      <a class="download-button"
-         id="downloadButton"
-         target="_blank"
-         rel="noopener noreferrer">
-        Baixar
-      </a>
+      <div class="share-fallback" id="shareFallback" hidden><label for="shareInput">Link deste item</label><input id="shareInput" type="text" readonly></div>
+      <p class="description" id="detailDescription" hidden></p><p class="status-note" id="detailStatus" hidden></p>
+      <section class="detail-section"><h3>Informações do arquivo</h3><dl class="facts"><div><dt>Versão</dt><dd id="detailVersion"></dd></div><div><dt>Formato</dt><dd id="detailType"></dd></div><div><dt>Créditos</dt><dd id="detailCredits"></dd></div><div><dt>Origem</dt><dd id="detailSource"></dd></div></dl><p class="item-activity" id="itemActivity" hidden></p></section>
+      <section class="detail-section" id="relatedSection" hidden><h3>Na mesma categoria</h3><div class="related-grid" id="relatedGrid"></div></section>
     </div>
   </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"><span id="toastMessage"></span><button id="toastAction" type="button" hidden>Desfazer</button></div>
 
   <script>
     'use strict';
-
-    /* =====================================================
-       7. GÊNEROS E SUBGÊNEROS
-
-       Copie os nomes desejados para data-genres.
-       Separe os nomes por vírgula.
-
-       Exemplo:
-       data-genres="RPG, Mundo aberto, Soulslike"
-
-       A lista é aberta:
-       qualquer nome novo escrito no card também é aceito.
-
-       Somente os gêneros usados nos itens aparecem
-       como filtros na página.
-       ===================================================== */
-
+    /* 9. REFERÊNCIA DE GÊNEROS. A lista continua aberta para novas etiquetas. */
     const GENEROS = [
       // Ação e combate
       "Ação", "Ação e aventura", "Arcade",
@@ -1057,439 +687,423 @@
       "Jogos de cassino",
 
       // Etiquetas para aplicativos e arquivos
-      "Emuladores", "Ferramentas"
+      "Emuladores", "Ferramentas",
+      "Gerenciador de modpacks", "Catálogo", "Utilitários"
     ];
 
+    /* 10. ESTADO LOCAL. Não há contas nem servidor de dados pessoais.
+       Histórico = abertura do link; não é confirmação do término no Drive. */
     const get = id => document.getElementById(id);
-
-    const normalize = value => String(value || '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .trim();
-
+    const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const slug = value => normalize(value).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     const unique = values => [...new Set(values)];
+    const KEYS = { favorites: 'z100-favorites-v1', downloads: 'z100-download-history-v1', viewed: 'z100-viewed-v1' };
+    const LIMITS = { history: 100, viewed: 12, shelf: 6 }; // Limites editáveis de armazenamento e exibição.
+    const BASE_TITLE = document.title;
+    const state = { view: 'catalog', query: '', genre: '', type: '', sort: 'source' };
+    const canonicalGenres = new Map(GENEROS.map(genre => [normalize(genre), genre]));
+    const items = [];
+    const byId = new Map();
+    let favorites, downloadHistory, viewed, activeItem = null;
+    let toastTimer, toastUndo, lastFocus, modalOwnsEntry = false;
 
-    let selectedGenre = '';
-
-    // Cria elementos sem interpretar os textos como HTML.
-    function make(tag, className, text) {
-      const element = document.createElement(tag);
-
-      if (className) {
-        element.className = className;
-      }
-
-      if (text !== undefined) {
-        element.textContent = text;
-      }
-
-      return element;
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
     }
-
-    // Aceita somente endereços HTTP ou HTTPS.
+    function icon(name) {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const use = document.createElementNS(svg.namespaceURI, 'use');
+      svg.setAttribute('aria-hidden', 'true'); use.setAttribute('href', '#i-' + name);
+      svg.append(use); return svg;
+    }
     function safeLink(value) {
-      try {
-        const url = new URL(value);
-
-        return ['http:', 'https:'].includes(url.protocol)
-          ? url.href
-          : '';
-      } catch (_) {
-        return '';
+      try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) ? url.href : ''; }
+      catch (_) { return ''; }
+    }
+    function readList(key) {
+      try { const data = JSON.parse(localStorage.getItem(key)); return Array.isArray(data) ? data : []; }
+      catch (_) { return []; }
+    }
+    function writeList(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+      catch (_) { return false; }
+    }
+    function genresOf(value) {
+      const result = [], seen = new Set();
+      const values = Array.isArray(value) ? value : String(value || '').split(',');
+      for (const text of values) {
+        if (typeof text !== 'string') continue;
+        const name = text.trim(), key = normalize(name);
+        if (key && !seen.has(key)) { result.push(canonicalGenres.get(key) || name); seen.add(key); }
       }
+      return result;
     }
-
-    function initials(name) {
-      return name.trim()
-        .split(/\s+/)
-        .slice(0, 2)
-        .map(word => word.charAt(0))
-        .join('')
-        .toUpperCase();
+    function cleanSnapshot(raw) {
+      if (!raw || typeof raw.id !== 'string' || typeof raw.name !== 'string') return null;
+      const item = { id: raw.id, name: raw.name, genres: genresOf(raw.genres) };
+      for (const key of ['image', 'type', 'version', 'credits', 'description', 'status']) item[key] = typeof raw[key] === 'string' ? raw[key] : '';
+      item.download = safeLink(raw.download); item.creditUrl = safeLink(raw.creditUrl);
+      return item;
     }
+    function loadLocalState() {
+      favorites = new Set(readList(KEYS.favorites).filter(id => typeof id === 'string'));
+      downloadHistory = readList(KEYS.downloads).map(record => {
+        const item = cleanSnapshot(record && record.item);
+        return record && typeof record.eventId === 'string' && Number.isFinite(record.at) && item && item.download ? { eventId: record.eventId, at: record.at, item } : null;
+      }).filter(Boolean).sort((a,b) => b.at-a.at).slice(0,LIMITS.history);
+      viewed = readList(KEYS.viewed).filter(record => record && typeof record.id === 'string' && Number.isFinite(record.at)).slice(0,LIMITS.viewed);
+    }
+    loadLocalState();
 
-    // Se a imagem falhar, mostra as iniciais.
-    function watchImage(image, fallback) {
+    /* Imagens mantêm a URL cadastrada; uma falha mostra as iniciais. */
+    function artwork(item, large = false, originalImage = null) {
+      const wrap = el('div', large ? 'card-art' : 'thumb');
+      const fallback = el('span', 'image-fallback', item.name.split(/\s+/).slice(0,2).map(word => word[0] || '').join('').toUpperCase());
+      fallback.setAttribute('aria-hidden', 'true'); wrap.append(fallback);
+      if (!item.image) return wrap;
+      if (large) {
+        const backdrop = el('img', 'art-backdrop'); backdrop.src = item.image; backdrop.alt = ''; backdrop.loading = 'lazy'; backdrop.setAttribute('aria-hidden', 'true'); wrap.append(backdrop);
+      }
+      const image = originalImage || el('img');
+      image.className = large ? 'app-icon' : '';
+      image.alt = item.name; image.loading = 'lazy'; image.decoding = 'async';
+      if (!originalImage) image.src = item.image;
       const update = () => {
-        if (!image.complete) {
-          image.hidden = false;
-          fallback.hidden = false;
-          return;
-        }
-
+        if (!image.complete) { image.hidden = false; return; }
         const loaded = image.naturalWidth > 0;
-
-        image.hidden = !loaded;
-        fallback.hidden = loaded;
+        image.hidden = !loaded; fallback.hidden = loaded; wrap.classList.toggle('has-image', loaded);
       };
-
-      image.addEventListener('load', update);
-      image.addEventListener('error', update);
-
-      update();
+      image.addEventListener('load', update); image.addEventListener('error', update);
+      wrap.append(image); update(); return wrap;
+    }
+    function tagList(item, limit = Infinity) {
+      const tags = el('div', 'tag-list');
+      item.genres.slice(0,limit).forEach(genre => tags.append(el('span', 'tag', genre)));
+      if (item.genres.length > limit) {
+        const more = el('span', 'tag-more', '+' + (item.genres.length-limit));
+        more.title = item.genres.slice(limit).join(', '); tags.append(more);
+      }
+      return tags;
     }
 
-    /* =====================================================
-       8. LEITURA E MONTAGEM DOS CARDS
-
-       Não precisa alterar esta parte ao adicionar itens.
-       ===================================================== */
-
-    const items = [...document.querySelectorAll('#gameGrid > .game-button')]
-      .map(card => {
-        const data = card.dataset;
-        const name = card.querySelector('span').textContent.trim();
-        const image = card.querySelector('img');
-
-        const item = {
-          card,
-          name,
-          image: image ? image.getAttribute('src') : '',
-          keywords: data.game || '',
-          type: data.type || 'Arquivo',
-
-          genres: unique(
-            (data.genres || data.category || '')
-              .split(',')
-              .map(value => value.trim())
-              .filter(Boolean)
-          ),
-
-          version: data.version || 'Não informada',
-          credits: data.credits || 'Não informados',
-          creditUrl: safeLink(data.creditUrl),
-          download: safeLink(data.download),
-          description: data.description || '',
-          status: data.status || ''
-        };
-
-        item.search = normalize([
-          name,
-          item.keywords,
-          item.type,
-          item.version,
-          item.credits,
-          ...item.genres
-        ].join(' '));
-
-        const cover = make('div', 'cover');
-        const fallback = make('span', 'cover-fallback', initials(name));
-
-        fallback.setAttribute('aria-hidden', 'true');
-        cover.append(fallback);
-
-        if (image) {
-          image.alt = name;
-          image.loading = 'lazy';
-          image.decoding = 'async';
-
-          cover.append(image);
-          watchImage(image, fallback);
-        }
-
-        const content = make('div', 'card-content');
-        const tags = make('div', 'tags');
-
-        item.genres.forEach(genre => {
-          tags.append(make('span', 'tag', genre));
-        });
-
-        const bottom = make('div', 'card-bottom');
-
-        bottom.append(
-          make('span', '', item.type),
-          make('b', '', 'Detalhes')
-        );
-
-        content.append(
-          make('h2', 'game-name', name),
-          tags,
-          bottom
-        );
-
-        card.replaceChildren(cover, content);
-
-        // Permite abrir com mouse, toque ou teclado.
-        card.tabIndex = 0;
-        card.setAttribute('role', 'button');
-
-        card.setAttribute(
-          'aria-label',
-          `Detalhes de ${name} — ${item.type}`
-        );
-
-        card.addEventListener('click', () => {
-          openDetails(item);
-        });
-
-        card.addEventListener('keydown', event => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            openDetails(item);
-          }
-        });
-
-        return item;
-      });
-
-    /* =====================================================
-       9. FILTROS AUTOMÁTICOS
-
-       Pesquisa, gênero e formato funcionam juntos.
-       ===================================================== */
-
-    unique(items.map(item => item.type))
-      .sort((a, b) => a.localeCompare(b, 'pt-BR'))
-      .forEach(value => {
-        get('typeFilter').add(new Option(value, value));
-      });
-
-    const usedGenres = unique(
-      items.flatMap(item => item.genres)
-    );
-
-    // Inclui tanto os gêneros da lista quanto os criados por você.
-    const orderedGenres = [
-      ...GENEROS.filter(genre => usedGenres.includes(genre)),
-      ...usedGenres.filter(genre => !GENEROS.includes(genre))
-    ];
-
-    ['', ...orderedGenres].forEach(genre => {
-      const button = make(
-        'button',
-        'genre-button',
-        genre || 'Todos'
-      );
-
-      button.type = 'button';
-      button.dataset.genre = genre;
-
-      button.setAttribute(
-        'aria-pressed',
-        String(!genre)
-      );
-
-      button.addEventListener('click', () => {
-        selectedGenre = genre;
-        filterItems();
-      });
-
-      get('genreFilters').append(button);
+    /* 11. MONTAGEM DOS CARDS. Copiar uma div continua sendo suficiente. */
+    document.querySelectorAll('#gameGrid > .game-button').forEach((card,index) => {
+      const data = card.dataset, image = card.querySelector('img');
+      const name = (card.querySelector('span')?.textContent || data.game || 'Sem título').trim();
+      const type = data.type || 'Arquivo';
+      let id = data.id || slug(name + '-' + type) || 'item';
+      const base = id; let suffix = 2;
+      while (byId.has(id)) id = base + '-' + suffix++;
+      const item = {
+        id, index, card, name, type,
+        image: image?.getAttribute('src') || '',
+        genres: genresOf(data.genres || data.category),
+        version: data.version || 'Não informada', credits: data.credits || 'Não informados',
+        creditUrl: safeLink(data.creditUrl), download: safeLink(data.download),
+        description: data.description || '', status: data.status || '', keywords: data.game || ''
+      };
+      const content = el('div', 'card-info');
+      const footer = el('div', 'card-footer'), hint = el('span', 'detail-hint', 'Detalhes');
+      hint.append(icon('arrow')); footer.append(el('span', 'format-label', type), hint);
+      content.append(el('h3', 'game-name', name), tagList(item,2), footer);
+      const open = el('button', 'card-open'); open.type = 'button';
+      open.setAttribute('aria-label', `Ver detalhes de ${name} — ${type}`);
+      open.addEventListener('click', () => openItem(item));
+      const save = el('button', 'favorite-button'); save.type = 'button'; save.dataset.favorite = id;
+      save.append(icon('heart')); save.addEventListener('click', () => toggleFavorite(item));
+      item.favoriteButton = save;
+      card.replaceChildren(artwork(item,true,image), content, open, save);
+      byId.set(id,item); items.push(item);
     });
 
-    function filterItems() {
-      const terms = normalize(get('searchInput').value)
-        .split(/\s+/)
-        .filter(Boolean);
-
-      const type = get('typeFilter').value;
-
-      let count = 0;
-
-      items.forEach(item => {
-        const visible =
-          terms.every(term => item.search.includes(term)) &&
-          (!type || item.type === type) &&
-          (!selectedGenre || item.genres.includes(selectedGenre));
-
-        item.card.hidden = !visible;
-
-        if (visible) {
-          count++;
-        }
+    function snapshot(item) {
+      const result = {};
+      for (const key of ['id','name','image','type','version','credits','creditUrl','download','description','status']) result[key] = item[key] || '';
+      result.genres = [...item.genres]; return result;
+    }
+    function notify(message, undo = null) {
+      clearTimeout(toastTimer); toastUndo = undo;
+      get('toastMessage').textContent = message; get('toastAction').hidden = !undo;
+      get('toast').classList.add('visible');
+      toastTimer = setTimeout(() => get('toast').classList.remove('visible'), undo ? 8000 : 3300);
+    }
+    get('toastAction').addEventListener('click', () => { const action = toastUndo; toastUndo = null; if(action) action(); notify('Alteração desfeita'); });
+    function syncFavorites() {
+      for (const item of items) {
+        const saved = favorites.has(item.id);
+        item.favoriteButton.setAttribute('aria-pressed', String(saved));
+        item.favoriteButton.setAttribute('aria-label', `${saved ? 'Remover dos favoritos' : 'Favoritar'}: ${item.name} — ${item.type}`);
+        item.favoriteButton.title = saved ? 'Remover dos favoritos' : 'Adicionar aos favoritos';
+      }
+      if (activeItem) {
+        const saved = favorites.has(activeItem.id);
+        get('detailFavorite').setAttribute('aria-pressed',String(saved));
+        get('detailFavoriteText').textContent = saved ? 'Favoritado' : 'Favoritar';
+      }
+      const counts = { favorites: items.filter(item => favorites.has(item.id)).length, history: downloadHistory.length };
+      document.querySelectorAll('[data-count]').forEach(node => { const count = counts[node.dataset.count]; node.textContent = count; node.hidden = !count; });
+    }
+    function toggleFavorite(item) {
+      const wasSaved = favorites.has(item.id);
+      if(wasSaved) favorites.delete(item.id); else favorites.add(item.id);
+      const persistent = writeList(KEYS.favorites,[...favorites]);
+      syncFavorites(); renderView();
+      notify((wasSaved ? 'Removido dos favoritos' : 'Adicionado aos favoritos') + (persistent ? '' : ' · apenas nesta guia'), () => {
+        if(wasSaved) favorites.add(item.id); else favorites.delete(item.id);
+        writeList(KEYS.favorites,[...favorites]); syncFavorites(); renderView();
       });
-
-      document.querySelectorAll('.genre-button').forEach(button => {
-        button.setAttribute(
-          'aria-pressed',
-          String(button.dataset.genre === selectedGenre)
-        );
+    }
+    function rememberViewed(item) {
+      if(!byId.has(item.id)) return;
+      viewed = [{id:item.id,at:Date.now()}, ...viewed.filter(record => record.id !== item.id)].slice(0,LIMITS.viewed);
+      writeList(KEYS.viewed,viewed); renderRecent();
+    }
+    function formatDate(at) { return new Date(at).toLocaleString('pt-BR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+    function sourceName(item) {
+      if(!item.download) return 'Não informada';
+      const host = new URL(item.download).hostname;
+      return {'drive.google.com':'Google Drive','play.google.com':'Google Play','apps.microsoft.com':'Microsoft Store'}[host] || host.replace(/^www\./,'');
+    }
+    function recordDownload(item) {
+      if(!item?.download) return;
+      const eventId = typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2);
+      downloadHistory = [{eventId,at:Date.now(),item:snapshot(item)}, ...downloadHistory].slice(0,LIMITS.history);
+      const persistent = writeList(KEYS.downloads,downloadHistory);
+      syncFavorites(); updateActivity();
+      // Aguarda a ação nativa do link antes de redesenhar uma linha do histórico.
+      setTimeout(() => renderView(),0);
+      notify(persistent ? 'Abertura registrada no histórico' : 'Abertura registrada apenas nesta guia');
+    }
+    function trackDownload(link, itemProvider) {
+      link.addEventListener('click', event => { if(event.button === 0) recordDownload(itemProvider()); });
+      link.addEventListener('auxclick', event => { if(event.button === 1) recordDownload(itemProvider()); });
+    }
+    function mergeHistory(records) {
+      const map = new Map([...downloadHistory,...records].map(record => [record.eventId,record]));
+      downloadHistory = [...map.values()].sort((a,b) => b.at-a.at).slice(0,LIMITS.history);
+      writeList(KEYS.downloads,downloadHistory); syncFavorites(); renderView(); updateActivity();
+    }
+    function removeHistory(record) {
+      downloadHistory = downloadHistory.filter(other => other.eventId !== record.eventId);
+      writeList(KEYS.downloads,downloadHistory); syncFavorites(); renderView();
+      notify('Registro removido',() => mergeHistory([record]));
+    }
+    get('clearHistory').addEventListener('click', () => {
+      const backup = downloadHistory; downloadHistory = [];
+      writeList(KEYS.downloads,downloadHistory); syncFavorites(); renderView();
+      notify('Histórico limpo',() => mergeHistory(backup));
+    });
+    get('clearViewed').addEventListener('click', () => {
+      const backup = viewed; viewed = []; writeList(KEYS.viewed,viewed); renderRecent();
+      notify('Itens recentes removidos',() => {
+        const merged = new Map();
+        [...viewed,...backup].sort((a,b) => b.at-a.at).forEach(record => { if(!merged.has(record.id)) merged.set(record.id,record); });
+        viewed = [...merged.values()].slice(0,LIMITS.viewed); writeList(KEYS.viewed,viewed); renderRecent();
       });
+    });
 
-      get('resultCount').textContent =
-        `${count} ${count === 1 ? 'item' : 'itens'}`;
-
+    /* 12. BUSCA, GÊNEROS, ORDENAÇÃO E AS TRÊS ABAS. */
+    function hasFilters() { return !!(state.query.trim() || state.genre || state.type); }
+    function matches(item) {
+      const text = normalize([item.name,item.keywords,item.type,item.version,item.credits,...item.genres].join(' '));
+      return normalize(state.query).split(/\s+/).filter(Boolean).every(term => text.includes(term))
+        && (!state.genre || item.genres.includes(state.genre)) && (!state.type || item.type === state.type);
+    }
+    function refreshControls() {
+      const types = unique([...items,...downloadHistory.map(record => record.item)].map(item => item.type));
+      get('typeFilter').replaceChildren(new Option('Todos os formatos',''));
+      types.sort((a,b) => a.localeCompare(b,'pt-BR')).forEach(type => get('typeFilter').add(new Option(type,type)));
+      get('typeFilter').value = state.type;
+      const used = unique((state.view === 'history' ? downloadHistory.map(record => record.item) : items).flatMap(item => item.genres));
+      const genres = [...GENEROS.filter(genre => used.includes(genre)),...used.filter(genre => !GENEROS.includes(genre)).sort((a,b) => a.localeCompare(b,'pt-BR'))];
+      get('genreFilters').replaceChildren();
+      ['',...genres].forEach(genre => {
+        const button = el('button','genre-button',genre || 'Todos'); button.type = 'button'; button.dataset.genre = genre;
+        button.addEventListener('click',() => { state.genre = genre; renderView(); }); get('genreFilters').append(button);
+      });
+    }
+    function miniCard(item, className) {
+      const button = el('button',className); button.type = 'button';
+      const copy = el('span','mini-copy'); copy.append(el('span','mini-name',item.name),el('span','mini-meta',item.genres[0] || item.type));
+      button.append(artwork(item),copy); button.addEventListener('click',() => openItem(item)); return button;
+    }
+    function renderRecent() {
+      // Itens salvos ficam na aba Favoritos, inclusive quando já foram vistos.
+      const recent = viewed.map(record => byId.get(record.id)).filter(item => item && !favorites.has(item.id)).slice(0,LIMITS.shelf);
+      get('recentSection').hidden = state.view !== 'catalog' || hasFilters() || !recent.length;
+      get('recentRail').replaceChildren(...recent.map(item => miniCard(item,'recent-card')));
+    }
+    function accessTime(item) {
+      return Math.max(viewed.find(record => record.id === item.id)?.at || 0, downloadHistory.find(record => record.item.id === item.id)?.at || 0);
+    }
+    function renderHistory(records) {
+      const fragment = document.createDocumentFragment();
+      records.forEach(record => {
+        const item = record.item, row = el('div','history-row'), copy = el('div');
+        const title = el('button','history-title',item.name); title.type = 'button'; title.addEventListener('click',() => openItem(item));
+        copy.append(title,el('p','history-meta',item.type + (item.version && item.version !== 'Não informada' ? ' · '+item.version : '') + ' · ' + sourceName(item)),el('p','history-date',formatDate(record.at)));
+        const download = el('a','secondary-button history-redownload','Baixar novamente'); download.href = item.download; download.target = '_blank'; download.rel = 'noopener noreferrer'; download.prepend(icon('download')); trackDownload(download,() => item);
+        const remove = el('button','icon-button history-remove'); remove.type = 'button'; remove.setAttribute('aria-label','Remover registro de '+item.name); remove.append(icon('trash')); remove.addEventListener('click',() => removeHistory(record));
+        row.append(artwork(item),copy,download,remove); fragment.append(row);
+      });
+      get('historyList').replaceChildren(fragment);
+    }
+    function renderView() {
+      syncFavorites(); renderRecent();
+      if(activeItem) renderRelated(activeItem);
+      const historyView = state.view === 'history';
+      get('gameGrid').hidden = historyView; get('historyList').hidden = !historyView;
+      get('sortWrap').hidden = historyView; get('clearHistory').hidden = !historyView || !downloadHistory.length;
+      document.querySelectorAll('[data-view]').forEach(button => {
+        const active = button.dataset.view === state.view; button.classList.toggle('active',active);
+        if(active) button.setAttribute('aria-current','page'); else button.removeAttribute('aria-current');
+      });
+      document.querySelectorAll('.genre-button').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.genre === state.genre)));
+      get('pageTitle').textContent = {catalog:'Catálogo',favorites:'Seus favoritos',history:'Downloads recentes'}[state.view];
+      get('searchInput').placeholder = {catalog:'Pesquisar jogos e aplicativos',favorites:'Pesquisar nos favoritos',history:'Pesquisar no histórico'}[state.view];
+      document.querySelector('label[for="searchInput"]').textContent = {catalog:'Pesquisar no catálogo',favorites:'Pesquisar nos favoritos',history:'Pesquisar no histórico'}[state.view];
+      let count = 0, total = 0;
+      if(historyView) {
+        const records = downloadHistory.filter(record => matches(record.item)); count = records.length; total = downloadHistory.length; renderHistory(records);
+        get('resultCount').textContent = `${count} ${count === 1 ? 'abertura de link registrada' : 'aberturas de links registradas'} neste navegador`;
+      } else {
+        // Favoritar move o item para Favoritos; remover faz voltar ao catálogo.
+        const scope = items.filter(item => state.view === 'favorites' ? favorites.has(item.id) : !favorites.has(item.id)); total = scope.length;
+        const visible = new Set(scope.filter(matches)); count = visible.size;
+        const ordered = [...items];
+        if(state.sort === 'az') ordered.sort((a,b) => a.name.localeCompare(b.name,'pt-BR') || a.index-b.index);
+        if(state.sort === 'recent') ordered.sort((a,b) => accessTime(b)-accessTime(a) || a.index-b.index);
+        const fragment = document.createDocumentFragment();
+        ordered.forEach(item => { item.card.hidden = !visible.has(item); fragment.append(item.card); }); get('gameGrid').append(fragment);
+        get('resultCount').textContent = hasFilters() ? `${count} de ${total} itens` : `${total} ${total === 1 ? 'item' : 'itens'}`;
+      }
+      get('clearSearch').hidden = !state.query; get('searchKey').hidden = !!state.query;
+      get('activeFilters').hidden = !hasFilters();
+      get('filterSummary').textContent = [state.query.trim() ? '“'+state.query.trim()+'”' : '',state.genre,state.type].filter(Boolean).join(' · ');
       get('emptyState').hidden = count > 0;
-
-      get('clearFilters').hidden = !(
-        terms.length ||
-        type ||
-        selectedGenre
-      );
+      const allSaved = state.view === 'catalog' && !total && items.length > 0;
+      let title = 'Nenhum item encontrado', text = 'Tente outro nome ou ajuste os filtros.', symbol = 'search';
+      if(!hasFilters() && allSaved) { title = 'Todos os itens estão nos favoritos'; text = 'Abra a aba Favoritos para acessar seus itens salvos.'; symbol = 'heart'; }
+      if(!hasFilters() && state.view === 'favorites') { title = 'Seus favoritos ficam aqui'; text = 'Toque no coração para salvar jogos e aplicativos.'; symbol = 'heart'; }
+      if(!hasFilters() && historyView) { title = 'Sua próxima abertura aparece aqui'; text = 'Os links que você abrir para baixar ficam registrados neste navegador.'; symbol = 'history'; }
+      get('emptyTitle').textContent = title; get('emptyText').textContent = text; get('emptyIcon').setAttribute('href','#i-'+symbol);
+      get('emptyAction').dataset.viewTarget = allSaved ? 'favorites' : 'catalog';
+      get('emptyAction').replaceChildren(document.createTextNode(hasFilters() ? 'Limpar filtros' : allSaved ? 'Ver favoritos' : 'Explorar catálogo'),icon('arrow'));
     }
-
-    get('searchInput').addEventListener('input', filterItems);
-    get('typeFilter').addEventListener('change', filterItems);
-
-    get('clearFilters').addEventListener('click', () => {
-      get('searchInput').value = '';
-      get('typeFilter').value = '';
-
-      selectedGenre = '';
-
-      filterItems();
-    });
-
-    /* =====================================================
-       10. DETALHES E DOWNLOAD
-
-       Abre o endereço cadastrado em uma nova aba.
-       Os endereços do Google Drive não são convertidos.
-       ===================================================== */
-
-    function sourceName(link) {
-      if (!link) {
-        return 'Não informada';
-      }
-
-      const host = new URL(link).hostname;
-
-      return {
-        'drive.google.com': 'Google Drive',
-        'play.google.com': 'Google Play',
-        'apps.microsoft.com': 'Microsoft Store'
-      }[host] || host;
+    function resetFilters() {
+      state.query = ''; state.genre = ''; state.type = '';
+      get('searchInput').value = ''; get('typeFilter').value = ''; renderView();
     }
+    function viewHash(view) { return {catalog:'',favorites:'#favoritos',history:'#historico'}[view]; }
+    function viewFromHash() { return location.hash === '#favoritos' ? 'favorites' : location.hash === '#historico' ? 'history' : 'catalog'; }
+    function navigate(view) {
+      state.view = view; state.query = ''; state.genre = ''; state.type = '';
+      get('searchInput').value = ''; window.history.replaceState(null,'',location.pathname+location.search+viewHash(view));
+      refreshControls(); renderView(); window.scrollTo({top:0,behavior:'instant'});
+    }
+    document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click',() => navigate(button.dataset.view)));
+    get('searchInput').addEventListener('input',event => { state.query = event.target.value; renderView(); });
+    get('searchForm').addEventListener('submit',event => { event.preventDefault(); get('mainContent').scrollIntoView({block:'start'}); });
+    get('clearSearch').addEventListener('click',() => { state.query = ''; get('searchInput').value = ''; renderView(); get('searchInput').focus(); });
+    get('typeFilter').addEventListener('change',event => { state.type = event.target.value; renderView(); });
+    get('sortSelect').addEventListener('change',event => { state.sort = event.target.value; renderView(); });
+    get('resetFilters').addEventListener('click',resetFilters);
+    get('emptyAction').addEventListener('click',() => hasFilters() ? resetFilters() : navigate(get('emptyAction').dataset.viewTarget));
+    get('backToTop').addEventListener('click',() => window.scrollTo({top:0,behavior:'smooth'}));
 
+    /* 13. DETALHES, LINKS COMPARTILHÁVEIS E ITENS RELACIONADOS. */
     const dialog = get('detailsDialog');
-    const detailImage = get('detailImage');
-
-    watchImage(detailImage, get('detailFallback'));
-
-    function openDetails(item) {
-      get('detailTitle').textContent = item.name;
-      get('detailVersion').textContent = item.version;
-      get('detailType').textContent = item.type;
-      get('detailSource').textContent = sourceName(item.download);
-      get('detailFallback').textContent = initials(item.name);
-
-      detailImage.hidden = true;
-      get('detailFallback').hidden = false;
-
-      if (item.image) {
-        detailImage.src = item.image;
-      } else {
-        detailImage.removeAttribute('src');
-      }
-
-      detailImage.alt = item.name;
-
-      if (detailImage.complete && detailImage.naturalWidth > 0) {
-        detailImage.hidden = false;
-        get('detailFallback').hidden = true;
-      }
-
-      get('detailGenres').replaceChildren();
-
-      item.genres.forEach(genre => {
-        get('detailGenres').append(
-          make('span', 'tag', genre)
-        );
-      });
-
-      for (const [id, text] of [
-        ['detailDescription', item.description],
-        ['detailStatus', item.status]
-      ]) {
-        get(id).textContent = text;
-        get(id).hidden = !text;
-      }
-
-      const credits = get('detailCredits');
-
-      credits.replaceChildren();
-
-      if (item.creditUrl) {
-        const link = make('a', '', item.credits);
-
-        link.href = item.creditUrl;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-
-        credits.append(link);
-      } else {
-        credits.textContent = item.credits;
-      }
-
-      const download = get('downloadButton');
-
-      download.hidden = !item.download;
-
-      if (item.download) {
-        download.href = item.download;
-      } else {
-        download.removeAttribute('href');
-      }
-
-      download.textContent =
-        normalize(item.type) === 'lojas oficiais'
-          ? 'Ver na loja'
-          : 'Baixar';
-
-      dialog.showModal();
+    function updateActivity() {
+      const record = activeItem && downloadHistory.find(record => record.item.id === activeItem.id);
+      get('itemActivity').hidden = !record;
+      get('itemActivity').textContent = record ? 'Última abertura do link: ' + formatDate(record.at) : '';
+    }
+    function renderRelated(item) {
+      const score = other => other.genres.reduce((total,genre) => total + Number(item.genres.includes(genre)),0);
+      const related = items.filter(other => other.id !== item.id && (state.view !== 'catalog' || !favorites.has(other.id)) && score(other) > 0).sort((a,b) => score(b)-score(a) || a.index-b.index).slice(0,3);
+      get('relatedSection').hidden = !related.length; get('relatedGrid').replaceChildren(...related.map(other => miniCard(other,'related-card')));
+    }
+    function renderDetails(item) {
+      activeItem = item; document.title = item.name + ' | Jogos e arquivos';
+      get('detailArtwork').replaceChildren(artwork(item));
+      get('detailTitle').textContent = item.name; get('detailKicker').textContent = item.genres[0] || item.type;
+      get('detailGenres').replaceChildren(...item.genres.map(genre => el('span','tag',genre)));
+      for(const [id,value] of [['detailVersion',item.version || 'Não informada'],['detailType',item.type],['detailSource',sourceName(item)]]) get(id).textContent = value;
+      for(const [id,value] of [['detailDescription',item.description],['detailStatus',item.status]]) { get(id).textContent = value; get(id).hidden = !value; }
+      const credit = get('detailCredits'); credit.replaceChildren();
+      if(item.creditUrl) { const link = el('a','',item.credits); link.href = item.creditUrl; link.target = '_blank'; link.rel = 'noopener noreferrer'; credit.append(link); }
+      else credit.textContent = item.credits || 'Não informados';
+      get('downloadLink').hidden = !item.download;
+      if(item.download) get('downloadLink').href = item.download; else get('downloadLink').removeAttribute('href');
+      get('downloadText').textContent = normalize(item.type) === 'lojas oficiais' ? 'Ver na loja' : 'Baixar';
+      get('shareFallback').hidden = true;
+      renderRelated(item);
+      updateActivity(); syncFavorites();
+    }
+    function openItem(item,fromUrl = false) {
+      const alreadyOpen = dialog.open;
+      if(!alreadyOpen) lastFocus = document.activeElement;
+      renderDetails(item); rememberViewed(item);
+      if(!alreadyOpen) { dialog.showModal(); document.body.classList.add('modal-open'); }
       dialog.scrollTop = 0;
-
-      document.body.classList.add('modal-open');
-    }
-
-    get('closeDetails').addEventListener('click', () => {
-      dialog.close();
-    });
-
-    dialog.addEventListener('close', () => {
-      document.body.classList.remove('modal-open');
-    });
-
-    // Esc fecha nativamente. Clicar no fundo também fecha.
-    dialog.addEventListener('click', event => {
-      const rect = dialog.getBoundingClientRect();
-
-      const outside =
-        event.clientX < rect.left ||
-        event.clientX > rect.right ||
-        event.clientY < rect.top ||
-        event.clientY > rect.bottom;
-
-      if (event.target === dialog && outside) {
-        dialog.close();
+      if(!fromUrl) {
+        const hash = '#item/'+encodeURIComponent(item.id);
+        if(alreadyOpen) window.history.replaceState(window.history.state,'',hash);
+        else { window.history.pushState({z100Modal:true},'',hash); modalOwnsEntry = true; }
       }
-    });
-
-    /* =====================================================
-       11. TEMA CLARO E ESCURO
-       ===================================================== */
-
-    function updateThemeButton() {
-      const dark =
-        document.documentElement.dataset.theme === 'dark';
-
-      get('themeToggle').textContent =
-        dark ? 'Claro' : 'Escuro';
-
-      get('themeToggle').setAttribute(
-        'aria-label',
-        dark ? 'Ativar tema claro' : 'Ativar tema escuro'
-      );
     }
-
-    get('themeToggle').addEventListener('click', () => {
-      const theme =
-        document.documentElement.dataset.theme === 'dark'
-          ? 'light'
-          : 'dark';
-
-      document.documentElement.dataset.theme = theme;
-
-      try {
-        localStorage.setItem('z100-theme', theme);
-      } catch (_) {}
-
-      updateThemeButton();
+    function closeDetails() {
+      if(modalOwnsEntry) { modalOwnsEntry = false; window.history.back(); }
+      else { window.history.replaceState(null,'',location.pathname+location.search+viewHash(state.view)); dialog.close(); }
+    }
+    function syncHash() {
+      let item;
+      try { if(location.hash.startsWith('#item/')) item = byId.get(decodeURIComponent(location.hash.slice(6))); } catch (_) {}
+      if(item) { if(!dialog.open || activeItem?.id !== item.id) openItem(item,true); }
+      else {
+        if(dialog.open) dialog.close(); modalOwnsEntry = false; state.view = viewFromHash(); refreshControls(); renderView();
+      }
+    }
+    get('closeDialog').addEventListener('click',closeDetails);
+    dialog.addEventListener('cancel',event => { event.preventDefault(); closeDetails(); });
+    dialog.addEventListener('close',() => {
+      activeItem = null; document.title = BASE_TITLE; document.body.classList.remove('modal-open');
+      if(lastFocus?.isConnected && !lastFocus.closest('[hidden]')) lastFocus.focus({preventScroll:true});
     });
+    dialog.addEventListener('click',event => { const r = dialog.getBoundingClientRect(); if(event.target === dialog && (event.clientX<r.left || event.clientX>r.right || event.clientY<r.top || event.clientY>r.bottom)) closeDetails(); });
+    get('detailFavorite').addEventListener('click',() => { if(activeItem) toggleFavorite(activeItem); });
+    trackDownload(get('downloadLink'),() => activeItem);
+    get('copyItemLink').addEventListener('click',async () => {
+      if(!activeItem) return;
+      const link = location.href.split('#')[0] + '#item/' + encodeURIComponent(activeItem.id);
+      try { if(!navigator.clipboard?.writeText) throw new Error('clipboard'); await navigator.clipboard.writeText(link); notify('Link copiado'); }
+      catch (_) { get('shareFallback').hidden = false; get('shareInput').value = link; get('shareInput').focus(); get('shareInput').select(); }
+    });
+    window.addEventListener('popstate',syncHash); window.addEventListener('hashchange',syncHash);
 
-    updateThemeButton();
-    filterItems();
+    /* 14. TEMA E SINCRONIZAÇÃO ENTRE ABAS DO MESMO NAVEGADOR. */
+    function updateTheme() {
+      const dark = document.documentElement.dataset.theme === 'dark';
+      get('themeToggle').setAttribute('aria-label',dark ? 'Ativar tema claro' : 'Ativar tema escuro');
+      document.querySelector('meta[name="theme-color"]').content = dark ? '#12151b' : '#f5f6f8';
+    }
+    get('themeToggle').addEventListener('click',() => {
+      const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = theme;
+      try { localStorage.setItem('z100-theme',theme); } catch (_) {} updateTheme();
+    });
+    window.addEventListener('storage',event => {
+      if(Object.values(KEYS).includes(event.key)) { loadLocalState(); refreshControls(); renderView(); if(activeItem) updateActivity(); }
+      if(event.key === 'z100-theme') { document.documentElement.dataset.theme = event.newValue === 'dark' ? 'dark' : 'light'; updateTheme(); }
+    });
+    document.addEventListener('keydown',event => {
+      if((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k' && !dialog.open) { event.preventDefault(); get('searchInput').focus(); }
+    });
+    state.view = viewFromHash(); updateTheme(); refreshControls(); renderView(); syncHash();
+
   </script>
-</body>
+<script type="module">import { mountSiteWidget } from "/_sites/dispatch-assets/sites-widget.js";mountSiteWidget({"kind":"editor-composer","mobileEnabled":false,"environment":"production","chatgptOrigin":"https://chatgpt.com","locale":"pt-BR","accountId":"personal","projectId":"appgprj_6adf6184f5b0819192878072b7bed36a","projectTitle":"Z100 Store — jogos e projetos"});</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50ddb922f36528a',t:'MTc5MzA2MzgxMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
