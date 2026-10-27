@@ -28,9 +28,6 @@ header{position:sticky;top:0;z-index:20;height:56px;display:flex;align-items:cen
 #cav{width:56px;height:56px;border-radius:50%;background:var(--chip)}
 .chan h1{margin:0;font-size:20px;line-height:26px}
 .chan p{margin:2px 0 0;font-size:14px;color:var(--tx2)}
-.upd{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2);text-align:right}
-.pulse{flex:none;width:8px;height:8px;border-radius:50%;background:#2ba640;animation:pu 1.6s infinite}
-@keyframes pu{50%{opacity:.25}}
 .chips{position:sticky;top:56px;z-index:10;display:flex;gap:12px;padding:12px 24px;background:var(--bg);overflow-x:auto}
 .chip{flex:none;height:32px;padding:0 12px;border:0;border-radius:8px;background:var(--chip);color:var(--tx);font:500 14px Roboto,Arial,sans-serif;cursor:pointer}
 .chip.on{background:var(--tx);color:var(--bg)}
@@ -55,7 +52,7 @@ h3{margin:0 0 4px;font-size:16px;line-height:22px;font-weight:500;display:-webki
 .msg{grid-column:1/-1;padding:48px 0;text-align:center;color:var(--tx2)}
 #more{display:block;height:36px;margin:28px auto 40px;padding:0 24px;border-radius:18px}
 #more[hidden]{display:none}
-@media(max-width:640px){.logo span,.pill b{display:none}.chan,.chips{padding-left:16px;padding-right:16px}#grid{padding:8px 0 0;gap:24px}.th{border-radius:0}.row{padding:0 12px}.upd{display:none}}
+@media(max-width:640px){.logo span,.pill b{display:none}.chan,.chips{padding-left:16px;padding-right:16px}#grid{padding:8px 0 0;gap:24px}.th{border-radius:0}.row{padding:0 12px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -75,7 +72,6 @@ h3{margin:0 0 4px;font-size:16px;line-height:22px;font-weight:500;display:-webki
 <section class="chan">
   <img id="cav" alt="">
   <div><h1 id="cname">Carregando…</h1><p id="cmeta"></p></div>
-  <div class="upd"><i class="pulse"></i><span id="upd">Conectando…</span></div>
 </section>
 
 <nav class="chips" aria-label="Ordenar vídeos">
@@ -196,7 +192,6 @@ async function refresh() {
       const el = document.querySelector(`.card[data-id="${v.id}"] .vw`);
       if (el) { el.textContent = views(n); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
     });
-    $('#upd').textContent = 'Visualizações atualizadas às ' + new Date().toLocaleTimeString('pt-BR');
     save();
   } catch (e) { console.error(e); }
 }
@@ -230,11 +225,10 @@ $('#theme').onclick = () => {
     if (!fresh) save();
   } catch (e) {
     console.error(e);
-    if (!cache) { $('#grid').innerHTML = '<p class="msg">Não foi possível carregar os vídeos. Verifique a chave da API e a cota do YouTube Data API.</p>'; $('#cname').textContent = 'Erro ao carregar'; $('#upd').textContent = 'Sem conexão com o YouTube'; return; }
+    if (!cache) { $('#grid').innerHTML = '<p class="msg">Não foi possível carregar os vídeos. Verifique a chave da API e a cota do YouTube Data API.</p>'; $('#cname').textContent = 'Erro ao carregar'; return; }
     st.ch = cache.ch; st.videos = cache.videos;
   }
   header(); render();
-  $('#upd').textContent = 'Atualizando a cada ' + REFRESH_MS / 1000 + ' s';
   if (fresh) refresh();
   setInterval(refresh, REFRESH_MS);
 })();
