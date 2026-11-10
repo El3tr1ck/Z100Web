@@ -118,6 +118,10 @@
   .card-art .image-fallback { position: absolute; width: 102px; height: 102px; background: var(--surface); border-radius: 23px; border: 1px solid var(--line); }
   .card-info { display: flex; flex-direction: column; flex: 1; padding: 17px 17px 15px; }
   .game-name { font-size: 15px; line-height: 1.35; letter-spacing: -.35px; font-weight: 700; min-height: 40px; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .game-summary { color: var(--muted); margin-top: 11px; font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-art.cover-art .app-icon { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0; box-shadow: none; }
+  .card-art.cover-art .art-backdrop { display: none; }
+  .card-art.cover-art .image-fallback { z-index: 0; }
   .tag-list { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 9px; }
   .tag { font-size: 9px; line-height: 1.35; color: var(--muted); background: var(--soft); padding: 4px 6px; border-radius: 5px; }
   .tag-more { font-size: 9px; color: var(--muted); padding-left: 2px; }
@@ -166,7 +170,7 @@
   .detail-actions { display: flex; gap: 9px; margin-top: 25px; align-items: stretch; }
   .detail-actions .primary-button { flex: 1; min-height: 47px; font-size: 13px; }
   .detail-actions .icon-button { min-height: 47px; height: auto; width: 45px; }
-  .description { color: var(--muted); font-size: 13px; white-space: pre-line; line-height: 1.85; margin-top: 24px; overflow-wrap: anywhere; }
+  .description { color: var(--muted); font-size: 13px; white-space: pre-line; line-height: 1.85; overflow-wrap: anywhere; }
   .status-note { color: var(--muted); background: var(--soft); border-left: 3px solid var(--accent); border-radius: 7px; padding: 11px 14px; font-size: 11px; margin-top: 22px; }
   .detail-section { margin-top: 27px; }
   .detail-section h3 { font-size: 15px; letter-spacing: -.35px; margin-bottom: 13px; }
@@ -225,6 +229,7 @@
     .favorite-button svg { width: 14px; height: 14px; }
     .card-info { padding: 12px 11px; }
     .game-name { min-height: 35px; font-size: 13px; letter-spacing: -.2px; }
+    .game-summary { font-size: 10px; margin-top: 9px; }
     .tag-list { gap: 4px; margin-top: 8px; }
     .tag { font-size: 8px; padding: 3px 5px; }
     .tag-more { font-size: 8px; }
@@ -338,8 +343,13 @@
     data-game: palavras extras para pesquisa; data-type: formato do arquivo.
     data-genres: etiquetas separadas por vírgula. A lista GENEROS, no script,
     é uma referência; qualquer nome novo também é aceito automaticamente.
-    data-version, data-credits, data-credit-url, data-description e data-status
-    são opcionais e ficam nos detalhes. Aplicativos usam categorias funcionais.
+    data-version, data-credits, data-credit-url e data-status são opcionais.
+    DESCRIÇÃO: use data-description="Texto breve" OU coloque um elemento
+    <p class="game-description">Descrição completa do jogo...</p> dentro do card.
+    O texto aparece resumido no catálogo e completo ao abrir os detalhes.
+    data-image-fit="cover": imagem preenchendo toda a capa (sem margens).
+    Sem esse atributo, a imagem fica como ícone centralizado.
+    Aplicativos usam categorias funcionais.
     data-id é opcional: use um identificador único e estável ao renomear um item.
     Se copiar um card com data-id, troque esse identificador ou remova o atributo.
     Sem data-id, o identificador é gerado pelo título e formato; atualizar somente
@@ -348,13 +358,15 @@
     MODELO (copie a div para fora deste comentário):
     <div class="game-button" data-game="palavras pesquisáveis" data-type="APK"
           data-genres="RPG, Aventura" data-version="1.0"
+          data-image-fit="cover"
           data-download="https://drive.google.com/file/d/SEU_ID/view">
       <img src="https://seu-site.com/imagem.jpg" alt="Nome do jogo">
       <span>Nome do jogo</span>
+      <p class="game-description">Escreva aqui a descrição do jogo. Pode incluir recursos, requisitos e informações importantes.</p>
     </div>
     -->
 
-    <div class="game-grid" id="gameGrid">
+   <div class="game-grid" id="gameGrid">
       <div class="game-button"
           data-game="myboy"
           data-type="APK"
@@ -363,6 +375,11 @@
           data-download="https://drive.google.com/file/d/137Vb0CXvUJrMQW4-ZjNBcBdwIEPf5FZh/view?usp=sharing">
         <img src="https://play-lh.googleusercontent.com/GmMy8HhuZPLeCep5Op5SOo7hn2S_n9520IZU0G6YStm4qIzzn7AlX1BD9S2jyQ8AOlOWX5hEuHHAM-VGaa8CrTo%3Dw240-h480" alt="My Boy!">
         <span>My Boy!</span>
+        <p class="game-description">
+My Boy! é um emulador de Game Boy Advance para Android. Ele permite executar jogos compatíveis com o console, incluindo títulos de aventura, RPG e plataforma.
+
+Entre seus recursos estão controles na tela, salvamento de progresso e opções de ajuste de emulação. Os jogos não acompanham o aplicativo e devem ser obtidos de fontes autorizadas.
+        </p>
       </div>
 
       <div class="game-button"
@@ -375,24 +392,45 @@
           data-download="https://drive.google.com/file/d/10c2byqf1rLcZ2x5vJm2f2s2kZo0Mn__y/view?usp=sharing">
         <img src="https://i.ibb.co/vCV8TPSk/aurora.png" alt="Aurora Modpack Studio">
         <span>Aurora Modpack Studio</span>
+        <p class="game-description">
+Aurora Modpack Studio é uma ferramenta criada por Eletrickz100 para facilitar a organização e a criação de modpacks de Minecraft.
+
+O projeto reúne funções de gerenciamento de mods, integração com o catálogo do Modrinth e recursos voltados ao trabalho com receitas (craftings). A proposta é simplificar a montagem de um pacote de modificações sem precisar organizar tudo manualmente.
+
+Plataforma: Windows. Versão disponibilizada no catálogo: 1.1.0.
+        </p>
       </div>
 
       <div class="game-button"
           data-game="pokemon"
           data-type="Arquivo"
           data-genres="RPG por turnos, Captura de monstros, RPG, Aventura"
+          data-credits="Game Freak (jogo original)"
           data-download="https://drive.google.com/file/d/1vjGyqWU3_zYIW3nXJhS69_bE7LICh58-/view?usp=sharing">
         <img src="https://www.vgdb.com.br/gf/fotos/games/media_46628/pok-mon-leafgreen-version---46628.jpg" alt="Pokémon Fire Red">
         <span>Pokémon Fire Red</span>
+        <p class="game-description">
+Pokémon FireRed é um RPG de captura e treinamento de criaturas ambientado na região de Kanto. O objetivo é explorar cidades e rotas, enfrentar líderes de ginásio e montar sua equipe de Pokémon.
+
+Lançado originalmente para Game Boy Advance, é uma recriação de Pokémon Red, com gráficos e sistemas atualizados para sua geração.
+
+Esta entrada foi cadastrada como edição em português. A versão específica da tradução e a extensão do arquivo não foram informadas.
+        </p>
       </div>
 
       <div class="game-button"
           data-game="pokemon leaf green"
           data-type="Arquivo"
           data-genres="RPG por turnos, Captura de monstros, RPG, Aventura"
+          data-credits="Game Freak (jogo original)"
           data-download="https://drive.google.com/file/d/1MryHL1oJeQyToBGWjEUyhKPzm7YMgHgP/view?usp=sharing">
         <img src="https://cdn.thegamesdb.net/images/original/boxart/front/2314-1.jpg" alt="Pokémon Leaf Green">
         <span>Pokémon Leaf Green</span>
+        <p class="game-description">
+Pokémon LeafGreen é um RPG de Game Boy Advance que revisita a aventura clássica da região de Kanto. O jogador escolhe seu primeiro Pokémon, explora o mapa, captura criaturas e participa de batalhas por turnos.
+
+É o jogo complementar de Pokémon FireRed, com diferenças na disponibilidade de determinados Pokémon. O idioma e o formato exato do arquivo desta entrada não foram informados.
+        </p>
       </div>
 
       <div class="game-button"
@@ -406,6 +444,13 @@
           data-download="https://drive.google.com/file/d/1RprnbYV6HMnBUV1S9tDe3VfU1H1AkX_n/view?usp=sharing">
         <img src="https://images.dwncdn.net/images/t_app-icon-l/p/da790bef-37c6-4f8f-ae10-0b6acb5580ce/734797589/minecraft-dungeons-logo" alt="Minecraft Dungeons">
         <span>Minecraft Dungeons</span>
+        <p class="game-description">
+Adaptação independente de Minecraft Dungeons para Android, desenvolvida por ParadoxBH. A proposta é levar ao celular uma experiência de aventura e combate em masmorras inspirada no título original.
+
+Esta entrada corresponde ao pacote APK, identificado como versão 3.2b. Trata-se de um projeto de fã, não de um lançamento oficial da Mojang ou da Microsoft.
+
+Estado do projeto: descontinuado e incompleto. O conteúdo disponível pode não representar a experiência integral do jogo original.
+        </p>
       </div>
 
       <div class="game-button"
@@ -419,6 +464,13 @@
           data-download="https://drive.google.com/file/d/1P-pVbqgHZW_kXxn5kQbijMWxJaBCqzA2/view?usp=sharing">
         <img src="https://images.dwncdn.net/images/t_app-icon-l/p/da790bef-37c6-4f8f-ae10-0b6acb5580ce/734797589/minecraft-dungeons-logo" alt="Minecraft Dungeons">
         <span>Minecraft Dungeons</span>
+        <p class="game-description">
+Projeto de fã inspirado em Minecraft Dungeons e desenvolvido por ParadoxBH, com foco em ação, exploração de masmorras e confrontos contra inimigos.
+
+Esta entrada corresponde à versão 2.1b, distribuída em um arquivo compactado RAR. O conteúdo do pacote e a forma de execução dependem dos arquivos presentes no download.
+
+Estado do projeto: descontinuado e incompleto. Não é uma distribuição oficial de Minecraft Dungeons.
+        </p>
       </div>
 
       <div class="game-button"
@@ -426,9 +478,18 @@
           data-type="Arquivo"
           data-genres="RPG por turnos, Captura de monstros, RPG, Aventura"
           data-version="Edição Emerald"
+          data-credits="TenmaRH (projeto de fã)"
+          data-credit-url="https://www.pokemonquetzal.app/pt-br/"
           data-download="https://drive.google.com/file/d/142HqtV8hFlK7mkBuOU8vv9MnajbO3JIs/view?usp=sharing">
         <img src="https://cdn2.steamgriddb.com/grid/4f9391d130076f4446a2654b34fdc507.png" alt="Pokémon Quetzal">
         <span>Pokémon Quetzal</span>
+        <p class="game-description">
+Pokémon Quetzal é uma modificação de fã baseada em Pokémon Emerald, criada por TenmaRH. O projeto amplia a aventura clássica com opções de multijogador, Pokémon de gerações posteriores e mecânicas de batalha mais modernas.
+
+Algumas edições oferecem personagens selecionáveis e Pokémon que acompanham o treinador durante a exploração. A disponibilidade de cada recurso depende da versão do projeto.
+
+Esta entrada foi identificada como Edição Emerald. É um projeto não oficial, e a versão exata do arquivo disponibilizado não foi informada.
+        </p>
       </div>
 
       <div class="game-button"
@@ -436,9 +497,17 @@
           data-type="APK"
           data-genres="Fazenda, Simulação de vida, RPG, Simulação"
           data-version="1.6.15.3"
+          data-credits="ConcernedApe (jogo original)"
           data-download="https://drive.google.com/file/d/16ohUKXgfJFky6WooxRpUuEYig-Djshzg/view?usp=sharing">
         <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/0d55ae41-e76d-4375-b2d9-5b40b36a2f82/dehzxxr-72b13630-0a09-4aa5-b442-1d752c6f6971.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzBkNTVhZTQxLWU3NmQtNDM3NS1iMmQ5LTViNDBiMzZhMmY4MlwvZGVoenh4ci03MmIxMzYzMC0wYTA5LTRhYTUtYjQ0Mi0xZDc1MmM2ZjY5NzEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.gQRDyl3DhBW2uywDMwt8CD4hYRqI5JG2GWHBBGNphJY" alt="Stardew Valley">
         <span>Stardew Valley</span>
+        <p class="game-description">
+Stardew Valley é um jogo de simulação de vida em que você assume uma fazenda, cultiva alimentos, cria animais e desenvolve relações com os moradores de uma pequena cidade.
+
+Além da agricultura, o jogo inclui pesca, mineração, exploração de cavernas e melhorias na propriedade. É uma experiência aberta, sem exigir que todas as atividades sejam realizadas na mesma ordem.
+
+Esta entrada está identificada como pacote APK para Android, versão 1.6.15.3.
+        </p>
       </div>
 
       <div class="game-button"
@@ -446,9 +515,17 @@
           data-type="APK"
           data-genres="Sandbox, Aventura, Sobrevivência, Construção"
           data-version="1.4.5.6.4"
+          data-credits="Re-Logic (jogo original)"
           data-download="https://drive.google.com/file/d/19wia05FcTi_9kBC8pZHW6Q4xgV8nrZll/view?usp=sharing">
         <img src="https://pt.quizur.com/_image?href=https%3A%2F%2Fimg.quizur.com%2Ff%2Fimg5dd9deecc98853.91042522.jpg%3FlastEdited%3D1574559475%3Fo%3Dfeed&amp;w=250&amp;h=300&amp;f=webp" alt="Terraria">
         <span>Terraria</span>
+        <p class="game-description">
+Terraria é um jogo de exploração e sobrevivência em um mundo 2D formado por blocos. O jogador coleta materiais, constrói abrigos, fabrica equipamentos e enfrenta criaturas e chefes.
+
+A progressão mistura construção livre, exploração subterrânea e combates que liberam novos recursos e áreas.
+
+Esta entrada foi cadastrada como APK para Android, versão 1.4.5.6.4.
+        </p>
       </div>
 
       <div class="game-button"
@@ -456,9 +533,15 @@
           data-type="Arquivo"
           data-genres="Sandbox, Aventura, Sobrevivência, Construção"
           data-version="1.4.5.6"
+          data-credits="Re-Logic (jogo original)"
           data-download="https://drive.google.com/file/d/1rSt3HOvcA1MLhuNFUwF7CRfI0ap-xIOc/view?usp=sharing">
         <img src="https://pt.quizur.com/_image?href=https%3A%2F%2Fimg.quizur.com%2Ff%2Fimg5dd9deecc98853.91042522.jpg%3FlastEdited%3D1574559475%3Fo%3Dfeed&amp;w=250&amp;h=300&amp;f=webp" alt="Terraria">
         <span>Terraria</span>
+        <p class="game-description">
+Terraria combina construção, mineração, exploração e combate em um universo 2D gerado proceduralmente. É possível desenvolver uma base, encontrar biomas variados e melhorar armas e armaduras para enfrentar desafios mais difíceis.
+
+Esta entrada está identificada como versão 1.4.5.6. A plataforma de destino e a extensão real do arquivo não foram informadas no cadastro.
+        </p>
       </div>
 
       <div class="game-button"
@@ -466,12 +549,19 @@
           data-type="Lojas oficiais"
           data-genres="Roguelike tradicional, Dungeon crawler, RPG por turnos, RPG"
           data-version="Consulte a loja"
+          data-credits="Rodrigo Pan (esta edição)"
           data-download="https://play.google.com/store/apps/details?id=br.com.rodriformiga.pixeldungeon">
         <img src="https://play-lh.googleusercontent.com/mitfjESw9ISs_NcriECeVQn8LqpVrR2zGv3fTNoChpR6t7_gNDK-a-EpT96aZSG8gg=w480-h960-rw" alt="Pixel Dungeon BR">
         <span>Pixel Dungeon BR</span>
+        <p class="game-description">
+Pixel Dungeon BR é um RPG roguelike de exploração de masmorras, com gráficos em pixel art e batalhas por turnos. A cada partida, o jogador encontra níveis gerados aleatoriamente, monstros, armadilhas e itens que exigem decisões estratégicas.
+
+Esta edição oferece interface e textos em português brasileiro, com diferentes classes de personagem e progressão baseada na descoberta de equipamentos e recursos.
+
+Disponível pela loja oficial indicada no catálogo. É um projeto de código aberto baseado no Pixel Dungeon original.
+        </p>
       </div>
 
-<div class="game-grid" id="gameGrid">
     <div class="game-button"
         data-game="journeypack"
         data-type="ZIP"
@@ -481,6 +571,13 @@
         data-download="https://drive.google.com/file/d/1Qm5wyltr1GY9rfA99y1ADR7qvgb_f_-R/view?usp=sharing">
       <img src="https://i.ibb.co/My78DTPS/flower.png" alt="journeypack">
       <span>journeypack</span>
+        <p class="game-description">
+JourneyPack é um modpack organizado por Eletrickz100 para Minecraft Java 1.20.1, voltado a quem procura uma experiência de sobrevivência, exploração e aventura com modificações no jogo.
+
+O conteúdo é distribuído em um arquivo ZIP. Antes de instalar, confira quais mods, dependências e carregador de modificações fazem parte do pacote, pois a compatibilidade depende da configuração incluída.
+
+Versão de Minecraft indicada: Java 1.20.1. A lista detalhada de mods não foi fornecida no cadastro.
+        </p>
     </div>
 
       <div class="game-button"
@@ -488,9 +585,17 @@
           data-type="Lojas oficiais"
           data-genres="Roguelike tradicional, Dungeon crawler, RPG por turnos, RPG"
           data-version="Consulte a loja"
+          data-credits="Watabou (jogo original)"
           data-download="https://apps.microsoft.com/detail/9p94wzvrlnw0?hl=pt-br&amp;gl=BR">
         <img src="https://play-lh.googleusercontent.com/mitfjESw9ISs_NcriECeVQn8LqpVrR2zGv3fTNoChpR6t7_gNDK-a-EpT96aZSG8gg=w480-h960-rw" alt="Pixel Dungeon">
         <span>Pixel Dungeon</span>
+        <p class="game-description">
+Pixel Dungeon é um RPG roguelike de masmorras em pixel art. Cada partida apresenta salas, inimigos e itens diferentes, exigindo planejamento para avançar e sobreviver.
+
+O combate é por turnos, com exploração de ambientes, uso de equipamentos e gerenciamento de recursos. A dificuldade e a aleatoriedade são partes centrais da experiência.
+
+Esta entrada direciona para a Microsoft Store. A versão disponível deve ser conferida na página da loja.
+        </p>
       </div>
 
       <div class="game-button"
@@ -502,6 +607,13 @@
           data-download="https://drive.google.com/file/d/1CrRLOYUC8NuEPo13MIHY-kr-B8SY_P-g/view?usp=sharing">
         <img src="https://i.ibb.co/nNc5StbR/Z100.png" alt="Z100web">
         <span>Z100web</span>
+        <p class="game-description">
+Z100web é o aplicativo do catálogo de jogos, ferramentas e arquivos reunidos por Eletrickz100. Seu objetivo é facilitar a consulta de títulos e o acesso às páginas e links cadastrados.
+
+O catálogo oferece organização por categorias e formatos, pesquisa de itens, favoritos e histórico local de acesso aos links, conforme os recursos disponíveis na versão utilizada.
+
+Esta entrada fornece o aplicativo em formato APK para Android.
+        </p>
       </div>
 
       <div class="game-button"
@@ -509,18 +621,32 @@
           data-type="APK"
           data-genres="Emuladores"
           data-version="1.20.4"
+          data-credits="Equipe PPSSPP (emulador)"
           data-download="https://drive.google.com/file/d/1rdFCini1RY0vht2G5uzQHegQl1AtB-tS/view?usp=sharing">
         <img src="https://pic.clubic.com/v1/images/2358814/raw" alt="PPSSPP Gold">
         <span>PPSSPP Gold</span>
+        <p class="game-description">
+PPSSPP Gold é uma edição do emulador PPSSPP para executar jogos de PlayStation Portable (PSP) em dispositivos compatíveis.
+
+O programa oferece controles virtuais, ajustes de desempenho e opções gráficas que podem melhorar a experiência em comparação com o hardware original, dependendo do aparelho.
+
+Esta entrada está identificada como APK para Android, versão 1.20.4. O emulador não inclui os jogos.
+        </p>
       </div>
 
       <div class="game-button"
           data-game="pokemon black portugues"
           data-type="Arquivo"
           data-genres="RPG por turnos, Captura de monstros, RPG, Aventura"
+          data-credits="Game Freak (jogo original)"
           data-download="https://drive.google.com/file/d/16bfLiEimvfZc5E0iEs4_rng0Kp78yxD3/view?usp=sharing">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRk-wyer_Vk26nTQvPmIavfLBuLyU5xeDYSsqjUF1k__7QnEN_C5tZeTEfMV8U_suZC426F2ky_giGJbTVO1mkXwffo81vEKX8O8qmmag" alt="Pokémon Black">
         <span>Pokémon Black</span>
+        <p class="game-description">
+Pokémon Black é um RPG lançado originalmente para Nintendo DS e ambientado na região de Unova. O jogador acompanha uma jornada de captura, treinamento e batalhas de Pokémon enquanto enfrenta líderes de ginásio e uma história centrada na relação entre humanos e criaturas.
+
+A versão original apresenta uma geração própria de Pokémon e batalhas por turnos. A entrada foi cadastrada com referência a português, mas o idioma exato do arquivo disponibilizado não foi confirmado.
+        </p>
       </div>
 
       <div class="game-button"
@@ -528,9 +654,17 @@
           data-type="APK"
           data-genres="Sandbox, Sobrevivência, Construção"
           data-version="26.33.1"
+          data-credits="Mojang Studios (jogo original)"
           data-download="https://drive.google.com/file/d/1rNVrNsH2-Bu40dcXs3JVW4SM8RRMAgyl/view?usp=sharing">
         <img src="https://minecraft.wiki/images/Bedrock_Edition_App_Store_icon_2.png?ec415" alt="Minecraft Bedrock">
         <span>Minecraft Bedrock</span>
+        <p class="game-description">
+Minecraft Bedrock é uma edição de Minecraft disponível em diferentes plataformas, incluindo Android. O jogador pode explorar mundos feitos de blocos, coletar materiais, criar ferramentas e construir estruturas.
+
+Os modos Sobrevivência e Criativo permitem estilos de jogo diferentes, e o multijogador depende da versão e das condições de conexão.
+
+Esta entrada está cadastrada como APK para Android, versão 26.33.1. Confira a compatibilidade do aplicativo com o seu dispositivo.
+        </p>
       </div>
 
       <div class="game-button"
@@ -538,9 +672,17 @@
           data-type="RAR"
           data-genres="Fazenda, Simulação de vida, RPG, Simulação"
           data-version="1.6.15"
+          data-credits="ConcernedApe (jogo original)"
           data-download="https://drive.google.com/file/d/1aTLNX2q1a11hsrbtFFgv2p60TgyBJcGd/view?usp=sharing">
         <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/0d55ae41-e76d-4375-b2d9-5b40b36a2f82/dehzxxr-72b13630-0a09-4aa5-b442-1d752c6f6971.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzBkNTVhZTQxLWU3NmQtNDM3NS1iMmQ5LTViNDBiMzZhMmY4MlwvZGVoenh4ci03MmIxMzYzMC0wYTA5LTRhYTUtYjQ0Mi0xZDc1MmM2ZjY5NzEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.gQRDyl3DhBW2uywDMwt8CD4hYRqI5JG2GWHBBGNphJY" alt="Stardew Valley">
         <span>Stardew Valley</span>
+        <p class="game-description">
+Stardew Valley é uma simulação de fazenda e vida em comunidade. Além de plantar e criar animais, o jogador pode pescar, minerar, melhorar a casa e conhecer os habitantes da cidade.
+
+A progressão é aberta: cada pessoa escolhe suas prioridades, seja produzir mais na fazenda, explorar cavernas ou participar de eventos locais.
+
+Esta entrada corresponde a um arquivo compactado RAR, identificado como versão 1.6.15. A plataforma e o método de instalação dependem do conteúdo do pacote.
+        </p>
       </div>
 
       <div class="game-button"
@@ -549,9 +691,17 @@
           data-genres="Run and gun, Plataforma 2D, Ação"
           data-credits="Gabe Developer"
           data-credit-url="https://www.youtube.com/@GabeDeveloper"
+          data-status="Projeto de fã não oficial."
           data-download="https://drive.google.com/file/d/13mp2mncHss7qaRv0qiFX_61HAnT-sWV_/view?usp=sharing">
         <img src="https://image.api.playstation.com/vulcan/img/cfn/11307fllh6D-IvbpCa18N0vRggVeRYWA06paTNCj3DENJMScAzW2f3ry4IwFcXBAt9kWXdZGpGoOGjxJ_e9MdordMVAosNhZ.png?w=440" alt="Cuphead Mobile">
         <span>Cuphead Mobile</span>
+        <p class="game-description">
+Cuphead Mobile é um projeto independente de fã para Android, desenvolvido por Gabe Developer, inspirado no jogo de ação e plataforma Cuphead, criado originalmente pela Studio MDHR.
+
+A proposta é recriar no celular elementos do estilo visual desenhado à mão, da movimentação e dos combates contra chefes característicos do jogo original.
+
+Não é uma versão oficial da Studio MDHR. Como se trata de um projeto de fã, o conteúdo e as funcionalidades podem ser diferentes dos apresentados no jogo original.
+        </p>
       </div>
     </div>
     <div class="history-list" id="historyList" hidden></div>
@@ -581,7 +731,8 @@
       <button class="icon-button" id="copyItemLink" type="button" aria-label="Copiar link deste item"><svg aria-hidden="true"><use href="#i-link"/></svg></button>
     </div>
     <div class="share-fallback" id="shareFallback" hidden><label for="shareInput">Link deste item</label><input id="shareInput" type="text" readonly></div>
-    <p class="description" id="detailDescription" hidden></p><p class="status-note" id="detailStatus" hidden></p>
+    <section class="detail-section" id="detailDescriptionSection" hidden><h3>Descrição</h3><p class="description" id="detailDescription"></p></section>
+    <p class="status-note" id="detailStatus" hidden></p>
     <section class="detail-section"><h3>Informações do arquivo</h3><dl class="facts"><div><dt>Versão</dt><dd id="detailVersion"></dd></div><div><dt>Formato</dt><dd id="detailType"></dd></div><div><dt>Créditos</dt><dd id="detailCredits"></dd></div><div><dt>Origem</dt><dd id="detailSource"></dd></div></dl><p class="item-activity" id="itemActivity" hidden></p></section>
     <section class="detail-section" id="relatedSection" hidden><h3>Na mesma categoria</h3><div class="related-grid" id="relatedGrid"></div></section>
   </div>
@@ -774,6 +925,7 @@
   /* Imagens mantêm a URL cadastrada; uma falha mostra as iniciais. */
   function artwork(item, large = false, originalImage = null) {
     const wrap = el('div', large ? 'card-art' : 'thumb');
+    if (large && item.imageFit === 'cover') wrap.classList.add('cover-art');
     const fallback = el('span', 'image-fallback', item.name.split(/\s+/).slice(0,2).map(word => word[0] || '').join('').toUpperCase());
     fallback.setAttribute('aria-hidden', 'true'); wrap.append(fallback);
     if (!item.image) return wrap;
@@ -805,6 +957,7 @@
   /* 11. MONTAGEM DOS CARDS. Copiar uma div continua sendo suficiente. */
   document.querySelectorAll('#gameGrid > .game-button').forEach((card,index) => {
     const data = card.dataset, image = card.querySelector('img');
+    const descriptionNode = card.querySelector(':scope > .game-description');
     const name = (card.querySelector('span')?.textContent || data.game || 'Sem título').trim();
     const type = data.type || 'Arquivo';
     let id = data.id || slug(name + '-' + type) || 'item';
@@ -816,12 +969,16 @@
       genres: genresOf(data.genres || data.category),
       version: data.version || 'Não informada', credits: data.credits || 'Não informados',
       creditUrl: safeLink(data.creditUrl), download: safeLink(data.download),
-      description: data.description || '', status: data.status || '', keywords: data.game || ''
+      description: (data.description || descriptionNode?.textContent || '').trim(),
+      imageFit: data.imageFit === 'cover' ? 'cover' : 'icon',
+      status: data.status || '', keywords: data.game || ''
     };
     const content = el('div', 'card-info');
     const footer = el('div', 'card-footer'), hint = el('span', 'detail-hint', 'Detalhes');
     hint.append(icon('arrow')); footer.append(el('span', 'format-label', type), hint);
-    content.append(el('h3', 'game-name', name), tagList(item,2), footer);
+    content.append(el('h3', 'game-name', name), tagList(item,2));
+    if (item.description) content.append(el('p', 'game-summary', item.description));
+    content.append(footer);
     const open = el('button', 'card-open'); open.type = 'button';
     open.setAttribute('aria-label', `Ver detalhes de ${name} — ${type}`);
     open.addEventListener('click', () => openItem(item));
@@ -921,7 +1078,7 @@
   /* 12. BUSCA, GÊNEROS, ORDENAÇÃO E AS TRÊS ABAS. */
   function hasFilters() { return !!(state.query.trim() || state.genre || state.type); }
   function matches(item) {
-    const text = normalize([item.name,item.keywords,item.type,item.version,item.credits,...item.genres].join(' '));
+    const text = normalize([item.name,item.keywords,item.type,item.version,item.credits,item.description,...item.genres].join(' '));
     return normalize(state.query).split(/\s+/).filter(Boolean).every(term => text.includes(term))
       && (!state.genre || item.genres.includes(state.genre)) && (!state.type || item.type === state.type);
   }
@@ -1050,7 +1207,10 @@
     get('detailTitle').textContent = item.name; get('detailKicker').textContent = item.genres[0] || item.type;
     get('detailGenres').replaceChildren(...item.genres.map(genre => el('span','tag',genre)));
     for(const [id,value] of [['detailVersion',item.version || 'Não informada'],['detailType',item.type],['detailSource',sourceName(item)]]) get(id).textContent = value;
-    for(const [id,value] of [['detailDescription',item.description],['detailStatus',item.status]]) { get(id).textContent = value; get(id).hidden = !value; }
+    get('detailDescription').textContent = item.description;
+    get('detailDescriptionSection').hidden = !item.description;
+    get('detailStatus').textContent = item.status;
+    get('detailStatus').hidden = !item.status;
     const credit = get('detailCredits'); credit.replaceChildren();
     if(item.creditUrl) { const link = el('a','',item.credits); link.href = item.creditUrl; link.target = '_blank'; link.rel = 'noopener noreferrer'; credit.append(link); }
     else credit.textContent = item.credits || 'Não informados';
